@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Код</title>
+    <style>
+        body { font-family: sans-serif; margin: 50px; }
+        .error { color: red; display: none; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <h2>Введите код участника:</h2>
+    
+    <input type="text" id="userInput" placeholder="Введите значение...">
+    <button onclick="checkValue()">Войти</button>
+
+    <p id="errorMessage" class="error">Ошибка</p>
+
+    <script>
+        // Список разрешенных значений
+        const allowedValues = ["ДОСТУП", "КОНФЕТА", "ДОМ", "ПОЧТА"];
+
+        // URL-адрес для перенаправления
+        const redirectUrl = "final.html";
+
+        function checkValue() {
+            // Получаем значение из поля ввода и убираем лишние пробелы
+            const input = document.getElementById("userInput").value.trim();
+            const errorText = document.getElementById("errorMessage");
+
+            // Проверяем, есть ли введенное значение в нашем списке
+            if (allowedValues.includes(input)) {
+                errorText.style.display = "none";
+                window.location.href = redirectUrl; // Перенаправление
+            } else {
+                errorText.style.display = "block"; // Показываем ошибку
+            }
+        }
+    </script>
+
+</body>
+</html>
