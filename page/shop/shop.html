@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Магазин Заря</title>
+  <title>Сбор средств</title>
   <style>
     body {
       background-color: #f0f2f5;
@@ -51,7 +51,8 @@
       height: 100%;
       background: linear-gradient(90deg, #4f46e5, #7c3aed);
       border-radius: 5px;
-      width: 3.11%;
+      width: 0%; /* Изначально 0, вычисляется через JS */
+      transition: width 0.5s ease-out; /* Плавная анимация при загрузке */
     }
 
     .stats-container {
@@ -149,17 +150,19 @@
     </div>
     
     <div class="progress-container">
-      <div class="progress-bar"></div>
+      <div class="progress-bar" id="progress-bar"></div>
     </div>
     
     <div class="stats-container">
       <div class="stat-item">
         <span class="stat-label">Собрано</span>
-        <span class="stat-value">2 000 000 ₽</span>
+        <!-- Добавлен id для отслеживания текущей суммы -->
+        <span class="stat-value" id="current-amount">1 000 340 ₽</span>
       </div>
       <div class="stat-item">
         <span class="stat-label">Цель</span>
-        <span class="stat-value">2 100 000 ₽</span>
+        <!-- Добавлен id для отслеживания целевой суммы -->
+        <span class="stat-value" id="target-amount">2 100 000 ₽</span>
       </div>
     </div>
 
@@ -177,10 +180,35 @@
   </div>
 
   <script>
+    // Элементы для управления кнопками и инпутом
     const buttons = document.querySelectorAll('.amount-btn');
     const input = document.getElementById('amount-input');
     const submitBtn = document.getElementById('submit-btn');
 
+    // Элементы для расчета шкалы прогресса
+    const progressBar = document.getElementById('progress-bar');
+    const currentAmountEl = document.getElementById('current-amount');
+    const targetAmountEl = document.getElementById('target-amount');
+
+    // Функция автоматического обновления шкалы
+    function updateProgressBar() {
+      // Извлекаем только цифры из текста (удаляем пробелы и знак ₽)
+      const current = parseFloat(currentAmountEl.textContent.replace(/[^\d]/g, '')) || 0;
+      const target = parseFloat(targetAmountEl.textContent.replace(/[^\d]/g, '')) || 1;
+
+      // Считаем процент и ограничиваем его в диапазоне от 0 до 100
+      let percentage = (current / target) * 100;
+      if (percentage > 100) percentage = 100;
+      if (percentage < 0) percentage = 0;
+
+      // Устанавливаем ширину шкалы
+      progressBar.style.width = `${percentage}%`;
+    }
+
+    // Запускаем расчет сразу при загрузке страницы
+    updateProgressBar();
+
+    // Логика клика по кнопкам с фиксированной суммой
     buttons.forEach(button => {
       button.addEventListener('click', () => {
         buttons.forEach(btn => btn.classList.remove('active'));
@@ -189,6 +217,7 @@
       });
     });
 
+    // Логика ручного ввода суммы в инпут
     input.addEventListener('input', () => {
       buttons.forEach(button => {
         if (button.getAttribute('data-amount') === input.value) {
@@ -199,6 +228,7 @@
       });
     });
 
+    // Имитация нажатия главной кнопки
     submitBtn.addEventListener('click', () => {
       alert(`Вы выбрали сумму: ${input.value} ₽. (Здесь будет переход к оплате)`);
     });
