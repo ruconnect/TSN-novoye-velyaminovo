@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Сбор средств</title>
+  <style>
+    body {
+      background-color: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .donation-widget {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      width: 100%;
+      max-width: 380px;
+      background-color: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      padding: 24px;
+      box-sizing: border-box;
+    }
+
+    .widget-header h2 {
+      margin: 0 0 8px 0;
+      font-size: 20px;
+      color: #1a1a1a;
+    }
+
+    .widget-header p {
+      margin: 0 0 20px 0;
+      font-size: 14px;
+      color: #666666;
+      line-height: 1.4;
+    }
+
+    .progress-container {
+      width: 100%;
+      height: 10px;
+      background-color: #eef2f5;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #4f46e5, #7c3aed);
+      border-radius: 5px;
+      width: 0%; /* Изначально 0, вычисляется через JS */
+      transition: width 0.5s ease-out; /* Плавная анимация при загрузке */
+    }
+
+    .stats-container {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: #8c8c8c;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    .amount-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .amount-btn {
+      background-color: #f3f4f6;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #4b5563;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .amount-btn:hover {
+      background-color: #e5e7eb;
+    }
+
+    .amount-btn.active {
+      background-color: #f5f3ff;
+      border-color: #7c3aed;
+      color: #7c3aed;
+    }
+
+    .custom-amount input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+      box-sizing: border-box;
+      margin-bottom: 20px;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .custom-amount input:focus {
+      border-color: #7c3aed;
+    }
+
+    .donate-submit-btn {
+      width: 100%;
+      background-color: #7c3aed;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .donate-submit-btn:hover {
+      background-color: #6d28d9;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="donation-widget">
+    <div class="widget-header">
+      <h2>Сбор на открытие магазина</h2>
+      <p>Магазин Заря. Магазин натуралтной пищи. Сыр, Молоко, яйца, малина, клубника, йогурт.</p>
+    </div>
+    
+    <div class="progress-container">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    
+    <div class="stats-container">
+      <div class="stat-item">
+        <span class="stat-label">Собрано</span>
+        <!-- Добавлен id для отслеживания текущей суммы -->
+        <span class="stat-value" id="current-amount">340 560 ₽</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Цель</span>
+        <!-- Добавлен id для отслеживания целевой суммы -->
+        <span class="stat-value" id="target-amount">2 100 000 ₽</span>
+      </div>
+    </div>
+
+    <div class="amount-buttons">
+      <button class="amount-btn" data-amount="100">100 ₽</button>
+      <button class="amount-btn active" data-amount="500">500 ₽</button>
+      <button class="amount-btn" data-amount="1000">1 000 ₽</button>
+    </div>
+
+    <div class="custom-amount">
+      <input type="number" id="amount-input" placeholder="Другая сумма, ₽" min="1" value="500">
+    </div>
+
+    <button class="donate-submit-btn" id="submit-btn">Поддержать проект</button>
+  </div>
+
+  <script>
+    // Элементы для управления кнопками и инпутом
+    const buttons = document.querySelectorAll('.amount-btn');
+    const input = document.getElementById('amount-input');
+    const submitBtn = document.getElementById('submit-btn');
+
+    // Элементы для расчета шкалы прогресса
+    const progressBar = document.getElementById('progress-bar');
+    const currentAmountEl = document.getElementById('current-amount');
+    const targetAmountEl = document.getElementById('target-amount');
+
+    // Функция автоматического обновления шкалы
+    function updateProgressBar() {
+      // Извлекаем только цифры из текста (удаляем пробелы и знак ₽)
+      const current = parseFloat(currentAmountEl.textContent.replace(/[^\d]/g, '')) || 0;
+      const target = parseFloat(targetAmountEl.textContent.replace(/[^\d]/g, '')) || 1;
+
+      // Считаем процент и ограничиваем его в диапазоне от 0 до 100
+      let percentage = (current / target) * 100;
+      if (percentage > 100) percentage = 100;
+      if (percentage < 0) percentage = 0;
+
+      // Устанавливаем ширину шкалы
+      progressBar.style.width = `${percentage}%`;
+    }
+
+    // Запускаем расчет сразу при загрузке страницы
+    updateProgressBar();
+
+    // Логика клика по кнопкам с фиксированной суммой
+    buttons.forEach(button => {
+      button.addEventListener('click', () => {
+        buttons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        input.value = button.getAttribute('data-amount');
+      });
+    });
+
+    // Логика ручного ввода суммы в инпут
+    input.addEventListener('input', () => {
+      buttons.forEach(button => {
+        if (button.getAttribute('data-amount') === input.value) {
+          button.classList.add('active');
+        } else {
+          button.classList.remove('active');
+        }
+      });
+    });
+
+    // Имитация нажатия главной кнопки
+    submitBtn.addEventListener('click', () => {
+      alert(`Вы выбрали сумму: ${input.value} ₽. (Здесь будет переход к оплате)`);
+    });
+  </script>
+</body>
+</html>
