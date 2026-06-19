@@ -1,7 +1,10 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Магазин Заря</title>
   <style>
-    /* Центрирование виджета на странице для демонстрации */
     body {
       background-color: #f0f2f5;
       display: flex;
@@ -11,7 +14,6 @@
       margin: 0;
     }
 
-    /* Стили виджета */
     .donation-widget {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       width: 100%;
@@ -49,6 +51,7 @@
       height: 100%;
       background: linear-gradient(90deg, #4f46e5, #7c3aed);
       border-radius: 5px;
+      width: 3.11%;
     }
 
     .stats-container {
@@ -141,12 +144,12 @@
 
   <div class="donation-widget">
     <div class="widget-header">
-      <h2>Сбор на открытия магазина</h2>
-      <p>Магазин Заря.</p>
+      <h2>Сбор на открытие магазина</h2>
+      <p>Магазин Заря. Магазин натуралтной пищи. Сыр, Молоко, яйца, малина, клубника, йогурт.</p>
     </div>
     
     <div class="progress-container">
-      <div class="progress-bar" style="width: 65%;"></div>
+      <div class="progress-bar"></div>
     </div>
     
     <div class="stats-container">
@@ -160,7 +163,6 @@
       </div>
     </div>
 
-    <!-- Добавлены data-атрибуты с числовым значением -->
     <div class="amount-buttons">
       <button class="amount-btn" data-amount="100">100 ₽</button>
       <button class="amount-btn active" data-amount="500">500 ₽</button>
@@ -179,23 +181,15 @@
     const input = document.getElementById('amount-input');
     const submitBtn = document.getElementById('submit-btn');
 
-    // Логика клика по кнопкам с фиксированной суммой
     buttons.forEach(button => {
       button.addEventListener('click', () => {
-        // Удаляем класс active у всех кнопок
         buttons.forEach(btn => btn.classList.remove('active'));
-        
-        // Добавляем класс active нажатой кнопке
         button.classList.add('active');
-        
-        // Копируем значение из кнопки в поле ввода
         input.value = button.getAttribute('data-amount');
       });
     });
 
-    // Логика ручного ввода суммы в инпут
     input.addEventListener('input', () => {
-      // Сбрасываем активную кнопку, если введенное вручную значение не совпадает с кнопками
       buttons.forEach(button => {
         if (button.getAttribute('data-amount') === input.value) {
           button.classList.add('active');
@@ -205,8 +199,9 @@
       });
     });
 
-    // Имитация нажатия главной кнопки (просто выводит alert для наглядности)
     submitBtn.addEventListener('click', () => {
       alert(`Вы выбрали сумму: ${input.value} ₽. (Здесь будет переход к оплате)`);
     });
   </script>
+</body>
+</html>
