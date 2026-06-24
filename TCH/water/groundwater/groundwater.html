@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Подземный грунт</title>
+    <style>
+        /* Центрирование на странице */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+
+        /* Общая единая линия-контейнер */
+        .double-progress-line {
+            position: relative;
+            width: 8px; /* Немного увеличили ширину для наглядности */
+            height: 300px;
+            background-color: #e0e0e0; /* Серый фон незаполненной шкалы */
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        /* Общие стили для внутренних полос */
+        .double-progress-line .bar {
+            position: absolute;
+            left: 0;
+            bottom: 0; /* Заполнение снизу вверх */
+            width: 100%;
+            border-radius: 4px;
+            transition: height 0.3s ease;
+        }
+
+        /* Первая линия — чёрная */
+        .double-progress-line .bar-black {
+            height: var(--progress-black, 0%);
+            background-color: #000000;
+            z-index: 1; /* Черный слой снизу */
+        }
+
+        /* Вторая линия — синяя */
+        .double-progress-line .bar-blue {
+            height: var(--progress-blue, 0%);
+            background-color: #007bff;
+            z-index: 2; /* Синий слой сверху (перекроет черный, если его % больше) */
+        }
+    </style>
+</head>
+<body>
+<p>чёрный - старая вода<p>
+<p>синий - новая вода<p>
+    <!-- Единая линия. Задайте нужные % для синей и черной полос -->
+    <div class="double-progress-line" style="--progress-black: 34%; --progress-blue: 66%;">
+        <div class="bar bar-black"></div>
+        <div class="bar bar-blue"></div>
+    </div>
+</body>
+</html>
