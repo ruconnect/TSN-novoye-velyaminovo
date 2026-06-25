@@ -1,3 +1,3 @@
 User-agent: *
-Sitemap: https://ruconnect.github.io/TSN-novoye-velyaminovo/sitemap.xml
+Sitemap: https://floppabank.github.io/Floppabank/sitemap.xml
 Allow: /
