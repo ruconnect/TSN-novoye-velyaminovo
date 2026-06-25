@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="https://www.xml-sitemaps.com/css/sitemap.css"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:fo="http://www.w3.org/1999/XSL/Format"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
+
+
+<url>
+  <loc>https://velyminovo.vercel.app/</loc>
+  <lastmod>2026-06-25T14:38:34+00:00</lastmod>
+  <priority>1.00</priority>
+</url>
+<url>
+  <loc>https://velyminovo.vercel.app/page/page1.html</loc>
+  <lastmod>2026-06-25T14:38:35+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://velyminovo.vercel.app/page/page3.html</loc>
+  <lastmod>2026-06-25T14:38:36+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://velyminovo.vercel.app/page/info.html</loc>
+  <lastmod>2026-06-25T14:38:36+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://velyminovo.vercel.app/TCH/README.html</loc>
+  <lastmod>2026-06-25T14:38:36+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://velyminovo.vercel.app/page/%D1%8F%D0%B1%D0%BB%D0%BE%D1%87%D0%BD%D1%8B%D0%B9%20%D0%BF%D0%B8%D1%80%D0%BE%D0%B3.html</loc>
+  <lastmod>2026-06-25T14:38:36+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://velyminovo.vercel.app/campaign/2026/index.html</loc>
+  <lastmod>2026-06-25T14:38:36+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://velyminovo.vercel.app/campaign/2026/form.html</loc>
+  <lastmod>2026-06-25T14:38:36+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://velyminovo.vercel.app/info.html</loc>
+  <lastmod>2026-06-25T14:38:36+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+
+</urlset>
