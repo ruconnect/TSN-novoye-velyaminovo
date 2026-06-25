@@ -2,6 +2,40 @@
 <a href="page/info.html" style="display: inline-block; padding: 12px 24px; background-color: #28a745; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold; font-family: sans-serif;">
     Клубника и малина
 </a>
+<meta charset="UTF-8">
+    <title>Кнопка с переходом</title>
+    <style>
+        /* Базовый стиль кнопки (ссылки) */
+        .action-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #3498db; /* Основной цвет (синий) */
+            color: #ffffff; /* Цвет текста */
+            text-decoration: none; /* Убираем подчеркивание */
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            border-radius: 5px; /* Скругленные углы */
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        /* Затемнение при наведении мыши */
+        .action-button:hover {
+            background-color: #2980b9;
+        }
+
+        /* Затемнение и эффект нажатия */
+        .action-button:active {
+            background-color: #1f618d; /* Более темный оттенок */
+            transform: scale(0.98); /* Слегка уменьшаем кнопку для эффекта нажатия */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Кнопка-ссылка, перенаправляющая на указанный адрес -->
+    <a href="TCH/README.html" class="action-button">Перейти к README</a>
 <p>На нашем сайте есть рецепты!</p>
 <a href="page/яблочный пирог.html" class="recipe-btn">Яблочный пирог</a>
 <meta charset="UTF-8">
