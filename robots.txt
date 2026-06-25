@@ -1,2 +1,2 @@
 User-agent: *
-Disallow: /sitemap.xml
+Sitemap: https://ruconnect.github.io/TSN-novoye-velyaminovo/sitemap.xml
