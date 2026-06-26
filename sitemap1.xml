@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Generated with https://sitemap-xml.ru-->
+<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd">
+  <url>
+    <loc>https://velyminovo.vercel.app/</loc>
+    <lastmod>2026-06-26T16:28:39+03:00</lastmod>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://velyminovo.vercel.app/page/page1.html</loc>
+    <lastmod>2026-06-26T16:29:20+03:00</lastmod>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://velyminovo.vercel.app/page/page3.html</loc>
+    <lastmod>2026-06-26T16:29:20+03:00</lastmod>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://velyminovo.vercel.app/page/info.html</loc>
+    <lastmod>2026-06-26T16:29:20+03:00</lastmod>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://velyminovo.vercel.app/TCH/README.html</loc>
+    <lastmod>2026-06-26T16:29:20+03:00</lastmod>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://velyminovo.vercel.app/page/%D1%8F%D0%B1%D0%BB%D0%BE%D1%87%D0%BD%D1%8B%D0%B9 %D0%BF%D0%B8%D1%80%D0%BE%D0%B3.html</loc>
+    <lastmod>2026-06-26T16:29:20+03:00</lastmod>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://velyminovo.vercel.app/campaign/2026/index.html</loc>
+    <lastmod>2026-06-26T16:29:23+03:00</lastmod>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://velyminovo.vercel.app/campaign/2026/form.html</loc>
+    <lastmod>2026-06-26T16:29:23+03:00</lastmod>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://velyminovo.vercel.app/info.html</loc>
+    <lastmod>2026-06-26T16:29:23+03:00</lastmod>
+    <priority>0.9</priority>
+  </url>
+</urlset>
