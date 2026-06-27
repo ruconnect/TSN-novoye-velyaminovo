@@ -3,3 +3,12 @@
 <button type="button" onclick="alert('Сайт сбрасывается')">сброс</button>
 <a href="sitemap.xml" class="my-button">sitemap 0</a>
 <a href="sitemap1.xml" class="my-button">sitemap 1</a>
+<!-- 1. Само окно -->
+<dialog id=reser">
+    <p>Данное действие сбросит сайт</p>
+    <!-- Кнопка внутри окна для его закрытия -->
+    <button onclick="document.getElementById('myWindow').close()">Отмена</button>
+</dialog>
+
+<!-- 2. Кнопка, которая вызывает окно -->
+<button onclick="document.getElementById('myWindow').showModal()">Сбросить сайт полностью</button>
