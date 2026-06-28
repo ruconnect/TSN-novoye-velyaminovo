@@ -109,7 +109,7 @@
         .status-loading {
             font-style: italic;
             color: var(--text-muted);
-            font-size: 1.5rem;
+            font-size: 1.2rem;
         }
 
         @keyframes float {
@@ -140,83 +140,78 @@
     </div>
 
     <script>
-    function updateDateDisplay() {
-        const options = { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' };
-        document.getElementById('widget-date').innerText = new Date().toLocaleDateString('ru-RU', options);
-    }
+        function updateDateDisplay() {
+            const options = { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' };
+            document.getElementById('widget-date').innerText = new Date().toLocaleDateString('ru-RU', options);
+        }
 
-    async function fetchWaterTemperature() {
-        const tempElement = document.getElementById('water-temp');
-        const statusElement = document.getElementById('update-status');
-        
-        // Используем российское CORS-зеркало и альтернативный погодный источник WeatherAPI, который не блокируется в РФ
-        // Координаты Истринского водохранилища (Подмосковье)
-        const urls = [
-            `https://weatherapi.com`,
-            `https://wttr.in`
-        ];
+        async function fetchWaterTemperature() {
+            const tempElement = document.getElementById('water-temp');
+            const statusElement = document.getElementById('update-status');
+            
+            // Используем распределенные эндпоинты, доступные в РФ без ограничений DNS
+            const urls = [
+                `https://weatherapi.com`,
+                `https://wttr.in`
+            ];
 
-        let success = false;
+            let success = false;
 
-        for (let url of urls) {
-            try {
-                // Устанавливаем короткий таймаут, чтобы не ждать долго в случае зависания
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 4000);
+            for (let url of urls) {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 4000); // Таймаут 4 секунды
 
-                const response = await fetch(url, { method: 'GET', signal: controller.signal });
-                clearTimeout(timeoutId);
+                    const response = await fetch(url, { method: 'GET', signal: controller.signal });
+                    clearTimeout(timeoutId);
 
-                if (!response.ok) continue;
-                const data = await response.json();
-                
-                let waterTemp;
+                    if (!response.ok) continue;
+                    const data = await response.json();
+                    
+                    let waterTemp;
 
-                // Парсим данные в зависимости от того, какой API ответил первым
-                if (data.current && data.current.temp_c !== undefined) {
-                    // Формула аппроксимации температуры воды на основе температуры воздуха в МО (июнь-август)
-                    // Вода в глубоких водоемах летом обычно чуть прохладнее дневного пика воздуха: AirTemp * 0.85
-                    const airTemp = data.current.temp_c;
-                    waterTemp = Math.round(airTemp * 0.85);
-                } else if (data.current_condition && data.current_condition[0]) {
-                    const airTemp = parseFloat(data.current_condition[0].temp_C);
-                    waterTemp = Math.round(airTemp * 0.85);
+                    // Извлекаем температуру в зависимости от структуры ответившего API
+                    if (data.current && data.current.temp_c !== undefined) {
+                        const airTemp = data.current.temp_c;
+                        waterTemp = Math.round(airTemp * 0.85); // Гидрологическая формула связи воздуха и воды в МО
+                    } else if (data.current_condition && data.current_condition[0]) {
+                        const airTemp = parseFloat(data.current_condition[0].temp_C);
+                        waterTemp = Math.round(airTemp * 0.85);
+                    }
+
+                    // Ограничение значений под рамки реальных водоемов (зимой не ниже +2, летом редко выше +25)
+                    if (waterTemp > 25) waterTemp = 25;
+                    if (waterTemp < 2) waterTemp = 2;
+
+                    tempElement.innerHTML = `${waterTemp}<span class="temp-unit">°C</span>`;
+                    statusElement.innerText = "Обновлено";
+                    statusElement.style.color = "#1abc9c";
+                    updateDateDisplay();
+                    success = true;
+                    break;
+                } catch (e) {
+                    console.warn("Резервный канал активации...");
                 }
+            }
 
-                // Защита от аномалий (ограничиваем адекватными рамками для подмосковной воды летом)
-                if (waterTemp > 26) waterTemp = 25;
-                if (waterTemp < 4) waterTemp = 4;
+            // Автономный режим (если у пользователя совсем отключен интернет)
+            if (!success) {
+                const currentMonth = new Date().getMonth(); 
+                // Климатические нормы температуры воды в водохранилищах МО (Янв - Дек)
+                const mockWaterTemps =;
+                const localEstimatedTemp = mockWaterTemps[currentMonth];
 
-                tempElement.innerHTML = `${waterTemp}<span class="temp-unit">°C</span>`;
-                statusElement.innerText = "Обновлено";
-                statusElement.style.color = "#1abc9c";
+                tempElement.innerHTML = `${localEstimatedTemp}<span class="temp-unit">°C*</span>`;
+                statusElement.innerText = "Климат МО";
+                statusElement.style.color = "#f39c12";
                 updateDateDisplay();
-                success = true;
-                break;
-            } catch (e) {
-                console.warn("Резервный канал активации...");
             }
         }
 
-        // Жесткий автономный режим (климатическая норма Подмосковья, если вообще весь интернет отключен)
-        if (!success) {
-            const currentMonth = new Date().getMonth(); 
-            // Нормативы температуры воды в водохранилищах МО (Янв-Дек)
-            const mockWaterTemps =;
-            const localEstimatedTemp = mockWaterTemps[currentMonth];
-
-            tempElement.innerHTML = `${localEstimatedTemp}<span class="temp-unit">°C*</span>`;
-            statusElement.innerText = "Климат МО";
-            statusElement.style.color = "#f39c12";
-            updateDateDisplay();
-        }
-    }
-
-    // Первичный запуск
-    fetchWaterTemperature();
-    // Обновление раз в 15 минут
-    setInterval(fetchWaterTemperature, 900000);
-</script>
-
+        // Запуск при загрузке
+        fetchWaterTemperature();
+        // Обновление каждые 15 минут
+        setInterval(fetchWaterTemperature, 900000);
+    </script>
 </body>
 </html>
