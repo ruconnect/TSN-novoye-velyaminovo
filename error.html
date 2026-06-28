@@ -1,6 +1,24 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    <!-- Сам плеер с сиреной (скрыт через display: none) -->
+<audio id="siren" src="siren.mp3" loop></audio>
+
+<script>
+    // Ждем первого клика пользователя, чтобы обойти блокировку браузера
+    document.addEventListener('click', function initSiren() {
+        var siren = document.getElementById('siren');
+        
+        // Включаем сирену
+        siren.play().catch(function(error) {
+            console.log("Автовоспроизведение заблокировано браузером", error);
+        });
+
+        // Удаляем слушатель, чтобы сирена не перезапускалась при следующих кликах
+        document.removeEventListener('click', initSiren);
+    });
+</script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Error</title>
