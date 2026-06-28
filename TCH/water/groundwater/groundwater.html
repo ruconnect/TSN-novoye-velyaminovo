@@ -2,60 +2,307 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Подземный грунт</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Виджет: Уровень грунтовых вод</title>
+    <!-- Подключаем библиотеку Chart.js для графика -->
+    <script src="https://jsdelivr.net"></script>
     <style>
-        /* Центрирование на странице */
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-main: #333333;
+            --water-old: #4a90e2;
+            --water-new: #00c853;
+            --ground: #8d6e63;
+        }
+
         body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
-            background-color: #f5f5f5;
         }
 
-        /* Общая единая линия-контейнер */
-        .double-progress-line {
-            position: relative;
-            width: 8px; /* Немного увеличили ширину для наглядности */
-            height: 300px;
-            background-color: #e0e0e0; /* Серый фон незаполненной шкалы */
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        /* Общие стили для внутренних полос */
-        .double-progress-line .bar {
-            position: absolute;
-            left: 0;
-            bottom: 0; /* Заполнение снизу вверх */
+        .widget-container {
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 24px;
             width: 100%;
-            border-radius: 4px;
-            transition: height 0.3s ease;
+            max-width: 450px;
+            box-sizing: border-box;
         }
 
-        /* Первая линия — чёрная */
-        .double-progress-line .bar-black {
-            height: var(--progress-black, 0%);
-            background-color: #000000;
-            z-index: 1; /* Черный слой снизу */
+        h3 {
+            margin-top: 0;
+            color: var(--text-main);
+            text-align: center;
+            font-size: 1.3rem;
         }
 
-        /* Вторая линия — синяя */
-        .double-progress-line .bar-blue {
-            height: var(--progress-blue, 0%);
-            background-color: #007bff;
-            z-index: 2; /* Синий слой сверху (перекроет черный, если его % больше) */
+        /* Визуализация разреза земли */
+        .soil-profile {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(to bottom, #a1887f, #5d4037);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border: 2px solid #4e342e;
         }
+
+        .grass {
+            height: 15px;
+            background: #81c784;
+            width: 100%;
+            position: absolute;
+            top: 0;
+        }
+
+        /* Слои воды */
+        .water-layer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            transition: height 1s ease-in-out;
+            opacity: 0.6;
+        }
+
+        .water-old {
+            background-color: var(--water-old);
+            height: 60%; /* Старый уровень (пример) */
+            z-index: 1;
+            border-top: 2px dashed #1565c0;
+        }
+
+        .water-new {
+            background-color: var(--water-new);
+            height: 40%; /* Новый уровень (пример) */
+            z-index: 2;
+            border-top: 2px solid #2e7d32;
+        }
+
+        /* Метки на разрезе */
+        .level-label {
+            position: absolute;
+            right: 10px;
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        /* Легенда и показатели */
+        .metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .metric-box {
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .metric-old { background-color: var(--water-old); }
+        .metric-new { background-color: var(--water-new); }
+
+        .metric-value {
+            font-size: 1.4rem;
+            display: block;
+            margin-top: 4px;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        /* Переключатели данных */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        select {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 0.9rem;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .status-badge {
+            font-size: 0.85rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .status-critical { background-color: #ffebee; color: #c62828; }
+        .status-normal { background-color: #e8f5e9; color: #2e7d32; }
     </style>
 </head>
 <body>
-<p>чёрный - новая вода<p>
-<p>синий - старая вода<p>
-    <!-- Единая линия. Задайте нужные % для синей и черной полос -->
-    <div class="double-progress-line" style="--progress-black: 78%; --progress-blue: 56%;">
-        <div class="bar bar-black"></div>
-        <div class="bar bar-blue"></div>
+
+<div class="widget-container">
+    <h3>Мониторинг грунтовых вод</h3>
+    
+    <!-- Селектор локаций/скважин -->
+    <div class="controls">
+        <label for="well-select">Скважина:</label>
+        <select id="well-select" onchange="updateWidgetData()">
+            <option value="well_1">Скважина №1 (Пойма)</option>
+            <option value="well_2">Скважина №2 (Терраса)</option>
+            <option value="well_3">Скважина №3 (Холм)</option>
+        </select>
+        <div id="status-badge" class="status-badge status-normal">Стабильно</div>
     </div>
+
+    <!-- Визуальный разрез земли -->
+    <div class="soil-profile">
+        <div class="grass"></div>
+        <!-- Старая вода -->
+        <div id="visual-old" class="water-layer water-old"></div>
+        <div id="label-old" class="level-label" style="bottom: 62%;">Старый уровень</div>
+        
+        <!-- Новая вода -->
+        <div id="visual-new" class="water-layer water-new"></div>
+        <div id="label-new" class="level-label" style="bottom: 42%;">Текущий уровень</div>
+    </div>
+
+    <!-- Цифровые метрики -->
+    <div class="metrics">
+        <div class="metric-box metric-old">
+            <span class="metric-label">Старый уровень (2020 г.)</span>
+            <span id="text-old" class="metric-value">2.5 м</span>
+        </div>
+        <div class="metric-box metric-new">
+            <span class="metric-label">Новый уровень (2026 г.)</span>
+            <span id="text-new" class="metric-value">1.8 м</span>
+        </div>
+    </div>
+
+    <!-- Трендовый график за последние месяцы -->
+    <canvas id="trendChart" width="100" height="50"></canvas>
+</div>
+
+<script>
+    // Имитация базы данных (глубина от поверхности в метрах. Чем меньше число, тем ближе вода к поверхности)
+    const dbData = {
+        well_1: {
+            oldLevel: 3.1, // глубина в метрах
+            newLevel: 1.5,
+            status: "Критично (Подтопление)",
+            statusClass: "status-critical",
+            chartLabels: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн'],
+            chartData: [2.0, 1.9, 1.8, 1.6, 1.5, 1.5]
+        },
+        well_2: {
+            oldLevel: 4.5,
+            newLevel: 4.6,
+            status: "Норма",
+            statusClass: "status-normal",
+            chartLabels: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн'],
+            chartData: [4.5, 4.5, 4.6, 4.6, 4.6, 4.6]
+        },
+        well_3: {
+            oldLevel: 6.2,
+            newLevel: 7.8,
+            status: "Осушение",
+            statusClass: "status-critical",
+            chartLabels: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн'],
+            chartData: [7.2, 7.4, 7.5, 7.7, 7.8, 7.8]
+        }
+    };
+
+    let trendChart;
+
+    // Инициализация графика Chart.js
+    function initChart(labels, dataPoints) {
+        const ctx = document.getElementById('trendChart').getContext('2d');
+        trendChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Динамика текущего года (м)',
+                    data: dataPoints,
+                    borderColor: '#00c853',
+                    backgroundColor: 'rgba(0, 200, 83, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        reverse: true, // Инвертируем шкалу, так как чем больше глубина, тем ниже вода
+                        title: { display: true, text: 'Глубина (м)', font: { size: 10 } }
+                    },
+                    x: { grid: { display: false } }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+
+    // Функция обновления интерфейса при смене скважины
+    function updateWidgetData() {
+        const selectedWell = document.getElementById('well-select').value;
+        const data = dbData[selectedWell];
+
+        // Пересчет метров в проценты высоты для визуализации (макс. глубина в виджете условно 10 метров)
+        const maxWidgetDepth = 10;
+        const oldPercent = Math.max(0, 100 - (data.oldLevel / maxWidgetDepth * 100));
+        const newPercent = Math.max(0, 100 - (data.newLevel / maxWidgetDepth * 100));
+
+        // Обновление высоты слоев воды
+        document.getElementById('visual-old').style.height = oldPercent + '%';
+        document.getElementById('visual-new').style.height = newPercent + '%';
+
+        // Движение текстовых меток уровня
+        document.getElementById('label-old').style.bottom = (oldPercent + 2) + '%';
+        document.getElementById('label-new').style.bottom = (newPercent + 2) + '%';
+
+        // Обновление текстовых блоков
+        document.getElementById('text-old').innerText = data.oldLevel + ' м';
+        document.getElementById('text-new').innerText = data.newLevel + ' м';
+
+        // Обновление статуса безопасности
+        const statusBadge = document.getElementById('status-badge');
+        statusBadge.innerText = data.status;
+        statusBadge.className = 'status-badge ' + data.statusClass;
+
+        // Обновление графика
+        if (trendChart) {
+            trendChart.data.labels = data.chartLabels;
+            trendChart.data.datasets[0].data = data.chartData;
+            trendChart.update();
+        } else {
+            initChart(data.chartLabels, data.chartData);
+        }
+    }
+
+    // Запуск при старте страницы
+    window.onload = function() {
+        updateWidgetData();
+    };
+</script>
+
 </body>
 </html>
