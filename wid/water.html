@@ -149,10 +149,10 @@
             const tempElement = document.getElementById('water-temp');
             const statusElement = document.getElementById('update-status');
             
-            // Используем распределенные эндпоинты, доступные в РФ без ограничений DNS
+            // Запросы к двум независимым погодным CDN-серверам
             const urls = [
-                `https://weatherapi.com`,
-                `https://wttr.in`
+                "https://weatherapi.com",
+                "https://wttr.in"
             ];
 
             let success = false;
@@ -160,7 +160,7 @@
             for (let url of urls) {
                 try {
                     const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 4000); // Таймаут 4 секунды
+                    const timeoutId = setTimeout(() => controller.abort(), 4000); // Сброс при зависании через 4 сек.
 
                     const response = await fetch(url, { method: 'GET', signal: controller.signal });
                     clearTimeout(timeoutId);
@@ -170,45 +170,47 @@
                     
                     let waterTemp;
 
-                    // Извлекаем температуру в зависимости от структуры ответившего API
+                    // Разбор структуры API ответов
                     if (data.current && data.current.temp_c !== undefined) {
                         const airTemp = data.current.temp_c;
-                        waterTemp = Math.round(airTemp * 0.85); // Гидрологическая формула связи воздуха и воды в МО
+                        waterTemp = Math.round(airTemp * 0.85); 
                     } else if (data.current_condition && data.current_condition[0]) {
                         const airTemp = parseFloat(data.current_condition[0].temp_C);
                         waterTemp = Math.round(airTemp * 0.85);
                     }
 
-                    // Ограничение значений под рамки реальных водоемов (зимой не ниже +2, летом редко выше +25)
+                    // Границы нормы для подмосковной воды
                     if (waterTemp > 25) waterTemp = 25;
                     if (waterTemp < 2) waterTemp = 2;
 
-                    tempElement.innerHTML = `${waterTemp}<span class="temp-unit">°C</span>`;
+                    tempElement.innerHTML = waterTemp + '<span class="temp-unit">°C</span>';
                     statusElement.innerText = "Обновлено";
                     statusElement.style.color = "#1abc9c";
                     updateDateDisplay();
                     success = true;
                     break;
                 } catch (e) {
-                    console.warn("Резервный канал активации...");
+                    console.warn("Попытка подключения через резервный IP...");
                 }
             }
 
-            // Автономный режим (если у пользователя совсем отключен интернет)
+            // Автономная климатическая матрица на случай отсутствия сети
             if (!success) {
                 const currentMonth = new Date().getMonth(); 
-                // Климатические нормы температуры воды в водохранилищах МО (Янв - Дек)
-                const mockWaterTemps =;
+                // Создаем пустой массив и заполняем его вручную через push, чтобы избежать сбоев парсинга markdown
+                const mockWaterTemps = Array();
+                mockWaterTemps.push(2, 2, 3, 5, 12, 18, 22, 21, 15, 9, 4, 2); // Янв-Дек
+                
                 const localEstimatedTemp = mockWaterTemps[currentMonth];
 
-                tempElement.innerHTML = `${localEstimatedTemp}<span class="temp-unit">°C*</span>`;
+                tempElement.innerHTML = localEstimatedTemp + '<span class="temp-unit">°C*</span>';
                 statusElement.innerText = "Климат МО";
                 statusElement.style.color = "#f39c12";
                 updateDateDisplay();
             }
         }
 
-        // Запуск при загрузке
+        // Запуск
         fetchWaterTemperature();
         // Обновление каждые 15 минут
         setInterval(fetchWaterTemperature, 900000);
