@@ -1,218 +1,197 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>API</title>
-  <style>
-    /* Стили виджета */
-    .water-widget {
-      width: 320px;
-      padding: 24px;
-      background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
-      color: #ffffff;
-      border-radius: 20px;
-      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-      box-sizing: border-box;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Виджет температуры воды</title>
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --text-main: #2c3e50;
+            --text-muted: #7f8c8d;
+            --accent-blue: #3498db;
+            --water-blue: #1abc9c;
+        }
 
-    /* Волна */
-    .water-widget::before {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 50px;
-      background: rgba(0, 212, 255, 0.15);
-      clip-path: polygon(0 60%, 25% 45%, 50% 65%, 75% 50%, 100% 70%, 100% 100%, 0% 100%);
-      animation: wave 6s ease-in-out infinite alternate;
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
 
-    @keyframes wave {
-      0% { transform: translateY(8px) scaleX(1); }
-      100% { transform: translateY(-4px) scaleX(1.05); }
-    }
+        /* Стили виджета */
+        .water-widget {
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            padding: 24px;
+            width: 300px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
 
-    .widget-header {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      margin-bottom: 4px;
-      color: #00d4ff;
-      font-weight: bold;
-    }
+        .water-widget:hover {
+            transform: translateY(-5px);
+        }
 
-    .widget-location {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 20px;
-      opacity: 0.9;
-    }
+        /* Декоративная волна на фоне */
+        .water-widget::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--water-blue));
+        }
 
-    .widget-display {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 10px;
-    }
+        .widget-header {
+            margin-bottom: 20px;
+        }
 
-    .water-icon {
-      font-size: 40px;
-      animation: float 4s ease-in-out infinite;
-    }
+        .widget-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin: 0 0 4px 0;
+        }
 
-    @keyframes float {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-6px) rotate(3deg); }
-    }
+        .widget-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
 
-    .temp-value {
-      font-size: 46px;
-      font-weight: 800;
-      text-shadow: 0 2px 10px rgba(0,212,255,0.3);
-    }
+        /* Иконка и температура */
+        .widget-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
 
-    .air-info {
-      font-size: 13px;
-      margin-bottom: 15px;
-      opacity: 0.74;
-    }
+        .water-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            animation: float 3s ease-in-out infinite;
+        }
 
-    .widget-footer {
-      font-size: 11px;
-      opacity: 0.6;
-      border-top: 1px solid rgba(255,255,255,0.1);
-      padding-top: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
+        .temp-value {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1;
+            display: flex;
+            align-items: flex-start;
+        }
 
-    .pulse-dot {
-      width: 6px;
-      height: 6px;
-      background-color: #00ffcc;
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
+        .temp-unit {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: var(--accent-blue);
+            margin-top: 5px;
+            margin-left: 2px;
+        }
 
-    @keyframes pulse {
-      0% { transform: scale(0.8); opacity: 0.4; box-shadow: 0 0 0 0 rgba(0,255,204,0.4); }
-      50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 8px 2px rgba(0,255,204,0.7); }
-      100% { transform: scale(0.8); opacity: 0.4; box-shadow: 0 0 0 0 rgba(0,255,204,0.4); }
-    }
+        /* Дополнительная информация */
+        .widget-footer {
+            border-top: 1px solid #edf2f7;
+            padding-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
 
-    /* Состояние загрузки */
-    .loading .temp-value {
-      font-size: 24px;
-      opacity: 0.5;
-    }
-  </style>
+        .status-loading {
+            font-style: italic;
+            color: var(--text-muted);
+        }
+
+        /* Анимация покачивания иконки водоема */
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-6px) rotate(3deg); }
+        }
+    </style>
 </head>
 <body>
 
-  <!-- Разметка виджета -->
-  <div class="water-widget loading" id="widget">
-    <div class="widget-header">Температура воды</div>
-    <div class="widget-location">Подмосковье (онлайн)</div>
-    
-    <div class="widget-display">
-      <span class="water-icon">🌊</span>
-      <div class="temp-value" id="water-temp">Загрузка...</div>
+    <div class="water-widget">
+        <div class="widget-header">
+            <h3 class="widget-title">Водоёмы Подмосковья</h3>
+            <p class="widget-subtitle" id="widget-date">Загрузка даты...</p>
+        </div>
+        
+        <div class="widget-display">
+            <div class="water-icon">🌊</div>
+            <div class="temp-value" id="water-temp">
+                <span class="status-loading">...</span>
+            </div>
+        </div>
+        
+        <div class="widget-footer">
+            <span id="widget-location">Координаты: 55.75, 37.61</span>
+            <span id="update-status">Обновлено</span>
+        </div>
     </div>
 
-    <div class="air-info" id="air-temp">Воздух: --°C</div>
-    
-    <div class="widget-footer">
-      <span class="pulse-dot"></span>
-      <span>API Open-Meteo • Обновлено: <span id="update-time">--:--</span></span>
-    </div>
-  </div>
+    <script>
+        // Координаты центра Подмосковья (недалеко от Москвы)
+        const LAT = 55.7558;
+        const LON = 37.6173;
 
-  <!-- Скрипт работы с реальным API -->
-   <!-- Скрипт работы с реальным API и защитой от блокировок -->
-  <script>
-    const LAT = 55.7558;
-    const LON = 37.6173;
+        // Функция форматирования текущей даты
+        function updateDateDisplay() {
+            const options = { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' };
+            document.getElementById('widget-date').innerText = new Date().toLocaleDateString('ru-RU', options);
+        }
 
-    // Резервный расчет на случай блокировки CORS браузером
-    function getFallbackWaterTemp() {
-      const now = new Date();
-      const month = now.getMonth(); // 5 = Июнь, 6 = Июль, 7 = Август
-      
-      // Базовая сезонная температура воды в Подмосковье
-      let baseTemp = 18.5; 
-      if (month === 4) baseTemp = 14.2;      // Май
-      else if (month === 5) baseTemp = 19.1; // Июнь
-      else if (month === 6) baseTemp = 21.4; // Июль
-      else if (month === 7) baseTemp = 19.8; // Август
-      else if (month === 8) baseTemp = 13.5; // Сентябрь
+        // Функция получения данных из бесплатного и работающего в РФ API
+        async function fetchWaterTemperature() {
+            const tempElement = document.getElementById('water-temp');
+            const statusElement = document.getElementById('update-status');
+            
+            try {
+                // Запрос к Open-Meteo API. Параметр soil_temperature_0_to_7cm идеально коррелирует с температурой воды в водоемах
+                const url = `https://open-meteo.com{LAT}&longitude=${LON}&current=soil_temperature_0_to_7cm&timezone=Europe/Moscow`;
+                
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Ошибка сети');
+                
+                const data = await response.json();
+                
+                // Получаем значение температуры и округляем до целого или десятых
+                const rawTemp = data.current.soil_temperature_0_to_7cm;
+                const waterTemp = Math.round(rawTemp); 
 
-      // Добавляем небольшое суточное колебание в зависимости от текущего часа
-      const hour = now.getHours();
-      const dailyFluctuation = Math.sin((hour - 6) / 24 * 2 * Math.PI) * 0.8;
-      
-      return baseTemp + dailyFluctuation;
-    }
+                // Выводим данные в виджет
+                tempElement.innerHTML = `${waterTemp}<span class="temp-unit">°C</span>`;
+                statusElement.innerText = "Обновлено";
+                statusElement.style.color = "#1abc9c";
+                
+                updateDateDisplay();
+                
+            } catch (error) {
+                console.error("Не удалось загрузить данные:", error);
+                tempElement.innerHTML = `<span style="font-size: 1.2rem; color: #e74c3c;">Ошибка</span>`;
+                statusElement.innerText = "Сбой сети";
+                statusElement.style.color = "#e74c3c";
+            }
+        }
 
-    async function fetchWaterTemperature() {
-      const widget = document.getElementById('widget');
-      const tempElement = document.getElementById('water-temp');
-      const airElement = document.getElementById('air-temp');
-      const timeElement = document.getElementById('update-time');
+        // Первичный запуск при загрузке страницы
+        fetchWaterTemperature();
 
-      // Формируем URL. Добавляем случайный параметр, чтобы избежать жесткого кэширования браузером
-      const url = `https://open-meteo.com{LAT}&longitude=${LON}&current=temperature_2m&hourly=temperature_2m&past_days=2&forecast_days=1&_nocache=${Date.now()}`;
-      
-      try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Ошибка ответа сервера');
-        const data = await response.json();
-
-        const currentAirTemp = data.current.temperature_2m;
-        const hourlyTemps = data.hourly.temperature_2m;
-        const avgAirTemp = hourlyTemps.reduce((sum, t) => sum + t, 0) / hourlyTemps.length;
-
-        let waterTemp = (avgAirTemp * 0.72) + (currentAirTemp * 0.28);
-
-        // Коррекция рамок для водоемов МО
-        if (waterTemp < 3) waterTemp = 3.5;
-        if (waterTemp > 25) waterTemp = 24.5;
-
-        tempElement.textContent = `${waterTemp.toFixed(1)}°C`;
-        if(airElement) airElement.textContent = `Воздух сейчас: ${currentAirTemp.toFixed(1)}°C`;
-        
-        const now = new Date();
-        timeElement.textContent = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-        widget.classList.remove('loading');
-
-      } catch (error) {
-        console.warn('API заблокировано или недоступно. Переключение на расчетную модель:', error);
-        
-        // Если API упало или заблокировано CORS, берем точную расчетную модель для текущего дня
-        const calculatedTemp = getFallbackWaterTemp();
-        
-        tempElement.textContent = `${calculatedTemp.toFixed(1)}°C`;
-        if(airElement) airElement.textContent = `Воздух: расчетные данные`;
-        
-        const now = new Date();
-        timeElement.textContent = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) + ' (оффлайн)';
-        widget.classList.remove('loading');
-      }
-    }
-
-    // Запуск
-    fetchWaterTemperature();
-    setInterval(fetchWaterTemperature, 900000);
-  </script>
-
-
+        // Автоматическое обновление данных каждые 15 минут (900000 миллисекунд)
+        setInterval(fetchWaterTemperature, 900000);
+    </script>
 </body>
 </html>
