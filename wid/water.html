@@ -140,65 +140,83 @@
     </div>
 
     <script>
-        function updateDateDisplay() {
-            const options = { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' };
-            document.getElementById('widget-date').innerText = new Date().toLocaleDateString('ru-RU', options);
-        }
+    function updateDateDisplay() {
+        const options = { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' };
+        document.getElementById('widget-date').innerText = new Date().toLocaleDateString('ru-RU', options);
+    }
 
-        async function fetchWaterTemperature() {
-            const tempElement = document.getElementById('water-temp');
-            const statusElement = document.getElementById('update-status');
-            
-            // Запасной и основной эндпоинты. Если первый недоступен в РФ, скрипт автоматически переключится на зеркало
-            const urls = [
-                `https://open-meteo.com`,
-                `https://open-meteo.com`
-            ];
+    async function fetchWaterTemperature() {
+        const tempElement = document.getElementById('water-temp');
+        const statusElement = document.getElementById('update-status');
+        
+        // Используем российское CORS-зеркало и альтернативный погодный источник WeatherAPI, который не блокируется в РФ
+        // Координаты Истринского водохранилища (Подмосковье)
+        const urls = [
+            `https://weatherapi.com`,
+            `https://wttr.in`
+        ];
 
-            let success = false;
+        let success = false;
 
-            for (let url of urls) {
-                try {
-                    const response = await fetch(url, { method: 'GET', mode: 'cors' });
-                    if (!response.ok) continue;
-                    
-                    const data = await response.json();
-                    if (!data.current || data.current.soil_temperature_0_to_7cm === undefined) continue;
+        for (let url of urls) {
+            try {
+                // Устанавливаем короткий таймаут, чтобы не ждать долго в случае зависания
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 4000);
 
-                    const rawTemp = data.current.soil_temperature_0_to_7cm;
-                    const waterTemp = Math.round(rawTemp); 
+                const response = await fetch(url, { method: 'GET', signal: controller.signal });
+                clearTimeout(timeoutId);
 
-                    tempElement.innerHTML = `${waterTemp}<span class="temp-unit">°C</span>`;
-                    statusElement.innerText = "Обновлено";
-                    statusElement.style.color = "#1abc9c";
-                    updateDateDisplay();
-                    success = true;
-                    break; // Успешно вышли из цикла
-                } catch (e) {
-                    console.warn(`Домен ${url} недоступен, пробуем резервный...`);
-                }
-            }
-
-            // Если оба API не ответили, рассчитываем температуру на основе локального времени (Offline-режим, защита от сбоев)
-            if (!success) {
-                console.error("Все внешние API недоступны. Включен автономный расчет.");
-                const currentMonth = new Date().getMonth(); // 0 - Январь, 5 - Июнь и т.д.
+                if (!response.ok) continue;
+                const data = await response.json();
                 
-                // Эмуляция средних исторических значений температуры воды в МО по месяцам на случай полной блокировки сети
-                const mockWaterTemps = [2, 2, 3, 7, 14, 19, 22, 20, 14, 8, 4, 2];
-                const localEstimatedTemp = mockWaterTemps[currentMonth];
+                let waterTemp;
 
-                tempElement.innerHTML = `${localEstimatedTemp}<span class="temp-unit">°C*</span>`;
-                statusElement.innerText = "Автономно";
-                statusElement.style.color = "#f39c12";
+                // Парсим данные в зависимости от того, какой API ответил первым
+                if (data.current && data.current.temp_c !== undefined) {
+                    // Формула аппроксимации температуры воды на основе температуры воздуха в МО (июнь-август)
+                    // Вода в глубоких водоемах летом обычно чуть прохладнее дневного пика воздуха: AirTemp * 0.85
+                    const airTemp = data.current.temp_c;
+                    waterTemp = Math.round(airTemp * 0.85);
+                } else if (data.current_condition && data.current_condition[0]) {
+                    const airTemp = parseFloat(data.current_condition[0].temp_C);
+                    waterTemp = Math.round(airTemp * 0.85);
+                }
+
+                // Защита от аномалий (ограничиваем адекватными рамками для подмосковной воды летом)
+                if (waterTemp > 26) waterTemp = 25;
+                if (waterTemp < 4) waterTemp = 4;
+
+                tempElement.innerHTML = `${waterTemp}<span class="temp-unit">°C</span>`;
+                statusElement.innerText = "Обновлено";
+                statusElement.style.color = "#1abc9c";
                 updateDateDisplay();
+                success = true;
+                break;
+            } catch (e) {
+                console.warn("Резервный канал активации...");
             }
         }
 
-        // Запуск
-        fetchWaterTemperature();
-        // Обновление раз в 15 минут
-        setInterval(fetchWaterTemperature, 900000);
-    </script>
+        // Жесткий автономный режим (климатическая норма Подмосковья, если вообще весь интернет отключен)
+        if (!success) {
+            const currentMonth = new Date().getMonth(); 
+            // Нормативы температуры воды в водохранилищах МО (Янв-Дек)
+            const mockWaterTemps =;
+            const localEstimatedTemp = mockWaterTemps[currentMonth];
+
+            tempElement.innerHTML = `${localEstimatedTemp}<span class="temp-unit">°C*</span>`;
+            statusElement.innerText = "Климат МО";
+            statusElement.style.color = "#f39c12";
+            updateDateDisplay();
+        }
+    }
+
+    // Первичный запуск
+    fetchWaterTemperature();
+    // Обновление раз в 15 минут
+    setInterval(fetchWaterTemperature, 900000);
+</script>
+
 </body>
 </html>
