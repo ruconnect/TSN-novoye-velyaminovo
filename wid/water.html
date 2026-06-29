@@ -1,33 +1,30 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <!-- HTML элемент списка -->
-<label for="v">Выберите город</label>
-<select id="v" onchange="updateVariable()">
-  <option value="Яблоко">МО</option>
-  <option value="Яблоко">ТУЛ</option>
+<label for="region">Выберите регион:</label>
+<!-- При изменении вызывается функция checkRegion -->
+<select id="region" onchange="checkRegion()">
+  <option value="MO">МО (Московская область)</option>
+  <option value="TUL">ТУЛ (Тульская область)</option>
 </select>
 
-<!-- Место для демонстрации работы переменной -->
-<p>Текущее значение переменной: <span id="output">ТУЛ</span></p>
-
 <script>
-  // 1. Создаем переменную с начальным значением
-  const FORCE_MAX_TEMP = false;
+  // Изначально задаем значение false (так как по умолчанию выбран МО)
+  let FORCE_MAX_TEMP = false;
 
-  // 2. Функция, которая запускается при каждом изменении выбора
-  function updateVariable() {
-    // Находим наш список в HTML
-    const selectElement = document.getElementById("v");
-    
-    // Записываем выбранное значение в переменную
-    selectedFruit = selectElement.value;
-    
-    // (Необязательно) Выводим значение на экран для проверки
-    document.getElementById("output").textContent = FORCE_MAX_TEMP;
-    
-    // Вывод в консоль разработчика (F12)
-    console.log("Новое значение переменной:", FORCE_MAX_TEMP);
+  function checkRegion() {
+    const selectElement = document.getElementById("region");
+    const selectedValue = selectElement.value;
+
+    // Проверяем: если выбран ТУЛ, то true, иначе false
+    if (selectedValue === "TUL") {
+      FORCE_MAX_TEMP = true;
+    } else {
+      FORCE_MAX_TEMP = false;
+    }
+
+    // Проверка работы в консоли (нажмите F12 в браузере)
+    console.log("Значение FORCE_MAX_TEMP:", FORCE_MAX_TEMP);
   }
 </script>
 
