@@ -19,6 +19,7 @@
     // Проверяем: если выбран ТУЛ, то true, иначе false
     if (selectedValue === "TUL") {
       FORCE_MAX_TEMP = true;
+      fetchWaterTemperature();
     } else {
       FORCE_MAX_TEMP = false;
     }
