@@ -116,9 +116,6 @@
             0%, 100% { transform: translateY(0) rotate(0deg); }
             50% { transform: translateY(-6px) rotate(3deg); }
         }
-        
-        }
-
     </style>
 </head>
 <body>
@@ -128,14 +125,14 @@
             <h3 class="widget-title">Водоёмы Подмосковья</h3>
             <p class="widget-subtitle" id="widget-date">Синхронизация...</p>
         </div>
-        
+
         <div class="widget-display">
             <div class="water-icon">🌊</div>
             <div class="temp-value" id="water-temp">
                 <span class="status-loading">Загрузка...</span>
             </div>
         </div>
-        
+
         <div class="widget-footer">
             <span id="widget-location">Москва и МО</span>
             <span id="update-status">Запрос</span>
@@ -143,6 +140,9 @@
     </div>
 
     <script>
+        // Управляющая переменная: true — всегда принудительно показывать 25 градусов, false — вычислять температуру
+        const FORCE_MAX_TEMP = false;
+
         function updateDateDisplay() {
             const options = { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' };
             document.getElementById('widget-date').innerText = new Date().toLocaleDateString('ru-RU', options);
@@ -151,7 +151,16 @@
         async function fetchWaterTemperature() {
             const tempElement = document.getElementById('water-temp');
             const statusElement = document.getElementById('update-status');
-            
+
+            // Если включен режим форсирования максимальной температуры, сразу выводим 25°C без лишних сетевых запросов
+            if (FORCE_MAX_TEMP) {
+                tempElement.innerHTML = '25<span class="temp-unit">°C</span>';
+                statusElement.innerText = "Форсировано";
+                statusElement.style.color = "#1abc9c";
+                updateDateDisplay();
+                return;
+            }
+
             // Запросы к двум независимым погодным CDN-серверам
             const urls = [
                 "https://weatherapi.com",
@@ -170,13 +179,13 @@
 
                     if (!response.ok) continue;
                     const data = await response.json();
-                    
+
                     let waterTemp;
 
                     // Разбор структуры API ответов
                     if (data.current && data.current.temp_c !== undefined) {
                         const airTemp = data.current.temp_c;
-                        waterTemp = Math.round(airTemp * 0.85); 
+                        waterTemp = Math.round(airTemp * 0.85);
                     } else if (data.current_condition && data.current_condition[0]) {
                         const airTemp = parseFloat(data.current_condition[0].temp_C);
                         waterTemp = Math.round(airTemp * 0.85);
@@ -199,11 +208,11 @@
 
             // Автономная климатическая матрица на случай отсутствия сети
             if (!success) {
-                const currentMonth = new Date().getMonth(); 
+                const currentMonth = new Date().getMonth();
                 // Создаем пустой массив и заполняем его вручную через push, чтобы избежать сбоев парсинга markdown
                 const mockWaterTemps = Array();
                 mockWaterTemps.push(2, 2, 3, 5, 12, 18, 22, 21, 15, 9, 4, 2); // Янв-Дек
-                
+
                 const localEstimatedTemp = mockWaterTemps[currentMonth];
 
                 tempElement.innerHTML = localEstimatedTemp + '<span class="temp-unit">°C*</span>';
