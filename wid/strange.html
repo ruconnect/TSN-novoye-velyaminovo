@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ретро Спидометр</title>
+    <style>
+        :root {
+            --speed-angle: -120deg; /* Управляет стрелкой (от -120deg до 120deg) */
+        }
+
+        body {
+            background-color: #1a1a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Arial Black', Gadget, sans-serif;
+        }
+
+        /* Корпус спидометра */
+        .speedometer {
+            width: 320px;
+            height: 320px;
+            background: #0d0d0d;
+            border-radius: 50%;
+            border: 8px solid #cbcbcb;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 10px 25px rgba(0,0,0,0.6);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        /* Стекло/блик */
+        .speedometer::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 50%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        /* Шкала разметки (упрощенная текстура) */
+        .scale {
+            position: absolute;
+            width: 270px;
+            height: 270px;
+            border-radius: 50%;
+            border: 4px dashed #666;
+            transform: rotate(-30deg);
+        }
+
+        /* Текстовые элементы */
+        .label-kmh {
+            color: #afafaf;
+            font-size: 16px;
+            position: absolute;
+            bottom: 95px;
+            left: 55px;
+            font-weight: bold;
+        }
+
+        .label-sports {
+            color: #ffffff;
+            font-size: 14px;
+            letter-spacing: 2px;
+            position: absolute;
+            top: 135px;
+            font-weight: normal;
+        }
+
+        .label-rpm {
+            color: #afafaf;
+            font-size: 12px;
+            position: absolute;
+            bottom: 50px;
+            right: 85px;
+        }
+
+        /* Статические цифры шкалы км/ч (примерное позиционирование) */
+        .num {
+            position: absolute;
+            color: #fff;
+            font-size: 20px;
+        }
+        .n0   { bottom: 95px; left: 95px; color: #ff3333; }
+        .n10  { top: 135px; left: 40px; }
+        .n20  { top: 55px; left: 85px; }
+        .n30  { top: 55px; right: 85px; }
+        .n40  { top: 135px; right: 40px; }
+        .n50  { bottom: 95px; right: 55px; color: #ff3333; }
+
+        /* Одометр (пробег) */
+        .odometer {
+            background: #000;
+            border: 3px solid #333;
+            border-radius: 4px;
+            padding: 2px 6px;
+            display: flex;
+            gap: 2px;
+            position: absolute;
+            bottom: 75px;
+            box-shadow: inset 0 0 5px rgba(0,0,0,1);
+        }
+
+        .dig {
+            background: #fff;
+            color: #000;
+            font-size: 22px;
+            font-weight: bold;
+            padding: 0 4px;
+            border-radius: 2px;
+            min-width: 14px;
+            text-align: center;
+        }
+
+        /* Последняя цифра пробега (белая на черном или наоборот для имитации долей) */
+        .dig:last-child {
+            background: #111;
+            color: #fff;
+        }
+
+        /* Стрелка спидометра */
+        .needle-center {
+            width: 36px;
+            height: 36px;
+            background: #111;
+            border: 2px solid #333;
+            border-radius: 50%;
+            position: absolute;
+            top: 155px;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        .needle {
+            position: absolute;
+            width: 110px;
+            height: 5px;
+            background: #ff2a2a;
+            top: 171px;
+            left: 65px;
+            transform-origin: 95px 2.5px;
+            transform: rotate(var(--speed-angle));
+            transition: transform 0.5s cubic-bezier(0.1, 0.8, 0.3, 1);
+            z-index: 9;
+            border-radius: 3px 0 0 3px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="speedometer">
+        <!-- Цифры скорости -->
+        <div class="num n0">0</div>
+        <div class="num n10">10</div>
+        <div class="num n20">20</div>
+        <div class="num n30">30</div>
+        <div class="num n40">40</div>
+        <div class="num n50">50</div>
+
+        <!-- Надписи -->
+        <div class="label-sports">SPORTS</div>
+        <div class="label-kmh">km/h</div>
+        <div class="label-rpm">RPM</div>
+
+        <!-- Стрелка и ось -->
+        <div class="needle" id="needle"></div>
+        <div class="needle-center"></div>
+
+        <!-- Одометр (Пробег) -->
+        <div class="odometer" id="odometer">
+            <div class="dig">0</div>
+            <div class="dig">0</div>
+            <div class="dig">0</div>
+            <div class="dig">0</div>
+            <div class="dig">0</div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // НАСТРОЙКА ДАННЫХ ДЛЯ ВЫВОДА:
+        // ==========================================
+        const CURRENT_SPEED = 25;    // Скорость от 0 до 50 км/ч
+        const CURRENT_MILEAGE = 148; // Пробег (любое число до 99999)
+        // ==========================================
+
+        function setSpeedometer(speed, mileage) {
+            // Ограничение скорости рамками шкалы (0 - 50)
+            const safeSpeed = Math.max(0, Math.min(50, speed));
+            
+            // Расчет угла: 0 км/ч = -120 градусов, 50 км/ч = 110 градусов
+            const minAngle = -120;
+            const maxAngle = 110;
+            const angle = minAngle + (safeSpeed / 50) * (maxAngle - minAngle);
+            
+            // Поворот стрелки
+            document.documentElement.style.setProperty('--speed-angle', `${angle}deg`);
+
+            // Форматирование пробега в 5 цифр (например, 00148)
+            const mileageStr = String(mileage).padStart(5, '0').slice(-5);
+            const odometerContainer = document.getElementById('odometer');
+            
+            // Обновление цифр одометра
+            odometerContainer.innerHTML = mileageStr
+                .split('')
+                .map(digit => `<div class="dig">${digit}</div>`)
+                .join('');
+        }
+
+        // Запуск инициализации данных
+        setSpeedometer(CURRENT_SPEED, CURRENT_MILEAGE);
+    </script>
+</body>
+</html>
