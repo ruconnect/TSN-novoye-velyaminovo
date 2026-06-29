@@ -1,6 +1,36 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    <!-- HTML элемент списка -->
+<label for="v">Выберите город</label>
+<select id="v" onchange="updateVariable()">
+  <option value="Яблоко">МО</option>
+  <option value="Яблоко">ТУЛ</option>
+</select>
+
+<!-- Место для демонстрации работы переменной -->
+<p>Текущее значение переменной: <span id="output">ТУЛ</span></p>
+
+<script>
+  // 1. Создаем переменную с начальным значением
+  const FORCE_MAX_TEMP = false;
+
+  // 2. Функция, которая запускается при каждом изменении выбора
+  function updateVariable() {
+    // Находим наш список в HTML
+    const selectElement = document.getElementById("v");
+    
+    // Записываем выбранное значение в переменную
+    selectedFruit = selectElement.value;
+    
+    // (Необязательно) Выводим значение на экран для проверки
+    document.getElementById("output").textContent = FORCE_MAX_TEMP;
+    
+    // Вывод в консоль разработчика (F12)
+    console.log("Новое значение переменной:", FORCE_MAX_TEMP);
+  }
+</script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Виджет температуры воды</title>
@@ -140,8 +170,6 @@
     </div>
 
     <script>
-        // Управляющая переменная: true — всегда принудительно показывать 25 градусов, false — вычислять температуру
-        const FORCE_MAX_TEMP = false;
 
         function updateDateDisplay() {
             const options = { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' };
