@@ -5,11 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Механический Спидометр</title>
     <style>
-        :root {
-            /* Переменные для динамического управления */
-            --speed-angle: -116deg; /* -116deg это 0 км/ч, 116deg это 50 км/ч */
-        }
-
         body {
             background-color: #121212;
             display: flex;
@@ -102,7 +97,7 @@
             font-weight: bold;
         }
 
-        /* Контейнер для цифр шкалы КМ/Ч (Внешний радиус) */
+        /* Контейнер для цифр шкалы КМ/Ч */
         .speed-numbers {
             position: absolute;
             width: 100%;
@@ -116,7 +111,6 @@
         .speed-numbers span {
             position: absolute;
         }
-        /* Точное позиционирование по кругу как на фото */
         .lbl-0   { bottom: 98px; left: 96px; color: #e62e2e; }
         .lbl-10  { top: 125px; left: 42px; }
         .lbl-20  { top: 48px; left: 95px; }
@@ -124,7 +118,7 @@
         .lbl-40  { top: 125px; right: 42px; }
         .lbl-50  { bottom: 98px; right: 62px; color: #e62e2e; }
 
-        /* Контейнер для цифр RPM (Внутренний радиус) */
+        /* Контейнер для цифр RPM */
         .rpm-numbers {
             position: absolute;
             width: 100%;
@@ -140,7 +134,7 @@
         .rpm-400 { top: 134px; right: 78px; }
         .rpm-600 { bottom: 52px; right: 124px; }
 
-        /* Одометр под классический механический барабан */
+        /* Одометр */
         .odometer-box {
             position: absolute;
             bottom: 74px;
@@ -170,9 +164,9 @@
         }
 
         /* Последний правый барабан для десятых долей км (черный с белыми цифрами) */
-        .drum-digit:last-child {
-            background: linear-gradient(to bottom, #151515 0%, #2a2a2a 40%, #151515 60%, #000000 100%);
-            color: #ffffff;
+        .drum-digit.fraction {
+            background: linear-gradient(to bottom, #151515 0%, #2a2a2a 40%, #151515 60%, #000000 100%) !important;
+            color: #ffffff !important;
             border: 1px solid #222;
         }
 
@@ -190,7 +184,7 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.6);
         }
 
-        /* Классическая длинная красная стрелка спидометра */
+        /* Красная стрелка спидометра */
         .needle-arrow {
             position: absolute;
             width: 120px;
@@ -198,10 +192,8 @@
             background: #ff2323;
             top: 170px;
             left: 52px;
-            /* Точка вращения смещена к правому краю стрелки, где центр диска */
             transform-origin: 107px 2px;
-            transform: rotate(var(--speed-angle));
-            /* Плавное качание стрелки, имитирующее механический тросик */
+            transform: rotate(-116deg); /* По умолчанию стоит на 0 км/ч */
             transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
             z-index: 9;
             border-radius: 4px 0 0 4px;
@@ -246,39 +238,52 @@
             <div class="needle-hub"></div>
 
             <!-- Механический одометр (пробег) -->
-            <div class="odometer-box" id="odometerBox">
-                <!-- Барабаны генерируются скриптом -->
-            </div>
+            <div class="odometer-box" id="odometerBox"></div>
 
         </div>
     </div>
 
     <script>
         // ==========================================================
-        // БЛОК УПРАВЛЕНИЯ ДАННЫМИ (УКАЖИТЕ СВОИ ЗНАЧЕНИЯ ТУТ)
+        // БЛОК УПРАВЛЕНИЯ ДАННЫМИ (УКАЖИТЕ СВОИ ЗНАЧЕНИЯ ТУТ):
         // ==========================================================
-        const SPEED_KMH = 18;      // Скорость для отображения: от 0 до 50 км/ч
-        const MILEAGE_KM = 347.5;  // Пробег: число (поддерживает десятичные доли, например 347.5)
+        const SPEED_KMH = 35;      // Скорость для отображения: от 0 до 50 км/ч
+        const MILEAGE_KM = 124.8;  // Пробег: число (десятичная дробь через точку)
         // ==========================================================
 
         function updateWidget(speed, mileage) {
-            // 1. Расчет угла стрелки
-            // Ограничиваем входящую скорость физическим лимитом шкалы
+            // 1. Поворот стрелки
             const clampedSpeed = Math.max(0, Math.min(50, speed));
-            
-            // Настоящий ноль на фото находится на -116 градусах, а 50 км/ч на 116 градусах
-            const startAngle = -116;
-            const endAngle = 116;
+            const startAngle = -116; // Угол для 0 км/ч
+            const endAngle = 116;   // Угол для 50 км/ч
             const targetAngle = startAngle + (clampedSpeed / 50) * (endAngle - startAngle);
             
-            // Применяем поворот стрелки через CSS переменную
-            document.documentElement.style.setProperty('--speed-angle', `${targetAngle}deg`);
+            // Находим стрелку по ID и принудительно меняем ее CSS-трансформацию
+            const needle = document.getElementById('speedNeedle');
+            if (needle) {
+                needle.style.transform = `rotate(${targetAngle}deg)`;
+            }
 
-            // 2. Сборка механического одометра
-            // Превращаем километры в строку фиксированной длины, убирая точку (например 123.4 -> "00124")
+            // 2. Сборка барабанов одометра
             const fixedMileage = Math.floor(mileage * 10); 
             const formattedStr = String(fixedMileage).padStart(5, '0').slice(-5);
-            
             const odoContainer = document.getElementById('odometerBox');
             
-            // Рендерим раздельные механические барабаны
+            if (odoContainer) {
+                const digitsHtml = formattedStr.split('').map((digit, index) => {
+                    // Последний барабан (индекс 4) помечаем отдельным классом fraction
+                    const isLast = index === 4 ? ' fraction' : '';
+                    return `<div class="drum-digit${isLast}">${digit}</div>`;
+                }).join('');
+                
+                odoContainer.innerHTML = digitsHtml;
+            }
+        }
+
+        // Запуск прорисовки данных при загрузке страницы
+        window.addEventListener('DOMContentLoaded', () => {
+            updateWidget(SPEED_KMH, MILEAGE_KM);
+        });
+    </script>
+</body>
+</html>
