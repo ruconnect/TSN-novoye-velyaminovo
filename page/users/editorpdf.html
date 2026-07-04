@@ -3,199 +3,272 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мини PDF Редактор</title>
-    <!-- Подключаем библиотеку PDF-lib из CDN для работы с PDF -->
+    <title>Визуальный PDF Редактор</title>
+    
+    <!-- Подключаем PDF-lib для изменения и PDF.js для рендеринга -->
     <script src="https://unpkg.com"></script>
+    <script src="https://cloudflare.com"></script>
+
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f9;
-            color: #333;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        h1 {
-            text-align: center;
-            font-size: 24px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input[type="file"], input[type="text"], input[type="number"] {
-            width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        .row {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #eef2f3;
             display: flex;
-            gap: 10px;
+            flex-direction: column;
+            height: 100vh;
         }
-        .row .form-group {
-            flex: 1;
+        /* Панель инструментов */
+        .toolbar {
+            background-color: #ffffff;
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            z-index: 10;
         }
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: #007bff;
-            color: white;
+        .btn {
+            padding: 10px 18px;
             border: none;
-            border-radius: 4px;
-            font-size: 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
-            font-weight: bold;
+            transition: all 0.2s;
         }
-        button:hover {
-            background-color: #0056b3;
+        .btn-primary { background-color: #4f46e5; color: white; }
+        .btn-primary:hover { background-color: #4338ca; }
+        .btn-success { background-color: #10b981; color: white; }
+        .btn-success:hover { background-color: #059669; }
+        .btn:disabled { background-color: #d1d5db; color: #9ca3af; cursor: not-allowed; }
+        
+        input[type="file"] { display: none; }
+        .file-label {
+            background-color: #374151;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
         }
-        button:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
+        .file-label:hover { background-color: #1f2937; }
+
+        /* Рабочая зона */
+        .workspace {
+            flex: 1;
+            overflow: auto;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 20px;
         }
-        #status {
-            margin-top: 15px;
+        /* Контейнер для PDF и перетаскиваемых элементов */
+        .pdf-container {
+            position: relative;
+            background-color: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            display: none;
+        }
+        canvas {
+            display: block;
+        }
+        /* Стили перетаскиваемого текстового блока */
+        .draggable-text {
+            position: absolute;
+            padding: 6px 10px;
+            background-color: rgba(253, 224, 71, 0.8); /* Желтый маркер */
+            border: 2px dashed #eab308;
+            color: #000;
+            cursor: move;
+            border-radius: 4px;
+            user-select: none;
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 16px;
+            white-space: nowrap;
+        }
+        .draggable-text:focus {
+            outline: 2px solid #4f46e5;
+            background-color: #fff;
+        }
+        /* Приветственный экран */
+        .welcome-screen {
             text-align: center;
-            font-weight: bold;
+            margin-top: 100px;
+            color: #6b7280;
         }
-        .success { color: green; }
-        .error { color: red; }
+        .welcome-screen h2 { color: #1f2937; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Простой PDF Редактор</h1>
-    
-    <!-- Шаг 1: Импорт PDF -->
-    <div class="form-group">
-        <label for="pdf-file">1. Импортировать PDF файл:</label>
-        <input type="file" id="pdf-file" accept=".pdf">
+    <!-- Панель управления -->
+    <div class="toolbar">
+        <label class="file-label" for="pdf-import">📂 Импортировать PDF</label>
+        <input type="file" id="pdf-import" accept=".pdf">
+
+        <button class="btn btn-primary" id="add-text-btn" disabled>➕ Добавить текст</button>
+        <button class="btn btn-success" id="download-btn" disabled>💾 Скачать готовый PDF</button>
     </div>
 
-    <!-- Шаг 2: Настройки редактирования -->
-    <div class="form-group">
-        <label for="text-to-add">2. Текст для добавления:</label>
-        <input type="text" id="text-to-add" placeholder="Введите ваш текст здесь" value="Тестовая строка / Test Text">
-    </div>
+    <!-- Область просмотра -->
+    <div class="workspace">
+        <div class="welcome-screen" id="welcome">
+            <h2>Визуальный редактор документов</h2>
+            <p>Загрузите ваш PDF-файл, чтобы начать редактирование</p>
+        </div>
 
-    <div class="row">
-        <div class="form-group">
-            <label for="coord-x">Координата X:</label>
-            <input type="number" id="coord-x" value="50">
-        </div>
-        <div class="form-group">
-            <label for="coord-y">Координата Y:</label>
-            <input type="number" id="coord-y" value="500">
-        </div>
-        <div class="form-group">
-            <label for="font-size">Размер шрифта:</label>
-            <input type="number" id="font-size" value="24">
+        <div class="pdf-container" id="pdf-wrapper">
+            <canvas id="pdf-canvas"></canvas>
+            <!-- Сюда JS будет динамически добавлять текст -->
         </div>
     </div>
-
-    <!-- Шаг 3: Экспорт -->
-    <button id="process-btn" disabled>Обработать и скачать PDF</button>
-
-    <div id="status"></div>
-</div>
 
 <script>
-    const fileInput = document.getElementById('pdf-file');
-    const processBtn = document.getElementById('process-btn');
-    const statusDiv = document.getElementById('status');
-    
-    let importedPdfBytes = null;
+    // Настройка PDF.js воркера
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cloudflare.com';
 
-    // Сбой/активация кнопки при выборе файла
+    let pdfBytes = null;      // Оригинальные байты для pdf-lib
+    let pdfDocJs = null;      // Объект документа для pdf.js (визуализация)
+    let pageScale = 1.3;      // Масштаб отображения страницы
+    let textElements = [];    // Массив для хранения добавленных текстов
+
+    const fileInput = document.getElementById('pdf-import');
+    const addTextBtn = document.getElementById('add-text-btn');
+    const downloadBtn = document.getElementById('download-btn');
+    const wrapper = document.getElementById('pdf-wrapper');
+    const canvas = document.getElementById('pdf-canvas');
+    const welcome = document.getElementById('welcome');
+
+    // 1. ИМПОРТ PDF ФАЙЛА
     fileInput.addEventListener('change', async (e) => {
         const file = e.target.files[0];
-        if (file) {
-            const arrayBuffer = await file.arrayBuffer();
-            importedPdfBytes = new Uint8Array(arrayBuffer);
-            processBtn.disabled = false;
-            showStatus('Файл успешно импортирован! Задайте настройки и нажмите кнопку ниже.', 'success');
-        } else {
-            importedPdfBytes = null;
-            processBtn.disabled = true;
-            showStatus('', '');
-        }
+        if (!file) return;
+
+        // Сохраняем байты для последующего сохранения
+        const arrayBuffer = await file.arrayBuffer();
+        pdfBytes = new Uint8Array(arrayBuffer);
+
+        // Рендерим страницу для пользователя
+        const loadingTask = pdfjsLib.getDocument({ data: pdfBytes });
+        pdfDocJs = await loadingTask.promise;
+        
+        renderPage(1); // Показывем первую страницу
+
+        // Активируем кнопки управления
+        addTextBtn.disabled = false;
+        downloadBtn.disabled = false;
+        welcome.style.display = 'none';
+        wrapper.style.display = 'block';
     });
 
-    // Функция редактирования и скачивания
-    processBtn.addEventListener('click', async () => {
-        if (!importedPdfBytes) return;
+    // Отрисовка страницы PDF на Canvas
+    async function renderPage(pageNumber) {
+        const page = await pdfDocJs.getPage(pageNumber);
+        const viewport = page.getViewport({ scale: pageScale });
+        
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+        wrapper.style.width = viewport.width + 'px';
+        wrapper.style.height = viewport.height + 'px';
 
+        const renderContext = {
+            canvasContext: canvas.getContext('2d'),
+            viewport: viewport
+        };
+        await page.render(renderContext).promise;
+    }
+
+    // 2. ДОБАВЛЕНИЕ И ПЕРЕТАСКИВАНИЕ ТЕКСТА (Интерфейс для людей)
+    addTextBtn.addEventListener('click', () => {
+        const textDiv = document.createElement('div');
+        textDiv.className = 'draggable-text';
+        textDiv.contentEditable = true; // Текст можно редактировать прямо на экране кликом!
+        textDiv.innerText = 'Кликни, чтобы изменить текст';
+        
+        // Начальная позиция по центру
+        textDiv.style.left = '50px';
+        textDiv.style.top = '50px';
+
+        wrapper.appendChild(textDiv);
+        makeElementDraggable(textDiv);
+        
+        // Сохраняем ссылку на элемент в массив данных
+        textElements.push(textDiv);
+        textDiv.focus();
+    });
+
+    // Функция реализации перетаскивания (Drag and Drop)
+    function makeElementDraggable(el) {
+        let offsetX = 0, offsetY = 0, mouseX = 0, mouseY = 0;
+
+        el.addEventListener('mousedown', dragMouseDown);
+
+        function dragMouseDown(e) {
+            // Если пользователь кликнул для редактирования текста, не сбрасываем фокус
+            if (document.activeElement === el && e.target === el) return;
+            
+            e.preventDefault();
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            document.addEventListener('mouseup', closeDragElement);
+            document.addEventListener('mousemove', elementDrag);
+        }
+
+        function elementDrag(e) {
+            e.preventDefault();
+            offsetX = mouseX - e.clientX;
+            offsetY = mouseY - e.clientY;
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+
+            // Считаем новые координаты внутри контейнера
+            let newTop = el.offsetTop - offsetY;
+            let newLeft = el.offsetLeft - offsetX;
+
+            // Ограничиваем движение границами документа
+            if (newTop < 0) newTop = 0;
+            if (newLeft < 0) newLeft = 0;
+            if (newTop > wrapper.clientHeight - el.clientHeight) newTop = wrapper.clientHeight - el.clientHeight;
+            if (newLeft > wrapper.clientWidth - el.clientWidth) newLeft = wrapper.clientWidth - el.clientWidth;
+
+            el.style.top = newTop + "px";
+            el.style.left = newLeft + "px";
+        }
+
+        function closeDragElement() {
+            document.removeEventListener('mouseup', closeDragElement);
+            document.removeEventListener('mousemove', elementDrag);
+        }
+    }
+
+    // 3. СКАЧИВАНИЕ (ЭКСПОРТ) ОТРЕДАКТИРОВАННОГО PDF
+    downloadBtn.addEventListener('click', async () => {
         try {
-            showStatus('Обработка файла...', '');
-
-            // Загружаем документ в PDF-lib
-            const pdfDoc = await PDFLib.PDFDocument.load(importedPdfBytes);
-            
-            // Получаем страницы документа
+            // Загружаем оригинальный файл в редактор pdf-lib
+            const pdfDoc = await PDFLib.PDFDocument.load(pdfBytes);
             const pages = pdfDoc.getPages();
-            if (pages.length === 0) {
-                throw new Error('В PDF документе нет страниц.');
-            }
-            
-            // Выбираем первую страницу для редактирования
             const firstPage = pages[0];
             
-            // Получаем значения из полей формы
-            const text = document.getElementById('text-to-add').value;
-            const x = parseFloat(document.getElementById('coord-x').value) || 50;
-            const y = parseFloat(document.getElementById('coord-y').value) || 500;
-            const size = parseInt(document.getElementById('font-size').value) || 24;
+            // Получаем физические размеры страницы PDF в пунктах (points)
+            const { width, height } = firstPage.getSize();
 
-            // Встраиваем стандартный шрифт (Внимание: стандартные шрифты в PDF не всегда поддерживают кириллицу. 
-            // Для полной поддержки русского языка нужно внедрять собственный шрифт .ttf, но для английского и базовых символов это работает отлично).
+            // Коэффициенты перевода экранных пикселей в координаты PDF
+            const scaleX = width / canvas.width;
+            const scaleY = height / canvas.height;
+
             const helveticaFont = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
 
-            // Рисуем текст на странице
-            firstPage.drawText(text, {
-                x: x,
-                y: y,
-                size: size,
-                font: helveticaFont,
-                color: PDFLib.rgb(0, 0, 0), // Черный цвет
-            });
+            // Переносим каждый экранный элемент в реальный PDF
+            for (let el of textElements) {
+                const text = el.innerText.trim();
+                if (!text) continue;
 
-            // Сохраняем измененный PDF обратно в байты
-            const modifiedPdfBytes = await pdfDoc.save();
-
-            // Создаем ссылку для скачивания файла
-            const blob = new Blob([modifiedPdfBytes], { type: 'application/pdf' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'edited_document.pdf';
-            
-            // Симулируем клик для скачивания
-            link.click();
-
-            showStatus('Файл успешно изменен и скачан!', 'success');
-        } catch (error) {
-            console.error(error);
-            showStatus('Произошла ошибка при обработке PDF: ' + error.message, 'error');
-        }
-    });
-
-    function showStatus(text, className) {
-        statusDiv.textContent = text;
-        statusDiv.className = className;
-    }
-</script>
-
-</body>
-</html>
+                // Переводим экранные координаты (сверху вниз) в координаты PDF (снизу вверх)
+                const screenX = parseFloat(el.style.left);
+                const screenY = parseFloat(el.style.top);
+                
+                const pdfX = screenX * scaleX;
