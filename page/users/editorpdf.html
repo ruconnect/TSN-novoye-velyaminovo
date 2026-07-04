@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мини PDF Редактор</title>
+    <!-- Подключаем библиотеку PDF-lib из CDN для работы с PDF -->
+    <script src="https://unpkg.com"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            font-size: 24px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="file"], input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .row {
+            display: flex;
+            gap: 10px;
+        }
+        .row .form-group {
+            flex: 1;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #status {
+            margin-top: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Простой PDF Редактор</h1>
+    
+    <!-- Шаг 1: Импорт PDF -->
+    <div class="form-group">
+        <label for="pdf-file">1. Импортировать PDF файл:</label>
+        <input type="file" id="pdf-file" accept=".pdf">
+    </div>
+
+    <!-- Шаг 2: Настройки редактирования -->
+    <div class="form-group">
+        <label for="text-to-add">2. Текст для добавления:</label>
+        <input type="text" id="text-to-add" placeholder="Введите ваш текст здесь" value="Тестовая строка / Test Text">
+    </div>
+
+    <div class="row">
+        <div class="form-group">
+            <label for="coord-x">Координата X:</label>
+            <input type="number" id="coord-x" value="50">
+        </div>
+        <div class="form-group">
+            <label for="coord-y">Координата Y:</label>
+            <input type="number" id="coord-y" value="500">
+        </div>
+        <div class="form-group">
+            <label for="font-size">Размер шрифта:</label>
+            <input type="number" id="font-size" value="24">
+        </div>
+    </div>
+
+    <!-- Шаг 3: Экспорт -->
+    <button id="process-btn" disabled>Обработать и скачать PDF</button>
+
+    <div id="status"></div>
+</div>
+
+<script>
+    const fileInput = document.getElementById('pdf-file');
+    const processBtn = document.getElementById('process-btn');
+    const statusDiv = document.getElementById('status');
+    
+    let importedPdfBytes = null;
+
+    // Сбой/активация кнопки при выборе файла
+    fileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const arrayBuffer = await file.arrayBuffer();
+            importedPdfBytes = new Uint8Array(arrayBuffer);
+            processBtn.disabled = false;
+            showStatus('Файл успешно импортирован! Задайте настройки и нажмите кнопку ниже.', 'success');
+        } else {
+            importedPdfBytes = null;
+            processBtn.disabled = true;
+            showStatus('', '');
+        }
+    });
+
+    // Функция редактирования и скачивания
+    processBtn.addEventListener('click', async () => {
+        if (!importedPdfBytes) return;
+
+        try {
+            showStatus('Обработка файла...', '');
+
+            // Загружаем документ в PDF-lib
+            const pdfDoc = await PDFLib.PDFDocument.load(importedPdfBytes);
+            
+            // Получаем страницы документа
+            const pages = pdfDoc.getPages();
+            if (pages.length === 0) {
+                throw new Error('В PDF документе нет страниц.');
+            }
+            
+            // Выбираем первую страницу для редактирования
+            const firstPage = pages[0];
+            
+            // Получаем значения из полей формы
+            const text = document.getElementById('text-to-add').value;
+            const x = parseFloat(document.getElementById('coord-x').value) || 50;
+            const y = parseFloat(document.getElementById('coord-y').value) || 500;
+            const size = parseInt(document.getElementById('font-size').value) || 24;
+
+            // Встраиваем стандартный шрифт (Внимание: стандартные шрифты в PDF не всегда поддерживают кириллицу. 
+            // Для полной поддержки русского языка нужно внедрять собственный шрифт .ttf, но для английского и базовых символов это работает отлично).
+            const helveticaFont = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
+
+            // Рисуем текст на странице
+            firstPage.drawText(text, {
+                x: x,
+                y: y,
+                size: size,
+                font: helveticaFont,
+                color: PDFLib.rgb(0, 0, 0), // Черный цвет
+            });
+
+            // Сохраняем измененный PDF обратно в байты
+            const modifiedPdfBytes = await pdfDoc.save();
+
+            // Создаем ссылку для скачивания файла
+            const blob = new Blob([modifiedPdfBytes], { type: 'application/pdf' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'edited_document.pdf';
+            
+            // Симулируем клик для скачивания
+            link.click();
+
+            showStatus('Файл успешно изменен и скачан!', 'success');
+        } catch (error) {
+            console.error(error);
+            showStatus('Произошла ошибка при обработке PDF: ' + error.message, 'error');
+        }
+    });
+
+    function showStatus(text, className) {
+        statusDiv.textContent = text;
+        statusDiv.className = className;
+    }
+</script>
+
+</body>
+</html>
