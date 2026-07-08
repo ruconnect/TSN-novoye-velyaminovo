@@ -1,214 +1,136 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Панель управления и статьи</title>
-  
-  <!-- Современный шрифт Google Fonts -->
-  <link rel="preconnect" href="https://googleapis.com">
-  <link rel="preconnect" href="https://gstatic.com" crossorigin>
-  <link href="https://googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
-  <style>
-    :root {
-      --bg-color: #f4f6f9;
-      --card-bg: #ffffff;
-      --text-main: #1e293b;
-      --text-muted: #64748b;
-      --primary: #4f46e5;
-      --primary-hover: #4338ca;
-      --secondary: #0ea5e9;
-      --secondary-hover: #0284c7;
-      --accent: #10b981;
-      --accent-hover: #059669;
-      --border-radius: 12px;
-      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-      --transition: all 0.2s ease-in-out;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Правильная подготовка дома к зиме</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+        body {
+            background-color: #1a1a24;
+            color: #e2e8f0;
+            line-height: 1.6;
+            padding: 20px;
+        }
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      line-height: 1.5;
-      padding: 2rem 1rem;
-    }
+        .container {
+            max-width: 700px;
+            margin: 40px auto;
+            background: #242432;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
 
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 2rem;
-    }
+        h1 {
+            font-size: 2rem;
+            color: #f1faee;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #e63946;
+            padding-bottom: 15px;
+        }
 
-    @media (min-width: 900px) {
-      .container {
-        grid-template-columns: 650px 1fr;
-      }
-    }
+        p.intro {
+            color: #94a3b8;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
 
-    /* Стили для блока с Яндекс Формой */
-    .form-section {
-      background: var(--card-bg);
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow);
-      padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      height: fit-content;
-    }
+        h2 {
+            font-size: 1.3rem;
+            color: #e63946;
+            margin: 25px 0 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-    .form-section iframe {
-      width: 100%;
-      min-height: 600px;
-      border: none;
-      border-radius: calc(var(--border-radius) - 4px);
-    }
+        .guide-box {
+            background: #1e1e2f;
+            border-left: 4px solid #3b82f6;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
 
-    /* Стили для панели управления и навигации */
-    .nav-section {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
+        .guide-box.danger {
+            border-left-color: #ef4444;
+        }
 
-    .card {
-      background: var(--card-bg);
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow);
-      padding: 1.5rem;
-    }
+        .guide-box h3 {
+            color: #ffffff;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
 
-    .card-title {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-      color: var(--text-main);
-      border-bottom: 2px solid #f1f5f9;
-      padding-bottom: 0.5rem;
-    }
+        ul {
+            margin-left: 20px;
+            margin-top: 10px;
+            color: #cbd5e1;
+        }
 
-    .grid-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
+        li {
+            margin-bottom: 8px;
+        }
 
-    /* Общие стили для кнопок */
-    button {
-      font-family: inherit;
-      font-size: 0.95rem;
-      font-weight: 500;
-      padding: 0.75rem 1rem;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: var(--transition);
-      display: inline-flex;
-      align-items: center;
-      justify-content: flex-start;
-      text-align: left;
-      width: 100%;
-    }
+        .badge {
+            background: #ef4444;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
 
-    /* Кнопки действий (Инструменты) */
-    .btn-tools {
-      background-color: #f1f5f9;
-      color: var(--text-main);
-    }
-    .btn-tools:hover {
-      background-color: #e2e8f0;
-    }
-    .btn-tools.primary-action {
-      background-color: var(--primary);
-      color: #ffffff;
-    }
-    .btn-tools.primary-action:hover {
-      background-color: var(--primary-hover);
-    }
-
-    /* Кнопки статей (PDF) */
-    .btn-pdf {
-      background-color: #f8fafc;
-      border: 1px solid #e2e8f0;
-      color: var(--text-main);
-    }
-    .btn-pdf:hover {
-      background-color: #f1f5f9;
-      border-color: #cbd5e1;
-      transform: translateY(-1px);
-    }
-
-    /* Иконки перед текстом на кнопках */
-    button::before {
-      margin-right: 0.75rem;
-      font-size: 1.1rem;
-    }
-    .icon-add::before { content: "✍️"; }
-    .icon-edit::before { content: "📝"; }
-    .icon-premium::before { content: "⚡"; }
-    .icon-doc::before { content: "📄"; }
-    .icon-well::before { content: "💧"; }
-  </style>
+        .badge.pro {
+            background: #10b981;
+        }
+    </style>
 </head>
 <body>
 
-  <div class="container">
-    
-    <!-- Левая колонка: Форма -->
-    <main class="form-section">
-      <script src="https://forms.yandex.ru/_static/embed.js"></script>
-      <iframe src="https://forms.yandex.ru/u/6a49017c4936398361abeea8?iframe=1" name="ya-form-6a49017c4936398361abeea8"></iframe>
-    </main>
+    <div class="container">
+        <h1>🛠️ Как на самом деле готовить дом к зиме</h1>
+        <p class="intro">Без дедовских методов, порчи сантехники и затопленных по весне полов.</p>
 
-    <!-- Правая колонка: Управление и статьи -->
-    <aside class="nav-section">
-      
-      <!-- Блок управления контентом -->
-      <div class="card">
-        <h2 class="card-title">Панель управления</h2>
-        <div class="grid-buttons">
-          <button class="btn-tools primary-action icon-add" onclick="window.location.href='form.html';">Написать свою статью</button>
-          <button class="btn-tools icon-edit" onclick="window.location.href='editor.html';">Редактировать статью</button>
-          <button class="btn-tools icon-premium" onclick="window.location.href='editorpl.html';">Editor+</button>
+        <!-- Раздел 1: Водопровод -->
+        <h2>⚡ Раздел 1: Адекватный слив воды и гидрозатворы</h2>
+        
+        <div class="guide-box danger">
+            <h3><span class="badge">Как делать НЕ надо:</span> Извозюкать всё незамерзайкой</h3>
+            <p>Советы «залить автомобильный тосол или незамерзайку в унитаз и раковины» — вредительство. Во-первых, она испаряется за месяц, и дом заполнится вонью из септика. Во-вторых, агрессивная химия разъедает резиновые уплотнители в трубах и портит глянец керамики.</p>
         </div>
-      </div>
 
-      <!-- Блок статей о колодцах -->
-      <div class="card">
-        <h2 class="card-title">Всё про колодцы</h2>
-        <div class="grid-buttons">
-          <button class="btn-tools icon-well" onclick="window.location.href='form.html';">Раздел для колодцев</button>
-          <button class="btn-pdf icon-doc" onclick="window.location.href='page1.pdf';">Свой колодец</button>
-          <button class="btn-pdf icon-doc" onclick="window.location.href='page5.pdf';">Провести воду из колодца в дом</button>
-          <button class="btn-pdf icon-doc" onclick="window.location.href='page6.pdf';">Погружной насос для колодца ручной</button>
-          <button class="btn-pdf icon-doc" onclick="window.location.href='page7.pdf';">Колодец с ведром</button>
+        <div class="guide-box">
+            <h3><span class="badge pro">Как правильно:</span> Продувка и откачка</h3>
+            <p>Если дом зимой уходит в минус, алгоритм жесткий:</p>
+            <ul>
+                <li><strong>Продувка компрессором:</strong> Просто открыть краны мало, в коленах и изгибах труб останется вода, которая их порвет. Подключите автомобильный или строительный компрессор к системе и выдуйте остатки влаги из всех точек.</li>
+                <li><strong>Осушение гидрозатворов:</strong> Воду из сифонов раковин и унитаза нужно полностью откачать (например, большим шприцем (жане) или клизмой).</li>
+                <li><strong>Защита от запаха:</strong> Чтобы из сухого сифона не несло канализацией, плотно заткните сливные отверстия резиновыми пробками, а унитаз закройте стрейч-пленкой в несколько слоев.</li>
+                <li><strong>Бойлер и фильтры:</strong> Из водонагревателя воду сливайте через специальный тройник. Все колбы магистральных фильтров скрутите, слейте из них воду, а сами картриджи выбросьте.</li>
+            </ul>
         </div>
-      </div>
 
-      <!-- Блок остальных статей -->
-      <div class="card">
-        <h2 class="card-title">Полезные статьи</h2>
-        <div class="grid-buttons">
-          <button class="btn-pdf icon-doc" onclick="window.location.href='page2.pdf';">Как посадить голубику</button>
-          <button class="btn-pdf icon-doc" onclick="window.location.href='page3.pdf';">Volkswagen Tiguan для семьи</button>
-          <button class="btn-pdf icon-doc" onclick="window.location.href='page4.pdf';">2 санузел как сделать</button>
-          <button class="btn-pdf icon-doc" onclick="window.location.href='page8.pdf';">Ягодная настойка</button>
-          <button class="btn-pdf icon-doc" onclick="window.location.href='page9.html';">Подготовить дом к зиме</button>
+        <!-- Раздел 2: Отопление -->
+        <h2>🔥 Раздел 2: Электричество и тепло</h2>
+        <div class="guide-box">
+            <h3>Греющий кабель — наше всё</h3>
+            <p>Если вы оставляете дом на «поддержании» температуры (+5 °C):</p>
+            <ul>
+                <li>Убедитесь, что греющий кабель на вводе трубы в дом подключен мимо общего автомата. Если во всем поселке временно отключится свет, а потом включится — кабель должен заработать сам.</li>
+                <li>Проверьте давление в расширительном баке котла отопления до наступления сильных морозов.</li>
+            </ul>
         </div>
-      </div>
 
-    </aside>
-
-  </div>
+    </div>
 
 </body>
 </html>
