@@ -1,155 +1,262 @@
-<!-- Yandex.Metrika counter -->
-<script type="text/javascript">
-    (function(m,e,t,r,i,k,a){
-        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-        m[i].l=1*new Date();
-        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
-    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=110388619', 'ym');
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главная панель навигации</title>
+    
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function(m,e,t,r,i,k,a){
+            m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+            m[i].l=1*new Date();
+            for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+            k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+        })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=110388619', 'ym');
 
-    ym(110388619, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
-</script>
-<noscript><div><img src="https://mc.yandex.ru/watch/110388619" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-<!-- /Yandex.Metrika counter -->
-<p><a class="button" href="page/page1.html">Варенье из шишек</a>< <a class="button" href="page/page3.html"> Куда можно сходить презентация</a></p>
-<a href="page/info.html" style="display: inline-block; padding: 12px 24px; background-color: #28a745; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold; font-family: sans-serif;">
-    Клубника и малина
-</a>
-<a href="page/users/page.html" style="display: inline-block; background-color: #007bff; color: white; text-decoration: none; padding: 10px 20px; border-radius: 4px; font-family: sans-serif; font-weight: bold; text-align: center;">
-  Другие статьи
-</a>
-<iframe src="wid/water.html" width="600" height="400" title="Пример фрейма"></iframe>
-<iframe src="wid/strange.html" width="600" height="400" title="Странный счётчик"></iframe>
-<meta charset="UTF-8">
-<a href="page/page4.html" style="display: inline-block; background-color: #007bff; color: white; text-decoration: none; padding: 10px 20px; border-radius: 4px; font-family: sans-serif; font-weight: bold; text-align: center;">
-  Бурение колодца с помощью ямобура
-</a>
-<script src="https://forms.yandex.ru/_static/embed.js"></script><iframe src="https://forms.yandex.ru/u/6a43c9b49029020029ba2b35?iframe=1" frameborder="0" name="ya-form-6a43c9b49029020029ba2b35" width="650"></iframe>
+        ym(110388619, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/110388619" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+
     <style>
-        /* Базовый стиль кнопки (ссылки) */
-        .action-button {
-            display: inline-block;
-            padding: 12px 24px;
-            background-color: #3498db; /* Основной цвет (синий) */
-            color: #ffffff; /* Цвет текста */
-            text-decoration: none; /* Убираем подчеркивание */
-            font-family: Arial, sans-serif;
-            font-size: 16px;
-            border-radius: 5px; /* Скругленные углы */
-            border: none;
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-main: #2d3748;
+            --text-muted: #718096;
+            --primary: #3182ce;
+            --primary-hover: #2b6cb0;
+            --success: #38a169;
+            --success-hover: #2f855a;
+            --accent: #ed8936;
+            --accent-hover: #dd6b20;
+            --dark: #1a202c;
+            --radius: 12px;
+            --shadow: 0 4px 6px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.1);
+            --transition: all 0.25s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-muted);
+        }
+
+        /* Сетка для основного контента */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (min-width: 992px) {
+            .main-layout {
+                grid-template-columns: 3fr 2fr;
+            }
+        }
+
+        /* Карточки секций */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .card h2 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+            border-bottom: 2px solid #edf2f7;
+            padding-bottom: 10px;
+        }
+
+        /* Сетка кнопок */
+        .btn-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        /* Базовые стили для обновленных кнопок */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 14px 20px;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: var(--radius);
             cursor: pointer;
-            transition: background-color 0.2s ease, transform 0.1s ease;
+            border: none;
+            transition: var(--transition);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
         }
 
-        /* Затемнение при наведении мыши */
-        .action-button:hover {
-            background-color: #2980b9;
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
-        /* Затемнение и эффект нажатия */
-        .action-button:active {
-            background-color: #1f618d; /* Более темный оттенок */
-            transform: scale(0.98); /* Слегка уменьшаем кнопку для эффекта нажатия */
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* Цветовые модификаторы кнопок */
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+
+        .btn-success { background-color: var(--success); color: white; }
+        .btn-success:hover { background-color: var(--success-hover); }
+
+        .btn-accent { background-color: var(--accent); color: white; }
+        .btn-accent:hover { background-color: #0066cc; } /* Синий при наведении по вашему коду */
+
+        .btn-dark { background-color: var(--primary); color: white; }
+        .btn-dark:hover { background-color: var(--dark); } /* Черный при наведении по вашему коду */
+
+        .btn-outline { background-color: transparent; border: 2px solid #e2e8f0; color: var(--text-main); }
+        .btn-outline:hover { background-color: #edf2f7; border-color: #cbd5e0; }
+
+        /* Секция фреймов и виджетов */
+        .widgets-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .iframe-wrapper {
+            position: relative;
+            width: 100%;
+            background: #fff;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            padding: 15px;
+        }
+
+        .iframe-wrapper h3 {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            color: var(--text-muted);
+        }
+
+        iframe {
+            width: 100%;
+            border: none;
+            border-radius: 6px;
+            background: #fafafa;
+        }
+
+        /* Ограничение для Яндекс Формы */
+        .form-wrapper iframe {
+            min-height: 500px;
         }
     </style>
 </head>
 <body>
 
-    <!-- Кнопка-ссылка, перенаправляющая на указанный адрес -->
-    <a href="TCH/README.html" class="action-button">Перейти к README</a>
-<p>На нашем сайте есть рецепты!</p>
-<a href="page/яблочный пирог.html" class="recipe-btn">Яблочный пирог</a>
-<meta charset="UTF-8">
-<style>
-.recipe-btn {
-    display: inline-block; 
-    padding: 12px 24px; 
-    background-color: #007bff; 
-    color: #ffffff; 
-    text-decoration: none; 
-    border-radius: 5px; 
-    font-weight: bold; 
-    font-family: sans-serif;
-    transition: background-color 0.3s ease; /* Плавное изменение цвета */
-}
+    <div class="container">
+        
+        <header>
+            <h1>Панель управления проектом</h1>
+            <p>Добро пожаловать. Выберите необходимый раздел или заполните форму ниже.</p>
+        </header>
 
-.recipe-btn:hover {
-    background-color: #0056b3; /* Темнеет при наведении */
-}
-</style>
+        <div class="main-layout">
+            
+            <!-- Левая колонка: Кнопки и Ссылки -->
+            <div class="widgets-section">
+                
+                <div class="card">
+                    <h2>Рецепты и статьи</h2>
+                    <div class="btn-grid">
+                        <a href="page/page1.html" class="btn btn-outline">Варенье из шишек</a>
+                        <a href="page/info.html" class="btn btn-success">Клубника и малина</a>
+                        <a href="page/яблочный пирог.html" class="btn btn-primary">Яблочный пирог</a>
+                        <a href="page/users/page.html" class="btn btn-outline">Другие статьи</a>
+                    </div>
+                </div>
 
-<style>
-  .blue-hover-btn {
-    background-color: #ff5722; /* Изначальный цвет кнопки (например, оранжевый) */
-    color: white;             /* Цвет текста */
-    padding: 12px 24px;       /* Отступы внутри кнопки */
-    border: none;             /* Убираем рамку */
-    border-radius: 5px;       /* Скругление углов */
-    font-size: 16px;          /* Размер шрифта */
-    cursor: pointer;          /* Меняем курсор при наведении */
-    transition: background-color 0.3s ease; /* Плавный переход цвета 0.3 секунды */
-  }
+                <div class="card">
+                    <h2>Строительство и презентации</h2>
+                    <div class="btn-grid">
+                        <a href="page/page4.html" class="btn btn-primary">Бурение колодца ямобуром</a>
+                        <a href="page/page3.html" class="btn btn-outline">Куда можно сходить</a>
+                    </div>
+                </div>
 
-  /* Состояние при наведении курсора */
-  .blue-hover-btn:hover {
-    background-color: #0066cc; /* Синий цвет фона */
-  }
-</style>
-<a href="campaign/2026/form.html" style="display: inline-block; padding: 12px 24px; background-color: #28a745; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold; font-family: sans-serif;">
-    Участвовать
-</a>
-<style>
-  .blue-hover-btn {
-    background-color: #ff5722; /* Изначальный цвет кнопки (например, оранжевый) */
-    color: white;             /* Цвет текста */
-    padding: 12px 24px;       /* Отступы внутри кнопки */
-    border: none;             /* Убираем рамку */
-    border-radius: 5px;       /* Скругление углов */
-    font-size: 16px;          /* Размер шрифта */
-    cursor: pointer;          /* Меняем курсор при наведении */
-    transition: background-color 0.3s ease; /* Плавный переход цвета 0.3 секунды */
-  }
+                <div class="card">
+                    <h2>Управление и участие</h2>
+                    <div class="btn-grid">
+                        <a href="TCH/README.html" class="btn btn-primary">Перейти к README</a>
+                        <a href="campaign/2026/form.html" class="btn btn-success">Участвовать</a>
+                        
+                        <!-- Исправлено: заменена кнопка-пустышка button на полноценную ссылку a -->
+                        <a href="campaign/2026/form.html" class="btn btn-accent">ТСН Вельяминово</a>
+                        
+                        <a href="info.html" class="btn btn-dark">Админ панель</a>
+                    </div>
+                </div>
 
-  /* Состояние при наведении курсора */
-  .blue-hover-btn:hover {
-    background-color: #0066cc; /* Синий цвет фона */
-  }
-</style>
-<button href="campaign/2026/form.html" class="blue-hover-btn">ТСН Вельяминово</button>
-<a href="info.html" class="black-hover-btn">Админ панель</a>
+                <!-- Яндекс.Форма перемещена в логичный блок контента -->
+                <div class="card form-wrapper">
+                    <h2>Обратная связь</h2>
+                    <script src="https://forms.yandex.ru/_static/embed.js"></script>
+                    <iframe src="https://forms.yandex.ru/u/6a43c9b49029020029ba2b35?iframe=1" name="ya-form-6a43c9b49029020029ba2b35"></iframe>
+                </div>
 
-<style>
-.black-hover-btn {
-  display: inline-block;
-  padding: 10px 20px;
-  background-color: #007bff; /* Исходный синий цвет */
-  color: white; /* Цвет текста */
-  text-decoration: none; /* Убирает подчеркивание ссылки */
-  border-radius: 5px; /* Скругление углов */
-  transition: background-color 0.3s ease; /* Плавный переход цвета */
-  font-family: Arial, sans-serif;
-}
+            </div>
 
-/* Эффект при наведении мыши */
-.black-hover-btn:hover {
-  background-color: black; /* Кнопка становится черной */
-}
-</style>
-<h1 style="color: green;">ТСН Новое Вельяминово</h1>
-<p>ТСН &laquo;Новое Вельяминово&raquo;&nbsp;&mdash;&nbsp;это товарищество собственников недвижимости, расположенное в Московской области, в городском округе Ступино, в селе Татариново. Оно зарегистрировано 18&nbsp;августа 2020&nbsp;года. Основной вид деятельности&nbsp;&mdash;&nbsp;управление эксплуатацией жилого фонда за вознаграждение или на договорной основе.</p>
-<h2>Расположение и транспортная доступность</h2>
-<p><a class="button" href="page/page1.html"><img src="TCH/1.webp" alt="Пляж" /></a></p>
-<p>Посёлок находится примерно в 45&ndash;51&nbsp;км от МКАД по Каширскому шоссе (трассе М4&nbsp;&laquo;Дон&raquo;). Чтобы добраться на автомобиле, нужно проехать от Москвы по Каширскому шоссе в направлении села Растуново. После железнодорожного переезда села Барыбино&nbsp;&mdash;&nbsp;первый поворот направо, далее прямо до села Татариново. ТСН &laquo;Новое Вельяминово&raquo; расположено справа от дороги, между СНТ &laquo;Парижская Коммуна&raquo; и СНТ &laquo;Калининец&raquo;.</p>
-<p>На общественном транспорте можно доехать электричкой Павелецкого направления от железнодорожной станции &laquo;Нижние Котлы&raquo; (м.&nbsp;&laquo;Нагатинская&raquo;) до платформы &laquo;Вельяминово&raquo;. До железнодорожной станции &laquo;Вельяминово&raquo; можно дойти пешком примерно за 10&nbsp;минут.</p>
-<h2>Инфраструктура</h2>
-<p><a class="button" href="page/page1.html"><img src="TCH/2.webp" alt="Пляж" /></a></p>
-<p>В пешей доступности от посёлка есть магазины (&laquo;Пятёрочка&raquo;, &laquo;Дикси&raquo;), строительный рынок, школа, детский сад, аптека, поликлиника, пункты выдачи Wildberries и Ozon. Также рядом есть конно-спортивный комплекс &laquo;Рэймонд&raquo;.&nbsp;</p>
-<p>В посёлке есть дороги с твёрдым покрытием, дренажная система, пожарный водоём.</p>
-<h2>Природа и экология</h2>
-<p>Посёлок расположен в экологически благоприятной зоне&nbsp;&mdash;&nbsp;граничит с лесным массивом и естественными водоёмами. Рядом есть смешанный лес, реки и пруды, что предоставляет возможности для прогулок, сбора грибов и ягод, рыбалки.</p>
-<h2>Коммуникации</h2>
-<p>В ТСН &laquo;Новое Вельяминово&raquo; подведено электричество. На участках может быть предусмотрено водоснабжение (например, скважина или колодец), канализация (септик).</p>
-<h2>Управление</h2>
-<p>Председатель правления с 30&nbsp;июля 2024&nbsp;года&nbsp;&mdash;&nbsp;Чупина Анна Константиновна. Юридический адрес: 142846, Московская область, г.&nbsp;о.&nbsp;Ступино, с.&nbsp;Татариново, тер.&nbsp;ТСН &laquo;Новое Вельяминово&raquo;, ул.&nbsp;Солнечная, д.&nbsp;39.</p>
-<h2>Дополнительные сведения</h2>
-<p>Территория посёлка закрыта, есть несколько въездов. Сообщество характеризуется как спокойное, с добрососедскими отношениями.</p>
+            <!-- Правая колонка: Информационные фреймы/виджеты -->
+            <div class="widgets-section">
+                
+                <div class="iframe-wrapper">
+                    <h3>Пример фрейма (Вода)</h3>
+                    <iframe src="wid/water.html" height="350" title="Пример фрейма"></iframe>
+                </div>
+
+                <div class="iframe-wrapper">
+                    <h3>Странный счётчик</h3>
+                    <iframe src="wid/strange.html" height="350" title="Странный счётчик"></iframe>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>
