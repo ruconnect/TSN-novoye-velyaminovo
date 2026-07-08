@@ -3,56 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Правильная подготовка дома к зиме</title>
+    <title>Инженерная подготовка дома к зиме</title>
     <style>
+        /* Минималистичные светлые стили */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         body {
-            background-color: #1a1a24;
-            color: #e2e8f0;
+            background-color: #f8fafc;
+            color: #334155;
             line-height: 1.6;
             padding: 20px;
         }
 
         .container {
-            max-width: 700px;
+            max-width: 680px;
             margin: 40px auto;
-            background: #242432;
-            padding: 30px;
+            background: #ffffff;
+            padding: 35px;
             border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            border: 1px solid #e2e8f0;
         }
 
         h1 {
-            font-size: 2rem;
-            color: #f1faee;
-            margin-bottom: 10px;
-            border-bottom: 2px solid #e63946;
-            padding-bottom: 15px;
+            font-size: 2.1rem;
+            color: #0f172a;
+            margin-bottom: 8px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
         }
 
         p.intro {
-            color: #94a3b8;
+            color: #64748b;
             font-size: 1.1rem;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
         }
 
         h2 {
-            font-size: 1.3rem;
-            color: #e63946;
-            margin: 25px 0 15px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            font-size: 1.4rem;
+            color: #0f172a;
+            margin: 35px 0 15px 0;
+            font-weight: 700;
         }
 
+        /* Карточки с инструкциями */
         .guide-box {
-            background: #1e1e2f;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
             border-left: 4px solid #3b82f6;
             padding: 20px;
             border-radius: 8px;
@@ -60,37 +62,62 @@
         }
 
         .guide-box.danger {
+            background: #fff5f5;
+            border-color: #feb2b2;
             border-left-color: #ef4444;
         }
 
         .guide-box h3 {
-            color: #ffffff;
+            color: #1e293b;
             font-size: 1.1rem;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .guide-box p {
+            font-size: 0.95rem;
+            color: #475569;
         }
 
         ul {
             margin-left: 20px;
-            margin-top: 10px;
-            color: #cbd5e1;
+            margin-top: 12px;
+            color: #475569;
         }
 
         li {
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
         }
 
+        li strong {
+            color: #0f172a;
+        }
+
+        /* Значки */
         .badge {
             background: #ef4444;
             color: white;
-            padding: 2px 6px;
+            padding: 2px 8px;
             border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: bold;
+            font-size: 0.75rem;
+            font-weight: 700;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .badge.pro {
             background: #10b981;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .container { padding: 20px; margin: 10px auto; }
+            h1 { font-size: 1.6rem; }
+            h2 { font-size: 1.2rem; }
         }
     </style>
 </head>
@@ -98,35 +125,35 @@
 
     <div class="container">
         <h1>🛠️ Как на самом деле готовить дом к зиме</h1>
-        <p class="intro">Без дедовских методов, порчи сантехники и затопленных по весне полов.</p>
+        <p class="intro">Адекватный разбор без вредных дачных советов, порчи сантехники и разорванных труб.</p>
 
-        <!-- Раздел 1: Водопровод -->
-        <h2>⚡ Раздел 1: Адекватный слив воды и гидрозатворы</h2>
+        <!-- Раздел 1 -->
+        <h2>Раздел 1: Правильный слив воды и гидрозатворы</h2>
         
         <div class="guide-box danger">
-            <h3><span class="badge">Как делать НЕ надо:</span> Извозюкать всё незамерзайкой</h3>
-            <p>Советы «залить автомобильный тосол или незамерзайку в унитаз и раковины» — вредительство. Во-первых, она испаряется за месяц, и дом заполнится вонью из септика. Во-вторых, агрессивная химия разъедает резиновые уплотнители в трубах и портит глянец керамики.</p>
+            <h3><span class="badge">Ошибка:</span> Заливать незамерзайку в сифоны</h3>
+            <p>Автомобильный тосол или жидкость для омывателя испаряются за несколько недель. Результат — дом пропитается вонью из септика, а агрессивный химический состав разъест резиновые уплотнители в трубах и испортит эмаль.</p>
         </div>
 
         <div class="guide-box">
-            <h3><span class="badge pro">Как правильно:</span> Продувка и откачка</h3>
-            <p>Если дом зимой уходит в минус, алгоритм жесткий:</p>
+            <h3><span class="badge pro">Решение:</span> Продувка компрессором и сухие затворы</h3>
+            <p>Если дом зимой не будет отапливаться, используйте технологию профессиональных монтажников:</p>
             <ul>
-                <li><strong>Продувка компрессором:</strong> Просто открыть краны мало, в коленах и изгибах труб останется вода, которая их порвет. Подключите автомобильный или строительный компрессор к системе и выдуйте остатки влаги из всех точек.</li>
-                <li><strong>Осушение гидрозатворов:</strong> Воду из сифонов раковин и унитаза нужно полностью откачать (например, большим шприцем (жане) или клизмой).</li>
-                <li><strong>Защита от запаха:</strong> Чтобы из сухого сифона не несло канализацией, плотно заткните сливные отверстия резиновыми пробками, а унитаз закройте стрейч-пленкой в несколько слоев.</li>
-                <li><strong>Бойлер и фильтры:</strong> Из водонагревателя воду сливайте через специальный тройник. Все колбы магистральных фильтров скрутите, слейте из них воду, а сами картриджи выбросьте.</li>
+                <li><strong>Продувка системы:</strong> Просто открыть краны недостаточно — в изгибах труб останется вода. Подключите строительный или автомобильный компрессор к входному узлу и выдуйте остатки влаги из всех смесителей.</li>
+                <li><strong>Осушение гидрозатворов:</strong> Полностью удалите воду из сифонов раковин, душа и унитаза с помощью ручного насоса, шприца или обычной клизмы.</li>
+                <li><strong>Защита от запаха:</strong> Чтобы из пустых труб не шел запах канализации, плотно закройте сливные отверстия резиновыми пробками, а чашу унитаза замотайте пищевой стрейч-пленкой.</li>
+                <li><strong>Фильтры и бойлер:</strong> Слейте воду из водонагревателя через сливной тройник. Скрутите колбы магистральных фильтров, опустошите их, а старые картриджи утилизируйте.</li>
             </ul>
         </div>
 
-        <!-- Раздел 2: Отопление -->
-        <h2>🔥 Раздел 2: Электричество и тепло</h2>
+        <!-- Раздел 2 -->
+        <h2>Раздел 2: Электрика и поддержание тепла</h2>
         <div class="guide-box">
-            <h3>Греющий кабель — наше всё</h3>
-            <p>Если вы оставляете дом на «поддержании» температуры (+5 °C):</p>
+            <h3>Греющий кабель и автоматика</h3>
+            <p>Если вы оставляете отопление в режиме «минимального плюса» (+5 °C):</p>
             <ul>
-                <li>Убедитесь, что греющий кабель на вводе трубы в дом подключен мимо общего автомата. Если во всем поселке временно отключится свет, а потом включится — кабель должен заработать сам.</li>
-                <li>Проверьте давление в расширительном баке котла отопления до наступления сильных морозов.</li>
+                <li><strong>Прямое подключение:</strong> Греющий кабель на вводе трубы в дом должен быть подключен в обход общего автомата. Если в поселке временно отключится, а затем восстановится электроснабжение — кабель запустится сам.</li>
+                <li><strong>Проверка давления:</strong> До первых сильных заморозков проверьте давление в расширительном баке котла и при необходимости подкачайте его.</li>
             </ul>
         </div>
 
