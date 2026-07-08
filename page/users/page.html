@@ -1,16 +1,213 @@
 <!DOCTYPE html>
-<html>
-  <script src="https://forms.yandex.ru/_static/embed.js"></script><iframe src="https://forms.yandex.ru/u/6a49017c4936398361abeea8?iframe=1" frameborder="0" name="ya-form-6a49017c4936398361abeea8" width="650"></iframe>
-<button onclick="window.location.href='form.html';">Написать свою статью</button>
-<button onclick="window.location.href='editor.html';">Редактировать статью</button>
-<button onclick="window.location.href='editorpl.html';">Editor+</button>
-<button onclick="window.location.href='page1.pdf';">Свой колодец</button>
-<button onclick="window.location.href='page2.pdf';">Как посадить голубику</button>
-<button onclick="window.location.href='page3.pdf';">Volkswagen Tiguan для семьи</button>
-<button onclick="window.location.href='page4.pdf';">2 санузел как сделать</button>
-<button onclick="window.location.href='page5.pdf';">Провести воду из колодца в дом</button>
-  <button onclick="window.location.href='form.html';">Раздел для колодцов</button>
-  <button onclick="window.location.href='page6.pdf';">Погружной насос для колодца ручной</button>
-  <button onclick="window.location.href='page7.pdf';">Колодец с ведром</button>
-  <button onclick="window.location.href='page8.pdf';">Ягодная настойка</button>
-<html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Панель управления и статьи</title>
+  
+  <!-- Современный шрифт Google Fonts -->
+  <link rel="preconnect" href="https://googleapis.com">
+  <link rel="preconnect" href="https://gstatic.com" crossorigin>
+  <link href="https://googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-color: #f4f6f9;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --secondary: #0ea5e9;
+      --secondary-hover: #0284c7;
+      --accent: #10b981;
+      --accent-hover: #059669;
+      --border-radius: 12px;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+      --transition: all 0.2s ease-in-out;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      line-height: 1.5;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    @media (min-width: 900px) {
+      .container {
+        grid-template-columns: 650px 1fr;
+      }
+    }
+
+    /* Стили для блока с Яндекс Формой */
+    .form-section {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      height: fit-content;
+    }
+
+    .form-section iframe {
+      width: 100%;
+      min-height: 600px;
+      border: none;
+      border-radius: calc(var(--border-radius) - 4px);
+    }
+
+    /* Стили для панели управления и навигации */
+    .nav-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--text-main);
+      border-bottom: 2px solid #f1f5f9;
+      padding-bottom: 0.5rem;
+    }
+
+    .grid-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    /* Общие стили для кнопок */
+    button {
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 500;
+      padding: 0.75rem 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-start;
+      text-align: left;
+      width: 100%;
+    }
+
+    /* Кнопки действий (Инструменты) */
+    .btn-tools {
+      background-color: #f1f5f9;
+      color: var(--text-main);
+    }
+    .btn-tools:hover {
+      background-color: #e2e8f0;
+    }
+    .btn-tools.primary-action {
+      background-color: var(--primary);
+      color: #ffffff;
+    }
+    .btn-tools.primary-action:hover {
+      background-color: var(--primary-hover);
+    }
+
+    /* Кнопки статей (PDF) */
+    .btn-pdf {
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      color: var(--text-main);
+    }
+    .btn-pdf:hover {
+      background-color: #f1f5f9;
+      border-color: #cbd5e1;
+      transform: translateY(-1px);
+    }
+
+    /* Иконки перед текстом на кнопках */
+    button::before {
+      margin-right: 0.75rem;
+      font-size: 1.1rem;
+    }
+    .icon-add::before { content: "✍️"; }
+    .icon-edit::before { content: "📝"; }
+    .icon-premium::before { content: "⚡"; }
+    .icon-doc::before { content: "📄"; }
+    .icon-well::before { content: "💧"; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- Левая колонка: Форма -->
+    <main class="form-section">
+      <script src="https://forms.yandex.ru/_static/embed.js"></script>
+      <iframe src="https://forms.yandex.ru/u/6a49017c4936398361abeea8?iframe=1" name="ya-form-6a49017c4936398361abeea8"></iframe>
+    </main>
+
+    <!-- Правая колонка: Управление и статьи -->
+    <aside class="nav-section">
+      
+      <!-- Блок управления контентом -->
+      <div class="card">
+        <h2 class="card-title">Панель управления</h2>
+        <div class="grid-buttons">
+          <button class="btn-tools primary-action icon-add" onclick="window.location.href='form.html';">Написать свою статью</button>
+          <button class="btn-tools icon-edit" onclick="window.location.href='editor.html';">Редактировать статью</button>
+          <button class="btn-tools icon-premium" onclick="window.location.href='editorpl.html';">Editor+</button>
+        </div>
+      </div>
+
+      <!-- Блок статей о колодцах -->
+      <div class="card">
+        <h2 class="card-title">Всё про колодцы</h2>
+        <div class="grid-buttons">
+          <button class="btn-tools icon-well" onclick="window.location.href='form.html';">Раздел для колодцев</button>
+          <button class="btn-pdf icon-doc" onclick="window.location.href='page1.pdf';">Свой колодец</button>
+          <button class="btn-pdf icon-doc" onclick="window.location.href='page5.pdf';">Провести воду из колодца в дом</button>
+          <button class="btn-pdf icon-doc" onclick="window.location.href='page6.pdf';">Погружной насос для колодца ручной</button>
+          <button class="btn-pdf icon-doc" onclick="window.location.href='page7.pdf';">Колодец с ведром</button>
+        </div>
+      </div>
+
+      <!-- Блок остальных статей -->
+      <div class="card">
+        <h2 class="card-title">Полезные статьи</h2>
+        <div class="grid-buttons">
+          <button class="btn-pdf icon-doc" onclick="window.location.href='page2.pdf';">Как посадить голубику</button>
+          <button class="btn-pdf icon-doc" onclick="window.location.href='page3.pdf';">Volkswagen Tiguan для семьи</button>
+          <button class="btn-pdf icon-doc" onclick="window.location.href='page4.pdf';">2 санузел как сделать</button>
+          <button class="btn-pdf icon-doc" onclick="window.location.href='page8.pdf';">Ягодная настойка</button>
+        </div>
+      </div>
+
+    </aside>
+
+  </div>
+
+</body>
+</html>
