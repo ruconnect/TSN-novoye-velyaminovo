@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Консервация дома к зиме: Чек-лист для Нового Вельминово</title>
+    <style>
+        /* Базовые стили */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f0f4f8;
+            color: #2c3e50;
+            line-height: 1.6;
+            padding: 0 0 40px 0;
+        }
+
+        /* Обложка статьи */
+        .hero {
+            background: linear-gradient(rgba(29, 53, 87, 0.75), rgba(29, 53, 87, 0.9)), 
+                        url('https://unsplash.com') center/cover no-repeat;
+            color: #f1faee;
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .hero h1 {
+            font-size: 2.2rem;
+            margin-bottom: 12px;
+            font-weight: 800;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+
+        /* Основной контейнер */
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 15px;
+        }
+
+        .intro-card {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            border-left: 5px solid #457b9d;
+        }
+
+        /* Блоки чек-листа */
+        .section-title {
+            font-size: 1.4rem;
+            color: #1d3557;
+            margin: 30px 0 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checklist {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 10px 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            list-style: none;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 15px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .check-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Кастомные чекбоксы */
+        .check-item input[type="checkbox"] {
+            margin-top: 5px;
+            margin-right: 15px;
+            min-width: 18px;
+            min-height: 18px;
+            accent-color: #e63946;
+            cursor: pointer;
+        }
+
+        .check-text strong {
+            display: block;
+            color: #1d3557;
+            font-size: 1.05rem;
+            margin-bottom: 2px;
+        }
+
+        .check-text p {
+            font-size: 0.95rem;
+            color: #64748b;
+        }
+
+        /* Информационная плашка */
+        .info-banner {
+            background: #e63946;
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .info-banner h3 {
+            margin-bottom: 5px;
+        }
+
+        /* Адаптивность для мобильных телефонов */
+        @media (max-width: 600px) {
+            .hero h1 {
+                font-size: 1.6rem;
+            }
+            .hero p {
+                font-size: 0.95rem;
+            }
+            .check-text strong {
+                font-size: 0.95rem;
+            }
+            .check-text p {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Шапка статьи -->
+    <header class="hero">
+        <h1>Зима близко: готовим дом в ТСН</h1>
+        <p>Пошаговое руководство по консервации дачи и подготовке инженерных систем к морозам</p>
+    </header>
+
+    <main class="container">
+        
+        <!-- Вводная карточка -->
+        <div class="intro-card">
+            <p>Резкие перепады температур в Подмосковье и сильные промерзания почвы могут нанести серьезный ущерб загородному дому. Чтобы весной не столкнуться с лопнувшими трубами и испорченной мебелью, выполните этот простой чек-лист до наступления первых устойчивых заморозков.</p>
+        </div>
+
+        <!-- Раздел 1: Водопровод -->
+        <h2 class="section-title">💧 1. Защита водопровода и сантехники</h2>
+        <ul class="checklist">
+            <li class="check-item">
+                <input type="checkbox">
+                <div class="check-text">
+                    <strong>Слив воды из системы</strong>
+                    <p>Отключите насос, откройте все краны и полностью слейте воду из труб, бойлера и фильтров очистки.</p>
+                </div>
+            </li>
+            <li class="check-item">
+                <input type="checkbox">
+                <div class="check-text">
+                    <strong>Осушение гидрозатворов</strong>
+                    <p>Удалите воду из унитаза, сифонов раковин и душевых кабин. Залейте туда автомобильный незамерзающий состав.</p>
+                </div>
+            </li>
+            <li class="check-item">
+                <input type="checkbox">
+                <div class="check-text">
+                    <strong>Уличные поливочные краны</strong>
+                    <p>Обязательно перекройте внутренний вентиль, ведущий к уличным кранам, и оставьте их открытыми.</p>
+                </div>
+            </li>
+        </ul>
+
+        <!-- Раздел 2: Отопление и Электрика -->
+        <h2 class="section-title">⚡ 2. Отопление, газ и электричество</h2>
+        <ul class="checklist">
+            <li class="check-item">
+                <input type="checkbox">
+                <div class="check-text">
+                    <strong>Режим консервации или «антизамерзания»</strong>
+                    <p>Если дом отапливается зимой, переведите котел в режим +5...+8 °C. Если дом уходит в «ноль» — слейте воду из радиаторов (если там не залит антифриз).</p>
+                </div>
+            </li>
+            <li class="check-item">
+                <input type="checkbox">
+                <div class="check-text">
+                    <strong>Отключение электроприборов</strong>
+                    <p>Выключите все приборы из розеток. При полной консервации — обесточьте дом на вводном щитке, оставив только греющий кабель на вводе (при наличии).</p>
+                </div>
+            </li>
+            <li class="check-item">
+                <input type="checkbox">
+                <div class="check-text">
+                    <strong>Газовые баллоны</strong>
+                    <p>Перекройте вентили всех газовых баллонов. По правилам безопасности их лучше хранить в специальных металлических шкафах на улице.</p>
+                </div>
+            </li>
+        </ul>
+
+        <!-- Раздел 3: Кровля и Участок -->
+        <h2 class="section-title">🏡 3. Кровля, стены и порядок на участке</h2>
+        <ul class="checklist">
+            <li class="check-item">
+                <input type="checkbox">
+                <div class="check-text">
+                    <strong>Очистка водостоков</strong>
+                    <p>Уберите из желобов листья и ветки. Забитый водосток зимой превратится в лед, который деформирует крышу и сорвет крепления.</p>
+                </div>
+            </li>
+            <li class="check-item">
+                <input type="checkbox">
+                <div class="check-text">
+                    <strong>Продух и вентиляция подпола</strong>
+                    <p>Закройте вентиляционные отверстия (продухи) в фундаменте, чтобы защитить перекрытия первого этажа от выстуживания и грызунов.</p>
+                </div>
+            </li>
+            <li class="check-item">
+                <input type="checkbox">
+                <div class="check-text">
+                    <strong>Садовый инвентарь и баки</strong>
+                    <p>Переверните пустые бочки на участке, спрячьте шланги в хозблок и заприте теплицы, укрепив их внутренними подпорками от тяжелого снега.</p>
+                </div>
+            </li>
+        </ul>
+
+        <!-- Раздел 4: Подготовка себя -->
+        <h2 class="section-title">🧣 4. Подготовка себя (для тех, кто остается)</h2>
+        <ul class="checklist">
+            <li class="check-item">
+                <input type="checkbox">
+                <div class="check-text">
+                    <strong>Запас топлива и дров</strong>
+                    <p>Завезите дрова или уголь заранее до снегопадов, пока дороги сухие и тяжелая техника не буксует.</p>
+                </div>
+            </li>
+            <li class="check-item">
+                <input type="checkbox">
+                <div class="check-text">
+                    <strong>Зимний инвентарь</strong>
+                    <p>Проверьте снеговые лопаты, подготовьте песок или реагент для обработки крыльца и дорожек от гололеда.</p>
+                </div>
+            </li>
+        </ul>
+
+        <!-- Важная плашка -->
+        <div class="info-banner">
+            <h3>Сохраните эту страницу!</h3>
+            <p>Проверяйте каждый пункт перед тем, как окончательно запереть ворота до весны.</p>
+        </div>
+
+    </main>
+
+</body>
+</html>
