@@ -8,7 +8,7 @@
   <!-- Современный шрифт Google Fonts -->
   <link rel="preconnect" href="https://googleapis.com">
   <link rel="preconnect" href="https://gstatic.com" crossorigin>
-  <link href="https://googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://googleapis.com" rel="stylesheet">
   
   <style>
     :root {
@@ -85,6 +85,25 @@
       border-radius: var(--border-radius);
       box-shadow: var(--shadow);
       padding: 1.5rem;
+      transition: var(--transition);
+    }
+
+    /* Стили для строки поиска */
+    .search-box {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      font-family: inherit;
+      font-size: 0.95rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      outline: none;
+      transition: var(--transition);
+      margin-bottom: 0.5rem;
+    }
+
+    .search-box:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
     }
 
     .card-title {
@@ -157,6 +176,11 @@
     .icon-premium::before { content: "⚡"; }
     .icon-doc::before { content: "📄"; }
     .icon-well::before { content: "💧"; }
+    
+    /* Класс для скрытия элементов */
+    .hidden {
+      display: none !important;
+    }
   </style>
 </head>
 <body>
@@ -165,12 +189,17 @@
     
     <!-- Левая колонка: Форма -->
     <main class="form-section">
-      <script src="https://forms.yandex.ru/_static/embed.js"></script>
-      <iframe src="https://forms.yandex.ru/u/6a49017c4936398361abeea8?iframe=1" name="ya-form-6a49017c4936398361abeea8"></iframe>
+      <script src="https://yandex.ru"></script>
+      <iframe src="https://yandex.ru" name="ya-form-6a49017c4936398361abeea8"></iframe>
     </main>
 
     <!-- Правая колонка: Управление и статьи -->
     <aside class="nav-section">
+      
+      <!-- НОВОЕ: Блок поиска -->
+      <div class="card">
+        <input type="text" id="pageSearch" class="search-box" placeholder="Поиск по статьям и разделам...">
+      </div>
       
       <!-- Блок управления контентом -->
       <div class="card">
@@ -210,6 +239,40 @@
     </aside>
 
   </div>
+
+  <!-- НОВОЕ: Скрипт интерактивного поиска -->
+  <script>
+    document.getElementById('pageSearch').addEventListener('input', function(e) {
+      const query = e.target.value.toLowerCase().trim();
+      const cards = document.querySelectorAll('.nav-section .card');
+
+      cards.forEach(card => {
+        // Пропускаем саму карточку поиска
+        if (card.contains(e.target)) return;
+
+        const buttons = card.querySelectorAll('.grid-buttons button');
+        let hasVisibleButtons = false;
+
+        buttons.forEach(button => {
+          const text = button.textContent.toLowerCase();
+          
+          if (text.includes(query)) {
+            button.classList.remove('hidden');
+            hasVisibleButtons = true;
+          } else {
+            button.classList.add('hidden');
+          }
+        });
+
+        // Если в карточке нет подходящих кнопок, скрываем всю карточку (вместе с заголовком)
+        if (hasVisibleButtons || query === '') {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    });
+  </script>
 
 </body>
 </html>
