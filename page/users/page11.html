@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Как начать делать самогон: Руководство для новичков</title>
+    <style>
+        /* Общие стили */
+        :root {
+            --bg-color: #f4f6f8;
+            --text-color: #2d3748;
+            --accent-color: #d97706;
+            --accent-hover: #b45309;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Типографика */
+        h1 {
+            font-size: 2.5rem;
+            color: #1a202c;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            color: #2d3748;
+            margin-top: 35px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: #4a5568;
+        }
+
+        p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        /* Метаданные */
+        .meta {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-bottom: 30px;
+        }
+
+        /* Списки и элементы */
+        ul, ol {
+            margin-bottom: 20px;
+            padding-left: 25px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        /* Выделения и предупреждения */
+        .highlight-box {
+            background-color: #fef3c7;
+            border-left: 4px solid var(--accent-color);
+            padding: 15px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 25px 0;
+        }
+
+        .highlight-box p {
+            margin-bottom: 0;
+            font-weight: 500;
+        }
+
+        /* Ингредиенты таблицей */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #f8fafc;
+            font-weight: 600;
+        }
+
+        /* Инфо-карточки шагов */
+        .step-card {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            display: inline-block;
+            background: var(--accent-color);
+            color: white;
+            font-weight: bold;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        /* Кнопка */
+        .btn {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-hover);
+        }
+
+        /* Адаптивность */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            h2 {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Как начать делать самогон: Пошаговое руководство для новичков</h1>
+            <div class="meta">Время чтения: 7 минут • Автор: Винокур-Любитель</div>
+        </header>
+
+        <article>
+            <p>Создание домашнего алкоголя — это увлекательное хобби, сочетающее в себе элементы химии, кулинарии и творчества. Вопреки стереотипам, современное самогоноварение позволяет получать чистый и качественный продукт, превосходящий по свойствам многие магазинные аналоги. В этой статье мы разберем базовый процесс на основе классической сахарной браги.</p>
+
+            <div class="highlight-box">
+                <p>⚠️ Важно: Согласно закону, изготовление самогона дома разрешено для личного употребления. Продажа готового напитка без лицензии преследуется по закону.</p>
+            </div>
+
+            <h2>Что понадобится на старте</h2>
+            <p>Для первого опыта не нужно покупать дорогое профессиональное оборудование. Достаточно минимального набора инструментов:</p>
+            <ul>
+                <li><strong>Самогонный аппарат (дистиллятор).</strong> Для новичка идеально подойдет классический аппарат с сухопарником или простая бражная колонна.</li>
+                <li><strong>Бродильная емкость.</strong> Пластиковый бак на 30 литров с герметичной крышкой и гидрозатвором.</li>
+                <li><strong>Измерительные приборы.</strong> Спиртометр (для измерения крепости) и ареометр-сахарометр АС-3 (контролировать брожение).</li>
+                <li><strong>Шланг</strong> для слива браги с осадка.</li>
+            </ul>
+
+            <h3>Пропорции ингредиентов (на ~20 литров браги)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ингредиент</th>
+                        <th>Количество</th>
+                        <th>Примечание</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Вода</td>
+                        <td>20 литров</td>
+                        <td>Чистая, не кипяченая (лучше родниковая или фильтрованная)</td>
+                    </tr>
+                    <tr>
+                        <td>Сахар</td>
+                        <td>5 кг</td>
+                        <td>Обычный свекольный сахар</td>
+                    </tr>
+                    <tr>
+                        <td>Дрожжи</td>
+                        <td>100 г (сухие)</td>
+                        <td>Специальные спиртовые или турбо-дрожжи</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>Главные этапы процесса</h2>
+
+            <div class="step-card">
+                <span class="step-number">Шаг 1</span>
+                <h3>Приготовление браги</h3>
+                <p>Растворите сахар в теплой воде (25-30°C). Рассыпьте дрожжи по поверхности сусла согласно инструкции на упаковке. Закройте емкость крышкой и установите гидрозатвор. Поставьте бак в темное и теплое место (22-28°C) на 5–9 дней.</p>
+            </div>
+
+            <div class="step-card">
+                <span class="step-number">Шаг 2</span>
+                <h3>Осветление браги</h3>
+                <p>Когда гидрозатвор замолчит, а на вкус брага станет горьковатой (без сладости), процесс завершен. Слейте жидкость с дрожжевого осадка через шланг в перегонный куб, чтобы избежать пригорания при нагреве.</p>
+            </div>
+
+            <div class="step-card">
+                <span class="step-number">Шаг 3</span>
+                <h3>Первая перегонка</h3>
+                <p>Перегоняйте брагу на максимальной мощности без разделения на фракции. Прекращайте отбор, когда крепость в струе упадет до 20 градусов. На выходе вы получите мутноватый спирт-сырец крепостью около 35-40 градусов.</p>
+            </div>
+
+            <div class="step-card">
+                <span class="step-number">Шаг 4</span>
+                <h3>Вторая (дробная) перегонка</h3>
+                <p>Разбавьте спирт-сырец водой до 20 градусов и залейте обратно в куб. Это критически важный этап для безопасности продукта.</p>
+                <ul>
+                    <li><strong>«Головы» (первые 10% от абсолютного спирта):</strong> Пить нельзя! Это ядовитый ацетон и метанол. Отбираются покапельно и выливаются.</li>
+                    <li><strong>«Тело» (основной питьевой спирт):</strong> Отбирается после голов. Имеет чистый запах. Сбор идет, пока крепость в струе держится выше 45%.</li>
+                    <li><strong>«Хвосты» (остаток):</strong> Содержат сивушные масла. Их собирают отдельно или прекращают погон.</li>
+                </ul>
+            </div>
+
+            <div class="step-card">
+                <span class="step-number">Шаг 5</span>
+                <h3>Разбавление и отдых</h3>
+                <p>Полученное «тело» разбавьте чистой водой до желаемой крепости (обычно 40-45 градусов). Разлейте по стеклянным бутылкам и дайте напитку «отдохнуть» в холодильнике 3-4 дня для завершения химических реакций смешивания. Теперь продукт готов к употреблению или настаиванию!</p>
+            </div>
+
+            <h2>Заключение</h2>
+            <p>Домашнее самогоноварение — это увлекательный путь. Начните с простых сахарных рецептов, освойте работу со своим аппаратом, и со временем вы сможете перейти к созданию благородных зерновых и фруктовых дистиллятов, таких как виски или бренди.</p>
+            
