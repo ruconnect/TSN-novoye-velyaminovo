@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Новое Вельяминово Дом</title>
+    <style>
+        /* Общие стили страницы для демонстрации */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Основной контейнер виджета */
+        .widget-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 400px;
+            padding: 24px;
+            box-sizing: border-box;
+        }
+
+        /* Шапка виджета (Данные о сборе) */
+        .widget-header {
+            margin-bottom: 20px;
+        }
+
+        .widget-title {
+            font-size: 1.25rem;
+            color: #1a1a1a;
+            margin: 0 0 8px 0;
+            font-weight: 600;
+        }
+
+        .widget-purpose {
+            font-size: 0.9rem;
+            color: #666;
+            margin: 0 0 16px 0;
+        }
+
+        /* Прогресс-бар */
+        .progress-container {
+            margin-bottom: 12px;
+        }
+
+        .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+        }
+
+        .current-amount {
+            font-weight: 700;
+            color: #007bff;
+        }
+
+        .target-amount {
+            color: #7a7a7a;
+        }
+
+        .progress-bar-bg {
+            background-color: #e9ecef;
+            border-radius: 8px;
+            height: 10px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            background: linear-gradient(90deg, #007bff, #00c6ff);
+            height: 100%;
+            border-radius: 8px;
+            /* Измените width в зависимости от процента сбора */
+            width: 64%; 
+            transition: width 0.3s ease;
+        }
+
+        .progress-percentage {
+            text-align: right;
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        /* Разделитель */
+        hr {
+            border: 0;
+            height: 1px;
+            background: #eee;
+            margin: 20px 0;
+        }
+
+        /* Список участников */
+        .contributors-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .section-title {
+            font-size: 0.95rem;
+            color: #1a1a1a;
+            margin: 0 0 4px 0;
+            font-weight: 600;
+        }
+
+        .contributor-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+
+        .contributor-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Аватарка заглушка */
+        .avatar {
+            width: 36px;
+            height: 36px;
+            background-color: #e2e8f0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        .contributor-name {
+            font-size: 0.95rem;
+            color: #2d3748;
+            font-weight: 500;
+        }
+
+        .contributor-amount {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="widget-card">
+        <!-- Блок сверху: Данные о сборе денег -->
+        <div class="widget-header">
+            <h2 class="widget-title">Сбор денег</h2>
+            <p class="widget-purpose">Нет общего сбора</p>
+            
+            <div class="progress-container">
+                <div class="progress-stats">
+                    <span class="current-amount">0 ₽</span>
+                    <span class="target-amount">из 0 ₽</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill"></div>
+                </div>
+                <div class="progress-percentage">Сбор денег идёт</div>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- Блок снизу: Сколько вложил каждый участник -->
+        <div class="contributors-section">
+            <h3 class="section-title">Вложения</h3>
+            
+            <!-- Участник 1 -->
+            <div class="contributor-row">
+                <div class="contributor-info">
+                    <div class="avatar" style="background-color: #ffeb3b;">Помпа для воды</div>
+                    <span class="contributor-name">Саша</span>
+                </div>
+                <span class="contributor-amount">0 ₽</span>
+            </div>
+
+            <!-- Участник 2 -->
+            <div class="contributor-row">
+                <div class="contributor-info">
+                    <div class="avatar" style="background-color: #8bc34a; color: white;">Нет</div>
+                    <span class="contributor-name">Денис</span>
+                </div>
+                <span class="contributor-amount">0 ₽</span>
+            </div>
+
+            <!-- Участник 3 -->
+            <div class="contributor-row">
+                <div class="contributor-info">
+                    <div class="avatar" style="background-color: #00bcd4; color: white;">Нет</div>
+                    <span class="contributor-name">Елена</span>
+                </div>
+                <span class="contributor-amount">0 ₽</span>
+            </div>
+
+            <!-- Участник 4 -->
+            <div class="contributor-row">
+                <div class="contributor-info">
+                    <div class="avatar" style="background-color: #e91e63; color: white;">!!!</div>
+                    <span class="contributor-name">Пригожин</span>
+                </div>
+                <span class="contributor-amount">0 ₽</span>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
