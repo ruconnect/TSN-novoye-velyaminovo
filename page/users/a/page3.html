@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Шашки против ИИ</title>
+</head>
+<body>
+
+<h2>Шашки против ИИ</h2>
+<p id="status">Ваш ход. Вы играете белыми.</p>
+
+<table id="board" border="1" cellspacing="0" cellpadding="0"></table>
+
+<script>
+var board = [];
+var selected = null;
+var currentPlayer = "w";
+var player = "w";
+var ai = "b";
+
+function initBoard() {
+    board = [];
+
+    for (var r = 0; r < 8; r++) {
+        board[r] = [];
+        for (var c = 0; c < 8; c++) {
+            board[r][c] = "";
+        }
+    }
+
+    for (var r = 0; r < 3; r++) {
+        for (var c = 0; c < 8; c++) {
+            if ((r + c) % 2 === 1) {
+                board[r][c] = "b";
+            }
+        }
+    }
+
+    for (var r = 5; r < 8; r++) {
+        for (var c = 0; c < 8; c++) {
+            if ((r + c) % 2 === 1) {
+                board[r][c] = "w";
+            }
+        }
+    }
+
+    drawBoard();
+}
+
+function drawBoard() {
+    var table = document.getElementById("board");
+    table.innerHTML = "";
+
+    for (var r = 0; r < 8; r++) {
+        var tr = document.createElement("tr");
+
+        for (var c = 0; c < 8; c++) {
+            var td = document.createElement("td");
+
+            td.width = 60;
+            td.height = 60;
+            td.align = "center";
+            td.valign = "middle";
+
+            if ((r + c) % 2 === 0) {
+                td.bgColor = "#eeeeee";
+            } else {
+                td.bgColor = "#777777";
+            }
+
+            if (selected && selected.r === r && selected.c === c) {
+                td.bgColor = "#55aa55";
+            }
+
+            td.onclick = function(row, col) {
+                return function() {
+                    cellClick(row, col);
+                };
+            }(r, c);
+
+            var piece = board[r][c];
+
+            if (piece === "w") {
+                td.innerHTML = "⚪";
+            } else if (piece === "b") {
+                td.innerHTML = "⚫";
+            } else if (piece === "W") {
+                td.innerHTML = "♔";
+            } else if (piece === "B") {
+                td.innerHTML = "♚";
+            } else {
+                td.innerHTML = "&nbsp;";
+            }
+
+            td.style.fontSize = "36px";
+
+            tr.appendChild(td);
+        }
+
+        table.appendChild(tr);
+    }
+}
+
+function cellClick(r, c) {
+    if (currentPlayer !== player) return;
+
+    var piece = board[r][c];
+
+    if (selected === null) {
+        if (piece && piece.toLowerCase() === player) {
+            selected = { r: r, c: c };
+            drawBoard();
+        }
+        return;
+    }
+
+    if (selected.r === r && selected.c === c) {
+        selected = null;
+        drawBoard();
+        return;
+    }
+
+    if (piece && piece.toLowerCase() === player) {
+        selected = { r: r, c: c };
+        drawBoard();
+        return;
+    }
+
+    var moves = getAllMoves(board, player);
+    var chosen = null;
+
+    for (var i = 0; i < moves.length; i++) {
+        if (
+            moves[i].from.r === selected.r &&
+            moves[i].from.c === selected.c &&
+            moves[i].to.r === r &&
+            moves[i].to.c === c
+        ) {
+            chosen = moves[i];
+            break;
+        }
+    }
+
+    if (chosen) {
+        makeMove(board, chosen);
+        selected = null;
+        promote(board);
+        drawBoard();
+
+        if (isGameOver(ai)) {
+            document.getElementById("status").innerHTML = "Вы победили!";
+            return;
+        }
+
+        currentPlayer = ai;
+        document.getElementById("status").innerHTML = "Ход ИИ...";
+
+        setTimeout(aiMove, 500);
+    }
+}
+
+function aiMove() {
+    var moves = getAllMoves(board, ai);
+
+    if (moves.length === 0) {
+        document.getElementById("status").innerHTML = "Вы победили!";
+        return;
+    }
+
+    var bestMove = null;
+    var bestScore = -999999;
+
+    for (var i = 0; i < moves.length; i++) {
+        var copy = copyBoard(board);
+        makeMove(copy, moves[i]);
+        promote(copy);
+
+        var score = minimax(copy, 3, false, -999999, 999999);
+
+        if (score > bestScore) {
+            bestScore = score;
+            bestMove = moves[i];
+        }
+    }
+
+    makeMove(board, bestMove);
+    promote(board);
+    drawBoard();
+
+    if (isGameOver(player)) {
+        document.getElementById("status").innerHTML = "ИИ победил!";
+        return;
+    }
+
+    currentPlayer = player;
+    document.getElementById("status").innerHTML = "Ваш ход.";
+}
+
+function minimax(pos, depth, maximizing, alpha, beta) {
+    if (depth === 0) {
+        return evaluate(pos);
+    }
+
+    var side = maximizing ? ai : player;
+    var moves = getAllMoves(pos, side);
+
+    if (moves.length === 0) {
+        if (side === ai) return -9999;
+        return 9999;
+    }
+
+    if (maximizing) {
+        var maxEval = -999999;
+
+        for (var i = 0; i < moves.length; i++) {
+            var copy = copyBoard(pos);
+            makeMove(copy, moves[i]);
+            promote(copy);
+
+            var evalScore = minimax(copy, depth - 1, false, alpha, beta);
+            if (evalScore > maxEval) maxEval = evalScore;
+            if (evalScore > alpha) alpha = evalScore;
+            if (beta <= alpha) break;
+        }
+
+        return maxEval;
+    } else {
+        var minEval = 999999;
+
+        for (var i = 0; i < moves.length; i++) {
+            var copy = copyBoard(pos);
+            makeMove(copy, moves[i]);
+            promote(copy);
+
+            var evalScore = minimax(copy, depth - 1, true, alpha, beta);
+            if (evalScore < minEval) minEval = evalScore;
+            if (evalScore < beta) beta = evalScore;
+            if (beta <= alpha) break;
+        }
+
+        return minEval;
+    }
+}
+
+function evaluate(pos) {
+    var score = 0;
+
+    for (var r = 0; r < 8; r++) {
+        for (var c = 0; c < 8; c++) {
+            var p = pos[r][c];
+
+            if (p === "b") score += 10;
+            if (p === "B") score += 30;
+            if (p === "w") score -= 10;
+            if (p === "W") score -= 30;
+
+            if (p === "b") score += r;
+            if (p === "w") score -= (7 - r);
+        }
+    }
+
+    return score;
+}
+
+function getAllMoves(pos, side) {
+    var captures = [];
+    var normalMoves = [];
+
+    for (var r = 0; r < 8; r++) {
+        for (var c = 0; c < 8; c++) {
+            var piece = pos[r][c];
+
+            if (piece && piece.toLowerCase() === side) {
+                var caps = getCaptures(pos, r, c);
+
+                for (var i = 0; i < caps.length; i++) {
+                    captures.push(caps[i]);
+                }
+
+                if (caps.length === 0) {
+                    var moves = getSimpleMoves(pos, r, c);
+
+                    for (var j = 0; j < moves.length; j++) {
+                        normalMoves.push(moves[j]);
+                    }
+                }
+            }
+        }
+    }
+
+    if (captures.length > 0) return captures;
+    return normalMoves;
+}
+
+function getSimpleMoves(pos, r, c) {
+    var piece = pos[r][c];
+    var moves = [];
+    var dirs = [];
+
+    if (piece === "w") dirs = [[-1, -1], [-1, 1]];
+    if (piece === "b") dirs = [[1, -1], [1, 1]];
+
+    if (piece === "W" || piece === "B") {
+        dirs = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
+    }
+
+    for (var i = 0; i < dirs.length; i++) {
+        var nr = r + dirs[i][0];
+        var nc = c + dirs[i][1];
+
+        if (inside(nr, nc) && pos[nr][nc] === "") {
+            moves.push({
+                from: { r: r, c: c },
+                to: { r: nr, c: nc },
+                capture: null
+            });
+        }
+    }
+
+    return moves;
+}
+
+function getCaptures(pos, r, c) {
+    var piece = pos[r][c];
+    var side = piece.toLowerCase();
+    var enemy = side === "w" ? "b" : "w";
+    var moves = [];
+    var dirs = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
+
+    for (var i = 0; i < dirs.length; i++) {
+        var mr = r + dirs[i][0];
+        var mc = c + dirs[i][1];
+        var tr = r + dirs[i][0] * 2;
+        var tc = c + dirs[i][1] * 2;
+
+        if (
+            inside(tr, tc) &&
+            inside(mr, mc) &&
+            pos[mr][mc] !== "" &&
+            pos[mr][mc].toLowerCase() === enemy &&
+            pos[tr][tc] === ""
+        ) {
+            moves.push({
+                from: { r: r, c: c },
+                to: { r: tr, c: tc },
+                capture: { r: mr, c: mc }
+            });
+        }
+    }
+
+    return moves;
+}
+
+function makeMove(pos, move) {
+    var piece = pos[move.from.r][move.from.c];
+
+    pos[move.to.r][move.to.c] = piece;
+    pos[move.from.r][move.from.c] = "";
+
+    if (move.capture) {
+        pos[move.capture.r][move.capture.c] = "";
+    }
+}
+
+function promote(pos) {
+    for (var c = 0; c < 8; c++) {
+        if (pos[0][c] === "w") pos[0][c] = "W";
+        if (pos[7][c] === "b") pos[7][c] = "B";
+    }
+}
+
+function isGameOver(side) {
+    return getAllMoves(board, side).length === 0;
+}
+
+function inside(r, c) {
+    return r >= 0 && r < 8 && c >= 0 && c < 8;
+}
+
+function copyBoard(pos) {
+    var copy = [];
+
+    for (var r = 0; r < 8; r++) {
+        copy[r] = [];
+
+        for (var c = 0; c < 8; c++) {
+            copy[r][c] = pos[r][c];
+        }
+    }
+
+    return copy;
+}
+
+initBoard();
+</script>
+
+</body>
+</html>
