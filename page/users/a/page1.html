@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Цели на сегодня</title>
+    <style>
+        /* Общие стили для страницы */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        /* Контейнер приложения */
+        .todo-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        h1 {
+            color: #333333;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        /* Форма ввода */
+        .input-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #4a90e2;
+        }
+
+        button {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #357abd;
+        }
+
+        /* Список целей */
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #4a90e2;
+            transition: all 0.2s;
+        }
+
+        /* Стиль для выполненной цели */
+        li.completed {
+            border-left-color: #2ecc71;
+            background-color: #f2fcf5;
+            opacity: 0.7;
+        }
+
+        li.completed span {
+            text-decoration: line-through;
+            color: #7f8c8d;
+        }
+
+        .goal-text {
+            flex: 1;
+            margin-right: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* Кнопка удаления */
+        .delete-btn {
+            background-color: transparent;
+            color: #e74c3c;
+            border: none;
+            padding: 5px 10px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: normal;
+        }
+
+        .delete-btn:hover {
+            background-color: #fde8e7;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="todo-container">
+        <h1>🎯 Цели на сегодня</h1>
+        
+        <div class="input-section">
+            <input type="text" id="goalInput" placeholder="Добавить новую цель..." autocomplete="off">
+            <button onclick="addGoal()">Добавить</button>
+        </div>
+
+        <ul id="goalList"></ul>
+    </div>
+
+    <script>
+        // Элементы со страницы
+        const goalInput = document.getElementById('goalInput');
+        const goalList = document.getElementById('goalList');
+
+        // Загрузка целей при старте страницы
+        let goals = JSON.parse(localStorage.getItem('todayGoals')) || [];
+
+        // Функция для отображения списка целей
+        function renderGoals() {
+            goalList.innerHTML = '';
+            goals.forEach((goal, index) => {
+                const li = document.createElement('li');
+                if (goal.completed) {
+                    li.classList.add('completed');
+                }
+
+                li.innerHTML = `
+                    <span class="goal-text" onclick="toggleGoal(${index})">${goal.text}</span>
+                    <button class="delete-btn" onclick="deleteGoal(${index})">Удалить</button>
+                `;
+                goalList.appendChild(li);
+            });
+            // Сохранение в локальную память браузера
+            localStorage.setItem('todayGoals', JSON.stringify(goals));
+        }
+
+        // Функция добавления новой цели
+        function addGoal() {
+            const text = goalInput.value.trim();
+            if (text !== '') {
+                goals.push({ text: text, completed: false });
+                goalInput.value = '';
+                renderGoals();
+            }
+        }
+
+        // Добавление цели по нажатию Enter
+        goalInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addGoal();
+            }
+        });
+
+        // Функция переключения статуса (выполнено / не выполнено)
+        function toggleGoal(index) {
+            goals[index].completed = !goals[index].completed;
+            renderGoals();
+        }
+
+        // Функция удаления цели
+        function deleteGoal(index) {
+            goals.splice(index, 1);
+            renderGoals();
+        }
+
+        // Первичный вывод данных на экран
+        renderGoals();
+    </script>
+
+</body>
+</html>
