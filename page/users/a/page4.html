@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Аир-хоккей против ИИ</title>
+</head>
+<body>
+    <h2 align="center">Аир-хоккей против ИИ</h2>
+    <p align="center">Управляй нижней битой мышью или пальцем. Забей 7 голов!</p>
+
+    <div align="center">
+        <canvas id="game" width="500" height="700"></canvas>
+    </div>
+
+    <p align="center">
+        <button onclick="restartGame()">Начать заново</button>
+    </p>
+
+    <script>
+        const canvas = document.getElementById("game");
+        const ctx = canvas.getContext("2d");
+
+        const W = canvas.width;
+        const H = canvas.height;
+
+        let playerScore = 0;
+        let aiScore = 0;
+        let maxScore = 7;
+        let gameOver = false;
+
+        const puck = {
+            x: W / 2,
+            y: H / 2,
+            r: 13,
+            vx: 4,
+            vy: 5
+        };
+
+        const player = {
+            x: W / 2,
+            y: H - 90,
+            r: 32
+        };
+
+        const ai = {
+            x: W / 2,
+            y: 90,
+            r: 32,
+            speed: 4.2
+        };
+
+        const goalWidth = 160;
+        const friction = 0.995;
+
+        function drawTable() {
+            ctx.fillStyle = "#102a43";
+            ctx.fillRect(0, 0, W, H);
+
+            ctx.strokeStyle = "white";
+            ctx.lineWidth = 4;
+            ctx.strokeRect(10, 10, W - 20, H - 20);
+
+            ctx.beginPath();
+            ctx.moveTo(10, H / 2);
+            ctx.lineTo(W - 10, H / 2);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(W / 2, H / 2, 70, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.fillStyle = "#00b4d8";
+            ctx.fillRect(W / 2 - goalWidth / 2, 10, goalWidth, 8);
+
+            ctx.fillStyle = "#ff006e";
+            ctx.fillRect(W / 2 - goalWidth / 2, H - 18, goalWidth, 8);
+
+            ctx.fillStyle = "white";
+            ctx.font = "28px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText(aiScore, W / 2 - 40, H / 2 - 25);
+            ctx.fillText(playerScore, W / 2 + 40, H / 2 + 45);
+        }
+
+        function drawCircle(obj, color) {
+            ctx.beginPath();
+            ctx.arc(obj.x, obj.y, obj.r, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.strokeStyle = "white";
+            ctx.lineWidth = 3;
+            ctx.stroke();
+        }
+
+        function draw() {
+            drawTable();
+            drawCircle(ai, "#00b4d8");
+            drawCircle(player, "#ff006e");
+            drawCircle(puck, "#f9c74f");
+
+            if (gameOver) {
+                ctx.fillStyle = "rgba(0,0,0,0.65)";
+                ctx.fillRect(0, 0, W, H);
+
+                ctx.fillStyle = "white";
+                ctx.font = "36px Arial";
+                ctx.textAlign = "center";
+
+                if (playerScore >= maxScore) {
+                    ctx.fillText("Ты победил!", W / 2, H / 2);
+                } else {
+                    ctx.fillText("ИИ победил!", W / 2, H / 2);
+                }
+
+                ctx.font = "20px Arial";
+                ctx.fillText("Нажми «Начать заново»", W / 2, H / 2 + 45);
+            }
+        }
+
+        function movePuck() {
+            puck.x += puck.vx;
+            puck.y += puck.vy;
+
+            puck.vx *= friction;
+            puck.vy *= friction;
+
+            if (Math.abs(puck.vx) < 1) puck.vx *= 1.03;
+            if (Math.abs(puck.vy) < 1) puck.vy *= 1.03;
+
+            if (puck.x - puck.r < 10) {
+                puck.x = 10 + puck.r;
+                puck.vx *= -1;
+            }
+
+            if (puck.x + puck.r > W - 10) {
+                puck.x = W - 10 - puck.r;
+                puck.vx *= -1;
+            }
+
+            if (puck.y - puck.r < 10) {
+                if (puck.x > W / 2 - goalWidth / 2 && puck.x < W / 2 + goalWidth / 2) {
+                    playerScore++;
+                    checkWinner();
+                    resetPuck(1);
+                } else {
+                    puck.y = 10 + puck.r;
+                    puck.vy *= -1;
+                }
+            }
+
+            if (puck.y + puck.r > H - 10) {
+                if (puck.x > W / 2 - goalWidth / 2 && puck.x < W / 2 + goalWidth / 2) {
+                    aiScore++;
+                    checkWinner();
+                    resetPuck(-1);
+                } else {
+                    puck.y = H - 10 - puck.r;
+                    puck.vy *= -1;
+                }
+            }
+        }
+
+        function moveAI() {
+            let targetX;
+
+            if (puck.y < H / 2) {
+                targetX = puck.x;
+            } else {
+                targetX = W / 2;
+            }
+
+            if (ai.x < targetX) ai.x += ai.speed;
+            if (ai.x > targetX) ai.x -= ai.speed;
+
+            if (puck.y < H / 2 && puck.y > ai.y) {
+                ai.y += ai.speed * 0.6;
+            } else if (ai.y > 90) {
+                ai.y -= ai.speed * 0.4;
+            } else if (ai.y < 90) {
+                ai.y += ai.speed * 0.4;
+            }
+
+            keepMalletInArea(ai, true);
+        }
+
+        function keepMalletInArea(mallet, isAI) {
+            if (mallet.x - mallet.r < 15) mallet.x = 15 + mallet.r;
+            if (mallet.x + mallet.r > W - 15) mallet.x = W - 15 - mallet.r;
+
+            if (isAI) {
+                if (mallet.y - mallet.r < 20) mallet.y = 20 + mallet.r;
+                if (mallet.y + mallet.r > H / 2 - 5) mallet.y = H / 2 - 5 - mallet.r;
+            } else {
+                if (mallet.y - mallet.r < H / 2 + 5) mallet.y = H / 2 + 5 + mallet.r;
+                if (mallet.y + mallet.r > H - 20) mallet.y = H - 20 - mallet.r;
+            }
+        }
+
+        function collide(mallet) {
+            const dx = puck.x - mallet.x;
+            const dy = puck.y - mallet.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const minDist = puck.r + mallet.r;
+
+            if (dist < minDist) {
+                const angle = Math.atan2(dy, dx);
+
+                puck.x = mallet.x + Math.cos(angle) * minDist;
+                puck.y = mallet.y + Math.sin(angle) * minDist;
+
+                const power = 7;
+                puck.vx = Math.cos(angle) * power;
+                puck.vy = Math.sin(angle) * power;
+
+                if (mallet === player && puck.vy > 0) {
+                    puck.vy *= -1;
+                }
+
+                if (mallet === ai && puck.vy < 0) {
+                    puck.vy *= -1;
+                }
+            }
+        }
+
+        function resetPuck(direction) {
+            puck.x = W / 2;
+            puck.y = H / 2;
+            puck.vx = 3 * (Math.random() > 0.5 ? 1 : -1);
+            puck.vy = 5 * direction;
+
+            player.x = W / 2;
+            player.y = H - 90;
+
+            ai.x = W / 2;
+            ai.y = 90;
+        }
+
+        function checkWinner() {
+            if (playerScore >= maxScore || aiScore >= maxScore) {
+                gameOver = true;
+            }
+        }
+
+        function restartGame() {
+            playerScore = 0;
+            aiScore = 0;
+            gameOver = false;
+            resetPuck(Math.random() > 0.5 ? 1 : -1);
+        }
+
+        function gameLoop() {
+            if (!gameOver) {
+                moveAI();
+                movePuck();
+                collide(player);
+                collide(ai);
+            }
+
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        canvas.addEventListener("mousemove", function(e) {
+            const rect = canvas.getBoundingClientRect();
+            player.x = e.clientX - rect.left;
+            player.y = e.clientY - rect.top;
+            keepMalletInArea(player, false);
+        });
+
+        canvas.addEventListener("touchmove", function(e) {
+            e.preventDefault();
+
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+
+            player.x = touch.clientX - rect.left;
+            player.y = touch.clientY - rect.top;
+
+            keepMalletInArea(player, false);
+        }, { passive: false });
+
+        resetPuck(1);
+        gameLoop();
+    </script>
+</body>
+</html>
