@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список статей</title>
+    <style>
+        /* Общие стили для всей страницы */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        /* Контейнер для кнопок-переходов */
+        .article-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* Отступ между кнопками */
+            width: 100%;
+            max-width: 600px; /* Ограничение ширины на ПК */
+        }
+
+        /* Стиль кнопки-ссылки */
+        .article-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #ffffff;
+            color: #34495e;
+            text-decoration: none; /* Убираем подчеркивание ссылки */
+            padding: 20px 25px;
+            border-radius: 10px;
+            border-left: 5px solid #3498db; /* Синяя полоска слева */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease; /* Плавная анимация при наведении */
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        /* Эффект при наведении курсора */
+        .article-btn:hover {
+            background-color: #3498db;
+            color: #ffffff;
+            transform: translateY(-2px); /* Легкий подъем вверх */
+            box-shadow: 0 6px 12px rgba(52, 152, 219, 0.3);
+            border-left-color: #2980b9;
+        }
+
+        /* Стрелочка внутри кнопки */
+        .article-btn::after {
+            content: "➔";
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        /* Анимация стрелочки при наведении */
+        .article-btn:hover::after {
+            transform: translateX(5px); /* Стрелка сдвигается вправо */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Полезные статьи</h1>
+
+    <div class="article-container">
+        
+        <!-- Замените "#" на реальные ссылки на ваши статьи -->
+        <a href="page1.html" class="article-btn">Страница 1</a>
+        
+    </div>
+
+</body>
+</html>
