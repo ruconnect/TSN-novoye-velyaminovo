@@ -5,152 +5,147 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Панель управления и статьи</title>
   
-  <!-- Современный шрифт Google Fonts -->
-  <link rel="preconnect" href="https://googleapis.com">
-  <link rel="preconnect" href="https://gstatic.com" crossorigin>
-  <link href="https://googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
   <style>
-    :root {
-      --bg-color: #f4f6f9;
-      --card-bg: #ffffff;
-      --text-main: #1e293b;
-      --text-muted: #64748b;
-      --primary: #4f46e5;
-      --primary-hover: #4338ca;
-      --secondary: #0ea5e9;
-      --secondary-hover: #0284c7;
-      --accent: #10b981;
-      --accent-hover: #059669;
-      --border-radius: 12px;
-      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-      --transition: all 0.2s ease-in-out;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    /* Оригинальный бирюзовый градиент Android Setup Wizard */
     body {
-      font-family: 'Inter', sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      line-height: 1.5;
-      padding: 2rem 1rem;
+      font-family: 'Roboto', 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0097a7 0%, #00acc1 50%, #00796b 100%);
+      margin: 0;
+      padding: 30px 20px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-sizing: border-box;
     }
 
+    /* Главный двухпанельный контейнер (как на планшетах Nexus) */
     .container {
-      max-width: 1100px;
-      margin: 0 auto;
+      width: 100%;
+      max-width: 1200px;
       display: grid;
       grid-template-columns: 1fr;
-      gap: 2rem;
+      gap: 24px;
     }
 
     @media (min-width: 900px) {
       .container {
-        grid-template-columns: 650px 1fr;
+        grid-template-columns: 550px 1fr;
+        height: 750px; /* Фиксированная высота как у экрана устройства */
       }
     }
 
-    /* Стили для блока с Яндекс Формой */
+    /* Квадратный системный блок для Яндекс-формы */
     .form-section {
-      background: var(--card-bg);
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow);
-      padding: 1.5rem;
+      background: #ffffff;
+      border: 1px solid #d1d5db;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
       display: flex;
       flex-direction: column;
-      height: fit-content;
+      overflow: hidden;
     }
 
     .form-section iframe {
       width: 100%;
-      min-height: 600px;
+      flex: 1;
+      min-height: 500px;
       border: none;
-      border-radius: calc(var(--border-radius) - 4px);
     }
 
-    /* Стили для панели управления и навигации */
+    /* Правая колонка с карточками меню */
     .nav-section {
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
+      gap: 24px;
+      overflow-y: auto; /* Скролл внутри блока, если контента много */
+      padding-right: 4px;
     }
 
+    /* Стилизация скроллбара под Android */
+    .nav-section::-webkit-scrollbar {
+      width: 6px;
+    }
+    .nav-section::-webkit-scrollbar-thumb {
+      background-color: rgba(251, 251, 251, 0.3);
+    }
+
+    /* Квадратное окно блока настроек */
     .card {
-      background: var(--card-bg);
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow);
-      padding: 1.5rem;
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-direction: column;
     }
 
+    /* Заголовок карточки в стиле системных подзаголовков Android */
     .card-title {
       font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-      color: var(--text-main);
-      border-bottom: 2px solid #f1f5f9;
-      padding-bottom: 0.5rem;
+      font-weight: 500;
+      color: #00acc1; /* Фирменный бирюзовый */
+      padding: 18px 24px 10px 24px;
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid #00acc1;
     }
 
+    /* Сетка/список кнопок */
     .grid-buttons {
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
     }
 
-    /* Общие стили для кнопок */
+    /* Элементы списка настроек Android */
     button {
       font-family: inherit;
-      font-size: 0.95rem;
-      font-weight: 500;
-      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      font-weight: 400;
+      padding: 18px 24px;
       border: none;
-      border-radius: 8px;
+      background: transparent;
+      color: #212121;
       cursor: pointer;
-      transition: var(--transition);
-      display: inline-flex;
+      display: flex;
       align-items: center;
       justify-content: flex-start;
       text-align: left;
       width: 100%;
+      border-bottom: 1px solid #eeeeee; /* Системный разделитель */
+      transition: background-color 0.15s ease;
+      box-sizing: border-box;
     }
 
-    /* Кнопки действий (Инструменты) */
-    .btn-tools {
-      background-color: #f1f5f9;
-      color: var(--text-main);
+    /* Убираем нижнюю черту у последнего пункта */
+    .grid-buttons button:last-child {
+      border-bottom: none;
     }
-    .btn-tools:hover {
-      background-color: #e2e8f0;
+
+    /* Эффект пульсации/выбора (Material Ripple Color) */
+    button:hover, button:active {
+      background-color: #e0f7fa !important;
+      color: #00838f !important;
     }
+
+    /* Главная кнопка действия (выделенный пункт) */
     .btn-tools.primary-action {
-      background-color: var(--primary);
-      color: #ffffff;
-    }
-    .btn-tools.primary-action:hover {
-      background-color: var(--primary-hover);
+      background-color: #f9f9f9;
+      font-weight: 500;
+      color: #00796b;
     }
 
     /* Кнопки статей (PDF) */
     .btn-pdf {
-      background-color: #f8fafc;
-      border: 1px solid #e2e8f0;
-      color: var(--text-main);
-    }
-    .btn-pdf:hover {
-      background-color: #f1f5f9;
-      border-color: #cbd5e1;
-      transform: translateY(-1px);
+      color: #424242;
     }
 
     /* Иконки перед текстом на кнопках */
     button::before {
-      margin-right: 0.75rem;
-      font-size: 1.1rem;
+      margin-right: 16px;
+      font-size: 1.2rem;
+      display: inline-block;
+      width: 24px;
+      text-align: center;
     }
     .icon-add::before { content: "✍️"; }
     .icon-edit::before { content: "📝"; }
@@ -164,13 +159,13 @@
 
   <div class="container">
     
-    <!-- Левая колонка: Форма -->
+    <!-- Левая колонка: Форма в виде системного планшетного окна -->
     <main class="form-section">
       <script src="https://forms.yandex.ru/_static/embed.js"></script>
       <iframe src="https://forms.yandex.ru/u/6a49017c4936398361abeea8?iframe=1" name="ya-form-6a49017c4936398361abeea8"></iframe>
     </main>
 
-    <!-- Правая колонка: Управление и статьи -->
+    <!-- Правая колонка: Управление и статьи (списки параметров) -->
     <aside class="nav-section">
       
       <!-- Блок управления контентом -->
@@ -196,6 +191,7 @@
           <button class="btn-pdf icon-doc" onclick="window.location.href='page10.html';">Калькулятор стоимости колодца</button>
         </div>
       </div>
+
       <!-- Блок статей о напитках -->
       <div class="card">
         <h2 class="card-title">Напитки</h2>
