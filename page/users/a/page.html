@@ -5,104 +5,151 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Список статей</title>
     <style>
-        /* Оригинальный градиентный фон Android Ice Cream Sandwich / Jelly Bean */
+        /* Бирюзово-синий градиентный фон из экрана "Welcome" */
         body {
-            font-family: 'Roboto', 'Helvetica Neue', Helvetica, sans-serif;
-            background: radial-gradient(circle, #1a2634 0%, #0d1117 100%);
+            font-family: 'Roboto', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0097a7 0%, #00acc1 50%, #00796b 100%);
             margin: 0;
-            padding: 40px 20px;
+            padding: 20px;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
             min-height: 100vh;
             box-sizing: border-box;
         }
 
-        /* Заголовок в стиле системного меню Android */
-        h1 {
-            color: #33b5e5; /* Фирменный цвет Holo Blue */
-            font-weight: 300;
-            text-transform: uppercase;
-            font-size: 1.5rem;
-            letter-spacing: 1px;
-            margin-bottom: 25px;
-            text-align: left;
+        /* Квадратное окно настройки Android Setup Wizard */
+        .setup-window {
+            background-color: #ffffff;
             width: 100%;
-            max-width: 560px;
-            padding-left: 10px;
-            border-bottom: 2px solid #33b5e5;
-            padding-bottom: 10px;
-        }
-
-        /* Квадратный контейнер настроек */
-        .article-container {
+            max-width: 450px;
+            height: 650px;
             display: flex;
             flex-direction: column;
-            background-color: #161f2b; /* Темный блок меню */
-            border: 1px solid #283747;
-            width: 100%;
-            max-width: 560px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
         }
 
-        /* Кнопки-пункты меню */
+        /* Верхняя цветная плашка (как на 2 и 3 экранах) */
+        .setup-header {
+            background-color: #00acc1;
+            padding: 24px;
+            color: #ffffff;
+        }
+
+        /* Заголовок окна */
+        .setup-header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 400;
+            line-height: 1.3;
+        }
+
+        /* Контейнер для списка (белая бумажная подложка) */
+        .article-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 16px 0;
+            overflow-y: auto;
+        }
+
+        /* Пункты меню в стиле списков Android (как выбор языка) */
         .article-btn {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background-color: transparent;
-            color: #ffffff;
+            background: transparent;
+            color: #212121;
             text-decoration: none;
-            padding: 22px 20px;
-            font-size: 1.1rem;
+            padding: 18px 24px;
+            font-size: 1rem;
             font-weight: 400;
-            border-bottom: 1px solid #283747; /* Тонкий разделитель пунктов */
-            transition: background-color 0.1s ease;
-            box-sizing: border-box;
+            border: none;
+            transition: background-color 0.2s ease;
+            border-bottom: 1px solid #eeeeee;
         }
 
-        /* Удаляем нижнюю границу у последнего пункта */
-        .article-btn:last-child {
-            border-bottom: none;
-        }
-
-        /* Фирменное неоново-синее свечение при наведении и нажатии */
+        /* Эффект нажатия (Material Ripple) */
         .article-btn:hover, .article-btn:active {
-            background-color: rgba(51, 181, 229, 0.2); /* Holo Blue с прозрачностью */
-            color: #33b5e5;
-            outline: none;
+            background-color: #e0f7fa;
+            color: #00838f;
         }
 
-        /* Минималистичный индикатор перехода в стиле старого Android */
+        /* Стрелочка индикатора */
         .article-btn::after {
-            content: "";
-            width: 8px;
-            height: 8px;
-            border-top: 2px solid #555555;
-            border-right: 2px solid #555555;
-            transform: rotate(45deg);
-            transition: border-color 0.1s ease;
-            margin-right: 5px;
+            content: "➔";
+            color: #00acc1;
+            font-size: 1.1rem;
+            opacity: 0.7;
+            transition: transform 0.2s ease;
         }
 
-        /* Подсветка стрелочки при наведении */
         .article-btn:hover::after {
-            border-color: #33b5e5;
+            transform: translateX(4px);
+            opacity: 1;
+        }
+
+        /* Нижняя панель навигации (кнопки Назад / Пропустить / Далее) */
+        .setup-navbar {
+            background-color: #eeeeee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 16px;
+            height: 48px;
+            box-sizing: border-box;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        /* Стиль сервисных кнопок внизу */
+        .nav-btn {
+            background: none;
+            border: none;
+            color: #424242;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+        }
+
+        .nav-btn:hover {
+            background-color: rgba(0, 0, 0, 0.05);
         }
     </style>
 </head>
 <body>
 
-    <h1>Полезные статьи</h1>
+    <!-- Квадратное устройство/окно настройки -->
+    <div class="setup-window">
+        
+        <!-- Шапка окна -->
+        <div class="setup-header">
+            <h1>Полезные статьи</h1>
+        </div>
 
-    <div class="article-container">
-        
-        <a href="page1.html" class="article-btn">Список целей</a>
-        <a href="page2.html" class="article-btn">Видео</a>
-        <a href="page3.html" class="article-btn">Шашки с ии</a>
-        <a href="page4.html" class="article-btn">Игра</a>
-        <a href="page5.html" class="article-btn">Игра дурак</a>
-        
+        <!-- Основной список -->
+        <div class="article-container">
+            <a href="page1.html" class="article-btn">Список целей</a>
+            <a href="page2.html" class="article-btn">Видео</a>
+            <a href="page3.html" class="article-btn">Шашки с ии</a>
+            <a href="page4.html" class="article-btn">Игра</a>
+            <a href="page5.html" class="article-btn">Игра дурак</a>
+        </div>
+
+        <!-- Нижняя панель навигации из оригинального интерфейса -->
+        <div class="setup-navbar">
+            <span class="nav-btn">〈</span>
+            <span class="nav-btn">Далее 〉</span>
+        </div>
+
     </div>
 
 </body>
