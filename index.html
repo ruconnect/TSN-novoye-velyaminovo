@@ -1,385 +1,264 @@
 <!DOCTYPE html>
-    <
-    html lang = "ru" >
-    <
-    head >
-    <
-    meta charset = "UTF-8" >
-    <
-    meta name = "viewport"
-content = "width=device-width, initial-scale=1.0" >
-    <
-    title > Главная панель навигации < /title>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главная панель навигации</title>
+    
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function(m,e,t,r,i,k,a){
+            m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+            m[i].l=1*new Date();
+            for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+            k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+        })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=110388619', 'ym');
 
-    <
-    !--Yandex.Metrika counter-- >
-    <
-    script type = "text/javascript" >
-    (function(m, e, t, r, i, k, a) {
-        m[i] = m[i] || function() {
-            (m[i].a = m[i].a || []).push(arguments)
-        };
-        m[i].l = 1 * new Date();
-        for (var j = 0; j < document.scripts.length; j++) {
-            if (document.scripts[j].src === r) {
-                return;
-            }
+        ym(110388619, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/110388619" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-main: #2d3748;
+            --text-muted: #718096;
+            --primary: #3182ce;
+            --primary-hover: #2b6cb0;
+            --success: #38a169;
+            --success-hover: #2f855a;
+            --accent: #ed8936;
+            --accent-hover: #dd6b20;
+            --dark: #1a202c;
+            --radius: 12px;
+            --shadow: 0 4px 6px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.1);
+            --transition: all 0.25s ease;
         }
-        k = e.createElement(t), a = e.getElementsByTagName(t)[0], k.async = 1, k.src = r, a.parentNode.insertBefore(k, a)
-    })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=110388619', 'ym');
 
-ym(110388619, 'init', {
-    ssr: true,
-    webvisor: true,
-    clickmap: true,
-    ecommerce: "dataLayer",
-    referrer: document.referrer,
-    url: location.href,
-    accurateTrackBounce: true,
-    trackLinks: true
-}); <
-/script> <
-noscript > < div > < img src = "https://mc.yandex.ru/watch/110388619"
-style = "position:absolute; left:-9999px;"
-alt = "" / > < /div></noscript >
-    <
-    !--/Yandex.Metrika counter -->
-
-    <
-    style >
-    /* Оригинальный бирюзовый градиент Android Setup Wizard */
-    body {
-        font - family: 'Roboto', -apple - system, BlinkMacSystemFont, "Segoe UI", sans - serif;
-        background: linear - gradient(135 deg, #0097a7 0%, # 00 acc1 50 % , #00796b 100%);
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
-        /* Главный двухпанельный контейнер */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
         .container {
-            width: 100%;
             max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-muted);
+        }
+
+        /* Сетка для основного контента */
+        .main-layout {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 24px;
+            gap: 30px;
+            margin-bottom: 40px;
         }
 
         @media (min-width: 992px) {
-            .container {
-                grid-template-columns: 1fr 500px; /* Форма слева, шаги настройки справа */
-                height: 720px;
+            .main-layout {
+                grid-template-columns: 3fr 2fr;
             }
         }
 
-        /* Квадратный системный блок для Яндекс-формы */
-        .form-card {
-            background: # ffffff; border: 1 px solid #d1d5db; box - shadow: 0 12 px 30 px rgba(0, 0, 0, 0.25); display: flex; flex - direction: column; overflow: hidden;
-            }
-
-            /* Шапка над формой */
-            .form - header {
-                background - color: #00838f;
-            padding: 20px 24px;
-            color: # ffffff;
-            }
-
-            .form - header h1 {
-                margin: 0;
-                font - size: 1.4 rem;
-                font - weight: 400;
-            }
-
-            .form - header p {
-                margin: 4 px 0 0 0;
-                font - size: 0.9 rem;
-                opacity: 0.8;
-            }
-
-            .form - card iframe {
-                width: 100 % ;
-                flex: 1;
-                min - height: 450 px;
-                border: none;
-                background: #fafafa;
-            }
-
-            /* Правая колонка: Окно мастера настройки */
-            .setup - wizard {
-                background: #ffffff;
-                border: 1 px solid #e0e0e0;
-                box - shadow: 0 12 px 30 px rgba(0, 0, 0, 0.25);
-                display: flex;
-                flex - direction: column;
-                height: 100 % ;
-                box - sizing: border - box;
-                overflow: hidden;
-            }
-
-            /* Контейнер для шагов */
-            .steps - container {
-                flex: 1;
-                overflow - y: auto;
-            }
-
-            /* Базовый класс для карточки-шага */
-            .card {
-                display: none;
-                flex - direction: column;
-                height: 100 % ;
-            }
-
-            /* Активный шаг */
-            .card.active {
-                display: flex;
-            }
-
-            /* Системный подзаголовок Android */
-            .card h2 {
-                font - size: 1.1 rem;
-                font - weight: 500;
-                color: #00acc1;
-            padding: 24px 24px 12px 24px;
-            margin: 0;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 2px solid # 00 acc1;
-            }
-
-            /* Контейнер списка кнопок */
-            .btn - list {
-                display: flex;
-                flex - direction: column;
-            }
-
-            /* Превращаем ссылки в классические элементы меню Android */
-            .btn {
-                font - size: 1 rem;
-                font - weight: 400;
-                padding: 20 px 24 px;
-                color: #212121;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid # eeeeee;
-                transition: background - color 0.15 s ease;
-                box - sizing: border - box;
-            }
-
-            .btn - list.btn: last - child {
-                border - bottom: none;
-            }
-
-            /* Эффект выделения Material Ripple при наведении/клике */
-            .btn: hover, .btn: active {
-                background - color: #e0f7fa!important;
-                color: #00838f !important;
+        /* Карточки секций */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
         }
 
-        /* Стилизация шеврона-стрелочки справа */
-        .btn::after {
-            content: "";
-            width: 8px;
-            height: 8px;
-            border-top: 2px solid # b0bec5;
-                border - right: 2 px solid #b0bec5;
-                transform: rotate(45 deg);
-                transition: border - color 0.15 s;
-            }
-
-            .btn: hover::after {
-                border - color: #00acc1;
+        .card h2 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+            border-bottom: 2px solid #edf2f7;
+            padding-bottom: 10px;
         }
 
-        /* Системная нижняя панель */
-        .setup-navbar {
-            background-color: # ededed;
-                display: flex;
-                justify - content: space - between;
-                align - items: center;
-                padding: 0 16 px;
-                height: 56 px;
-                border - top: 1 px solid #dbdbdb;
-                margin - top: auto;
-            }
+        /* Сетка кнопок */
+        .btn-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+        }
 
-            /* Сервисные кнопки навигации */
-            .nav - btn {
-                background: transparent;
-                border: none;
-                color: #424242;
-            font-size: 0.9rem;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            padding: 12px 16px;
+        /* Базовые стили для обновленных кнопок */
+        .btn {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            justify-content: center;
+            text-align: center;
+            padding: 14px 20px;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
         }
 
-        .nav-btn:hover {
-            background-color: rgba(0, 0, 0, 0.05);
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
-        .nav-btn:disabled {
-            color: # b0b0b0;
-                cursor: not - allowed;
-                background: transparent;
-            } <
-            /style> <
-            /head> <
-            body >
-
-            <
-            div class = "container" >
-
-            <
-            !--Левая колонка: Форма обратной связи и приветствие-- >
-            <
-            main class = "form-card" >
-            <
-            div class = "form-header" >
-            <
-            h1 > Панель управления проектом < /h1> <
-            p > Добро пожаловать.Выберите необходимый раздел или заполните форму. < /p> <
-            /div> <
-            script src = "https://forms.yandex.ru/_static/embed.js" > < /script> <
-            iframe src = "https://forms.yandex.ru/u/6a43c9b49029020029ba2b35?iframe=1"
-        name = "ya-form-6a43c9b49029020029ba2b35" > < /iframe> <
-            /main>
-
-            <
-            !--Правая колонка: Пошаговое меню в стиле Android-- >
-            <
-            aside class = "setup-wizard" >
-
-            <
-            div class = "steps-container" >
-
-            <
-            !--Шаг 1-- >
-            <
-            div class = "card active"
-        data - step = "1" >
-            <
-            h2 > Рецепты и статьи(1 / 3) < /h2> <
-            div class = "btn-list" >
-            <
-            a href = "page/page1.html"
-        class = "btn" > Варенье из шишек < /a> <
-            a href = "page/info.html"
-        class = "btn" > Клубника и малина < /a> <
-            a href = "page/яблочный пирог.html"
-        class = "btn" > Яблочный пирог < /a> <
-            a href = "page/users/page.html"
-        class = "btn" > Другие статьи < /a> <
-            /div> <
-            /div>
-
-            <
-            !--Шаг 2-- >
-            <
-            div class = "card"
-        data - step = "2" >
-            <
-            h2 > Строительство и презентации(2 / 3) < /h2> <
-            div class = "btn-list" >
-            <
-            a href = "page/page4.html"
-        class = "btn" > Бурение колодца ямобуром < /a> <
-            a href = "page/page3.html"
-        class = "btn" > Как открыть магазин < /a> <
-            /div> <
-            /div>
-
-            <
-            !--Шаг 3-- >
-            <
-            div class = "card"
-        data - step = "3" >
-            <
-            h2 > Управление и участие(3 / 3) < /h2> <
-            div class = "btn-list" >
-            <
-            a href = "TCH/README.html"
-        class = "btn" > Перейти к README < /a> <
-            a href = "campaign/2026/form.html"
-        class = "btn" > Участвовать < /a> <
-            a href = "campaign/2026/form.html"
-        class = "btn" > ТСН Вельяминово < /a> <
-            a href = "info.html"
-        class = "btn" > Админ панель < /a> <
-            /div> <
-            /div>
-
-            <
-            /div>
-
-            <
-            !--Нижняя панель переключения-- >
-            <
-            div class = "setup-navbar" >
-            <
-            button class = "nav-btn"
-        id = "prevBtn"
-        disabled > 〈Назад < /button> <
-            button class = "nav-btn"
-        id = "nextBtn" > Далее〉 < /button> <
-            /div>
-
-            <
-            /aside>
-
-            <
-            /div>
-
-            <
-            !--Логика мастера настройки-- >
-            <
-            script >
-            let currentStep = 1;
-        const totalSteps = 3;
-
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const cards = document.querySelectorAll('.card');
-
-        function updateWizard() {
-            cards.forEach(card => {
-                if (parseInt(card.getAttribute('data-step')) === currentStep) {
-                    card.classList.add('active');
-                } else {
-                    card.classList.remove('active');
-                }
-            });
-
-            prevBtn.disabled = currentStep === 1;
-
-            if (currentStep === totalSteps) {
-                nextBtn.innerText = 'Готово ✓';
-            } else {
-                nextBtn.innerText = 'Далее 〉';
-            }
+        .btn:active {
+            transform: translateY(0);
         }
 
-        prevBtn.addEventListener('click', () => {
-            if (currentStep > 1) {
-                currentStep--;
-                updateWizard();
-            }
-        });
-        nextBtn.addEventListener('click', () => {
-            if (currentStep < totalSteps) {
-                currentStep++;
-                updateWizard();
-            } else {
-                alert('Все разделы успешно просмотрены!');
-            }
-        });
+        /* Цветовые модификаторы кнопок */
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+
+        .btn-success { background-color: var(--success); color: white; }
+        .btn-success:hover { background-color: var(--success-hover); }
+
+        .btn-accent { background-color: var(--accent); color: white; }
+        .btn-accent:hover { background-color: #0066cc; } /* Синий при наведении по вашему коду */
+
+        .btn-dark { background-color: var(--primary); color: white; }
+        .btn-dark:hover { background-color: var(--dark); } /* Черный при наведении по вашему коду */
+
+        .btn-outline { background-color: transparent; border: 2px solid #e2e8f0; color: var(--text-main); }
+        .btn-outline:hover { background-color: #edf2f7; border-color: #cbd5e0; }
+
+        /* Секция фреймов и виджетов */
+        .widgets-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .iframe-wrapper {
+            position: relative;
+            width: 100%;
+            background: #fff;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            padding: 15px;
+        }
+
+        .iframe-wrapper h3 {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            color: var(--text-muted);
+        }
+
+        iframe {
+            width: 100%;
+            border: none;
+            border-radius: 6px;
+            background: #fafafa;
+        }
+
+        /* Ограничение для Яндекс Формы */
+        .form-wrapper iframe {
+            min-height: 500px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header>
+            <h1>Панель управления проектом</h1>
+            <p>Добро пожаловать. Выберите необходимый раздел или заполните форму ниже.</p>
+        </header>
+
+        <div class="main-layout">
+            
+            <!-- Левая колонка: Кнопки и Ссылки -->
+            <div class="widgets-section">
+                
+                <div class="card">
+                    <h2>Рецепты и статьи</h2>
+                    <div class="btn-grid">
+                        <a href="page/page1.html" class="btn btn-outline">Варенье из шишек</a>
+                        <a href="page/info.html" class="btn btn-success">Клубника и малина</a>
+                        <a href="page/яблочный пирог.html" class="btn btn-primary">Яблочный пирог</a>
+                        <a href="page/users/page.html" class="btn btn-outline">Другие статьи</a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Строительство и презентации</h2>
+                    <div class="btn-grid">
+                        <a href="page/page4.html" class="btn btn-primary">Бурение колодца ямобуром</a>
+                        <a href="page/page3.html" class="btn btn-outline">Как открыть магазин</a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Управление и участие</h2>
+                    <div class="btn-grid">
+                        <a href="TCH/README.html" class="btn btn-primary">Перейти к README</a>
+                        <a href="campaign/2026/form.html" class="btn btn-success">Участвовать</a>
+                        
+                        <!-- Исправлено: заменена кнопка-пустышка button на полноценную ссылку a -->
+                        <a href="campaign/2026/form.html" class="btn btn-accent">ТСН Вельяминово</a>
+                        
+                        <a href="info.html" class="btn btn-dark">Админ панель</a>
+                    </div>
+                </div>
+
+                <!-- Яндекс.Форма перемещена в логичный блок контента -->
+                <div class="card form-wrapper">
+                    <h2>Обратная связь</h2>
+                    <script src="https://forms.yandex.ru/_static/embed.js"></script>
+                    <iframe src="https://forms.yandex.ru/u/6a43c9b49029020029ba2b35?iframe=1" name="ya-form-6a43c9b49029020029ba2b35"></iframe>
+                </div>
+
+            </div>
+
+            <!-- Правая колонка: Информационные фреймы/виджеты -->
+            <div class="widgets-section">
+                
+                <div class="iframe-wrapper">
+                    <h3>Температура воды</h3>
+                    <iframe
+                      src="wid/water.html"
+                      width="560"
+                      height="520"
+                      frameborder="0"
+                      style="border: none; border-radius: 18px; overflow: hidden;"
+                    ></iframe>
+                </div>
+
+
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>
