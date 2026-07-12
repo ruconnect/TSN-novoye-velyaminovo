@@ -18,7 +18,7 @@
 
     .water-widget {
       width: 100%;
-      max-width: 540px;
+      max-width: 560px;
       padding: 18px;
       border-radius: 18px;
       background: linear-gradient(135deg, #0676c9, #13c8e8);
@@ -177,7 +177,7 @@
     <div class="widget-header">
       <div>
         <h2 class="widget-title">Температура воды</h2>
-        <div class="widget-subtitle">Реальные данные без своего API</div>
+        <div class="widget-subtitle">Моря и водоёмы Подмосковья</div>
       </div>
 
       <button class="refresh-btn" id="refreshBtn">Обновить</button>
@@ -211,15 +211,15 @@
       </div>
 
       <div class="detail-box">
-        <div class="detail-label">Комфорт</div>
-        <div class="detail-value" id="comfort">—</div>
+        <div class="detail-label">Тип данных</div>
+        <div class="detail-value" id="dataType">—</div>
       </div>
     </div>
 
     <div class="message" id="message"></div>
 
     <div class="footer">
-      Источник: Open-Meteo Forecast API. Для внутренних рек и озёр данные могут быть недоступны.
+      Источник: Open-Meteo. Для внутренних водоёмов реальные данные могут быть недоступны, тогда используется оценка по температуре воздуха.
     </div>
   </div>
 
@@ -230,77 +230,136 @@
         name: "Сочи",
         waterPlace: "Чёрное море",
         latitude: 43.5853,
-        longitude: 39.7203
+        longitude: 39.7203,
+        type: "sea"
       },
       {
         id: "anapa",
         name: "Анапа",
         waterPlace: "Чёрное море",
         latitude: 44.8950,
-        longitude: 37.3167
+        longitude: 37.3167,
+        type: "sea"
       },
       {
         id: "gelendzhik",
         name: "Геленджик",
         waterPlace: "Чёрное море",
         latitude: 44.5622,
-        longitude: 38.0848
+        longitude: 38.0848,
+        type: "sea"
       },
       {
         id: "tuapse",
         name: "Туапсе",
         waterPlace: "Чёрное море",
         latitude: 44.1053,
-        longitude: 39.0802
+        longitude: 39.0802,
+        type: "sea"
       },
       {
         id: "novorossiysk",
         name: "Новороссийск",
         waterPlace: "Чёрное море",
         latitude: 44.7239,
-        longitude: 37.7686
-      },
-      {
-        id: "yalta",
-        name: "Ялта",
-        waterPlace: "Чёрное море",
-        latitude: 44.4952,
-        longitude: 34.1663
-      },
-      {
-        id: "sevastopol",
-        name: "Севастополь",
-        waterPlace: "Чёрное море",
-        latitude: 44.6167,
-        longitude: 33.5254
+        longitude: 37.7686,
+        type: "sea"
       },
       {
         id: "vladivostok",
         name: "Владивосток",
         waterPlace: "Японское море",
         latitude: 43.1155,
-        longitude: 131.8855
+        longitude: 131.8855,
+        type: "sea"
       },
       {
         id: "kaliningrad",
         name: "Калининград",
         waterPlace: "Балтийское море",
         latitude: 54.7104,
-        longitude: 20.4522
+        longitude: 20.4522,
+        type: "sea"
       },
       {
         id: "murmansk",
         name: "Мурманск",
         waterPlace: "Баренцево море",
         latitude: 68.9707,
-        longitude: 33.0749
+        longitude: 33.0749,
+        type: "sea"
       },
       {
         id: "petropavlovsk",
         name: "Петропавловск-Камчатский",
         waterPlace: "Тихий океан",
         latitude: 53.0241,
-        longitude: 158.6435
+        longitude: 158.6435,
+        type: "sea"
+      },
+      {
+        id: "istra_reservoir",
+        name: "Истринское водохранилище",
+        waterPlace: "Подмосковье",
+        latitude: 56.0700,
+        longitude: 36.7400,
+        type: "inland"
+      },
+      {
+        id: "mozhaysk_reservoir",
+        name: "Можайское водохранилище",
+        waterPlace: "Подмосковье",
+        latitude: 55.5600,
+        longitude: 35.8500,
+        type: "inland"
+      },
+      {
+        id: "klyazma_reservoir",
+        name: "Клязьминское водохранилище",
+        waterPlace: "Подмосковье",
+        latitude: 55.9900,
+        longitude: 37.6100,
+        type: "inland"
+      },
+      {
+        id: "pirogovo_reservoir",
+        name: "Пироговское водохранилище",
+        waterPlace: "Подмосковье",
+        latitude: 55.9850,
+        longitude: 37.6750,
+        type: "inland"
+      },
+      {
+        id: "ruza_reservoir",
+        name: "Рузское водохранилище",
+        waterPlace: "Подмосковье",
+        latitude: 55.7900,
+        longitude: 36.1000,
+        type: "inland"
+      },
+      {
+        id: "ozerninskoe_reservoir",
+        name: "Озернинское водохранилище",
+        waterPlace: "Подмосковье",
+        latitude: 55.7600,
+        longitude: 36.2200,
+        type: "inland"
+      },
+      {
+        id: "senezh_lake",
+        name: "Озеро Сенеж",
+        waterPlace: "Подмосковье",
+        latitude: 56.1900,
+        longitude: 37.0000,
+        type: "inland"
+      },
+      {
+        id: "biserovo_lake",
+        name: "Бисерово озеро",
+        waterPlace: "Подмосковье",
+        latitude: 55.7800,
+        longitude: 38.1200,
+        type: "inland"
       }
     ];
 
@@ -311,7 +370,7 @@
     const statusEl = document.getElementById("status");
     const waterPlace = document.getElementById("waterPlace");
     const dataTime = document.getElementById("dataTime");
-    const comfort = document.getElementById("comfort");
+    const dataType = document.getElementById("dataType");
     const message = document.getElementById("message");
 
     let selectedPlaceId = places[0].id;
@@ -322,13 +381,6 @@
       if (temp < 20) return "прохладная";
       if (temp < 24) return "комфортная";
       return "тёплая";
-    }
-
-    function getComfort(temp) {
-      if (temp < 15) return "низкий";
-      if (temp < 20) return "средний";
-      if (temp < 24) return "хороший";
-      return "отличный";
     }
 
     function formatTime(value) {
@@ -360,7 +412,7 @@
       statusEl.textContent = "загрузка";
       waterPlace.textContent = place.waterPlace;
       dataTime.textContent = "—";
-      comfort.textContent = "—";
+      dataType.textContent = "—";
       hideMessage();
       refreshBtn.disabled = true;
     }
@@ -371,7 +423,7 @@
       statusEl.textContent = "нет данных";
       waterPlace.textContent = place.waterPlace;
       dataTime.textContent = "—";
-      comfort.textContent = "—";
+      dataType.textContent = "—";
       showMessage(text);
     }
 
@@ -388,6 +440,90 @@
       placeSelect.value = selectedPlaceId;
     }
 
+    function findNearestValidItem(times, values) {
+      const validItems = values
+        .map((value, index) => ({
+          value,
+          time: times[index]
+        }))
+        .filter(item => item.value !== null && item.value !== undefined);
+
+      if (!validItems.length) return null;
+
+      const now = new Date();
+
+      let nearest = validItems[0];
+      let minDiff = Math.abs(new Date(nearest.time) - now);
+
+      validItems.forEach(item => {
+        const diff = Math.abs(new Date(item.time) - now);
+
+        if (diff < minDiff) {
+          minDiff = diff;
+          nearest = item;
+        }
+      });
+
+      return nearest;
+    }
+
+    function estimateWaterTemperatureByAir(hourly) {
+      if (!hourly || !hourly.temperature_2m || !hourly.time) return null;
+
+      const validTemps = hourly.temperature_2m
+        .map((temp, index) => ({
+          temp,
+          time: hourly.time[index]
+        }))
+        .filter(item => item.temp !== null && item.temp !== undefined);
+
+      if (!validTemps.length) return null;
+
+      const now = new Date();
+      const lastTemps = validTemps
+        .filter(item => new Date(item.time) <= now)
+        .slice(-24);
+
+      const sourceTemps = lastTemps.length ? lastTemps : validTemps.slice(-24);
+
+      const averageAirTemp =
+        sourceTemps.reduce((sum, item) => sum + Number(item.temp), 0) / sourceTemps.length;
+
+      let estimatedWaterTemp = averageAirTemp - 2;
+
+      if (averageAirTemp > 22) {
+        estimatedWaterTemp = averageAirTemp - 3;
+      }
+
+      if (averageAirTemp < 10) {
+        estimatedWaterTemp = averageAirTemp - 1;
+      }
+
+      return {
+        value: estimatedWaterTemp,
+        time: sourceTemps[sourceTemps.length - 1].time
+      };
+    }
+
+    async function fetchOpenMeteo(place, hourlyParameters) {
+      const url = new URL("https://api.open-meteo.com/v1/forecast");
+
+      url.searchParams.set("latitude", place.latitude);
+      url.searchParams.set("longitude", place.longitude);
+      url.searchParams.set("hourly", hourlyParameters);
+      url.searchParams.set("timezone", "auto");
+      url.searchParams.set("forecast_days", "1");
+      url.searchParams.set("past_days", "1");
+
+      const response = await fetch(url.toString());
+
+      if (!response.ok) {
+        throw new Error("Ошибка запроса: " + response.status);
+      }
+
+      return await response.json();
+    }
+
     async function loadWaterTemperature() {
       const place = places.find(item => item.id === selectedPlaceId);
 
@@ -395,75 +531,68 @@
 
       setLoading(place);
 
-      const url = new URL("https://api.open-meteo.com/v1/forecast");
-
-      url.searchParams.set("latitude", place.latitude);
-      url.searchParams.set("longitude", place.longitude);
-      url.searchParams.set("hourly", "sea_surface_temperature");
-      url.searchParams.set("timezone", "auto");
-      url.searchParams.set("forecast_days", "1");
-      url.searchParams.set("past_days", "1");
+      const realWaterParameter =
+        place.type === "inland"
+          ? "water_temperature"
+          : "sea_surface_temperature";
 
       try {
-        const response = await fetch(url.toString());
+        let data = null;
 
-        if (!response.ok) {
-          throw new Error("Ошибка запроса: " + response.status);
+        try {
+          data = await fetchOpenMeteo(place, realWaterParameter);
+        } catch (error) {
+          data = null;
         }
 
-        const data = await response.json();
+        const times = data && data.hourly && data.hourly.time;
+        const realWaterValues = data && data.hourly && data.hourly[realWaterParameter];
 
-        const times = data.hourly && data.hourly.time;
-        const temps = data.hourly && data.hourly.sea_surface_temperature;
+        if (times && realWaterValues && realWaterValues.length) {
+          const nearest = findNearestValidItem(times, realWaterValues);
 
-        if (!times || !temps || !temps.length) {
-          setError(
-            place,
-            "Для этой точки Open-Meteo не вернул температуру поверхности моря. Попробуйте выбрать другой город ближе к побережью."
-          );
-          return;
-        }
-
-        const validItems = temps
-          .map((temp, index) => ({
-            temp,
-            time: times[index]
-          }))
-          .filter(item => item.temp !== null && item.temp !== undefined);
-
-        if (!validItems.length) {
-          setError(
-            place,
-            "Температура воды для этой точки сейчас недоступна. Это частая ситуация для некоторых координат и внутренних водоёмов."
-          );
-          return;
-        }
-
-        const now = new Date();
-
-        let nearest = validItems[0];
-        let minDiff = Math.abs(new Date(nearest.time) - now);
-
-        validItems.forEach(item => {
-          const diff = Math.abs(new Date(item.time) - now);
-
-          if (diff < minDiff) {
-            minDiff = diff;
-            nearest = item;
+          if (nearest) {
+            placeName.textContent = place.name;
+            temperature.textContent = `${Number(nearest.value).toFixed(1)}°C`;
+            statusEl.textContent = getStatus(nearest.value);
+            waterPlace.textContent = place.waterPlace;
+            dataTime.textContent = formatTime(nearest.time);
+            dataType.textContent = "реальные";
+            hideMessage();
+            return;
           }
-        });
+        }
 
-        placeName.textContent = place.name;
-        temperature.textContent = `${Number(nearest.temp).toFixed(1)}°C`;
-        statusEl.textContent = getStatus(nearest.temp);
-        waterPlace.textContent = place.waterPlace;
-        dataTime.textContent = formatTime(nearest.time);
-        comfort.textContent = getComfort(nearest.temp);
-        hideMessage();
+        if (place.type === "inland") {
+          const airData = await fetchOpenMeteo(place, "temperature_2m");
+          const estimated = estimateWaterTemperatureByAir(airData.hourly);
+
+          if (estimated) {
+            placeName.textContent = place.name;
+            temperature.textContent = `${Number(estimated.value).toFixed(1)}°C`;
+            statusEl.textContent = getStatus(estimated.value);
+            waterPlace.textContent = place.waterPlace;
+            dataTime.textContent = formatTime(estimated.time);
+            dataType.textContent = "оценка";
+
+            showMessage(
+              "Open-Meteo не вернул реальную температуру воды для этого водоёма. Показана приблизительная оценка по температуре воздуха за последние часы."
+            );
+
+            return;
+          }
+        }
+
+        setError(
+          place,
+          place.type === "inland"
+            ? "Для этого водоёма сейчас нет ни реальной температуры воды, ни данных для оценки по воздуху."
+            : "Для этой морской точки Open-Meteo не вернул температуру поверхности воды. Попробуйте выбрать другой город."
+        );
       } catch (error) {
         setError(
           place,
-          "Не удалось получить данные. Возможные причины: блокировка запроса браузером, временная недоступность Open-Meteo или отсутствие интернета."
+          "Не удалось получить данные. Проверьте интернет-соединение или попробуйте обновить позже."
         );
       } finally {
         refreshBtn.disabled = false;
