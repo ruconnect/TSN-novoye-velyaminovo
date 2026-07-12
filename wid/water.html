@@ -1,257 +1,486 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<label for="region">Выберите регион:</label>
-<!-- При изменении вызывается функция checkRegion -->
-<select id="region" onchange="checkRegion()">
-  <option value="MO">МО (Московская область)</option>
-  <option value="TUL">ТУЛ (Тульская область)</option>
-</select>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Температура воды</title>
 
-<script>
-  // Изначально задаем значение false (так как по умолчанию выбран МО)
-  let FORCE_MAX_TEMP = false;
-
-  function checkRegion() {
-    const selectElement = document.getElementById("region");
-    const selectedValue = selectElement.value;
-
-    // Проверяем: если выбран ТУЛ, то true, иначе false
-    if (selectedValue === "TUL") {
-      FORCE_MAX_TEMP = true;
-      fetchWaterTemperature();
-    } else {
-      FORCE_MAX_TEMP = false;
+  <style>
+    * {
+      box-sizing: border-box;
     }
 
-    // Проверка работы в консоли (нажмите F12 в браузере)
-    console.log("Значение FORCE_MAX_TEMP:", FORCE_MAX_TEMP);
-  }
-</script>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: transparent;
+    }
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Виджет температуры воды</title>
-    <style>
-        :root {
-            --bg-color: #f0f4f8;
-            --card-bg: #ffffff;
-            --text-main: #2c3e50;
-            --text-muted: #7f8c8d;
-            --accent-blue: #3498db;
-            --water-blue: #1abc9c;
-        }
+    .water-widget {
+      width: 100%;
+      max-width: 540px;
+      padding: 18px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #0676c9, #13c8e8);
+      color: #ffffff;
+      box-shadow: 0 12px 30px rgba(0, 80, 140, 0.25);
+    }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
+    .widget-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
 
-        .water-widget {
-            background: var(--card-bg);
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-            padding: 24px;
-            width: 300px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.3s ease;
-        }
+    .widget-title {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+    }
 
-        .water-widget:hover {
-            transform: translateY(-5px);
-        }
+    .widget-subtitle {
+      margin-top: 5px;
+      font-size: 13px;
+      opacity: 0.9;
+    }
 
-        .water-widget::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 8px;
-            background: linear-gradient(90deg, var(--accent-blue), var(--water-blue));
-        }
+    .refresh-btn {
+      border: none;
+      border-radius: 12px;
+      padding: 9px 12px;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      cursor: pointer;
+      font-size: 13px;
+      transition: 0.2s;
+      white-space: nowrap;
+    }
 
-        .widget-header {
-            margin-bottom: 20px;
-        }
+    .refresh-btn:hover {
+      background: rgba(255, 255, 255, 0.32);
+    }
 
-        .widget-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-main);
-            margin: 0 0 4px 0;
-        }
+    .refresh-btn:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
 
-        .widget-subtitle {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin: 0;
-        }
+    .place-select {
+      width: 100%;
+      border: none;
+      outline: none;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 14px;
+      font-size: 15px;
+      color: #0a3958;
+      background: #ffffff;
+    }
 
-        .widget-display {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 20px;
-        }
+    .current-card {
+      padding: 18px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(8px);
+      margin-bottom: 14px;
+      min-height: 125px;
+    }
 
-        .water-icon {
-            font-size: 3rem;
-            margin-bottom: 10px;
-            animation: float 3s ease-in-out infinite;
-        }
+    .place-name {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
 
-        .temp-value {
-            font-size: 3.5rem;
-            font-weight: 800;
-            color: var(--text-main);
-            line-height: 1;
-            display: flex;
-            align-items: flex-start;
-        }
+    .temperature-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
 
-        .temp-unit {
-            font-size: 1.5rem;
-            font-weight: 500;
-            color: var(--accent-blue);
-            margin-top: 5px;
-            margin-left: 2px;
-        }
+    .temperature {
+      font-size: 46px;
+      font-weight: 800;
+      line-height: 1;
+    }
 
-        .widget-footer {
-            border-top: 1px solid #edf2f7;
-            padding-top: 15px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
+    .water-icon {
+      font-size: 46px;
+    }
 
-        .status-loading {
-            font-style: italic;
-            color: var(--text-muted);
-            font-size: 1.2rem;
-        }
+    .details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-6px) rotate(3deg); }
-        }
-    </style>
+    .detail-box {
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    .detail-label {
+      font-size: 12px;
+      opacity: 0.85;
+      margin-bottom: 4px;
+    }
+
+    .detail-value {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .message {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.16);
+      font-size: 13px;
+      line-height: 1.4;
+      display: none;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    .footer {
+      margin-top: 12px;
+      font-size: 11px;
+      opacity: 0.85;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 420px) {
+      .water-widget {
+        border-radius: 0;
+      }
+
+      .details {
+        grid-template-columns: 1fr;
+      }
+
+      .temperature {
+        font-size: 40px;
+      }
+    }
+  </style>
 </head>
+
 <body>
+  <div class="water-widget">
+    <div class="widget-header">
+      <div>
+        <h2 class="widget-title">Температура воды</h2>
+        <div class="widget-subtitle">Реальные данные без своего API</div>
+      </div>
 
-    <div class="water-widget">
-        <div class="widget-header">
-            <h3 class="widget-title">Водоёмы Подмосковья</h3>
-            <p class="widget-subtitle" id="widget-date">Синхронизация...</p>
-        </div>
-
-        <div class="widget-display">
-            <div class="water-icon">🌊</div>
-            <div class="temp-value" id="water-temp">
-                <span class="status-loading">Загрузка...</span>
-            </div>
-        </div>
-
-        <div class="widget-footer">
-            <span id="widget-location">Москва и МО</span>
-            <span id="update-status">Запрос</span>
-        </div>
+      <button class="refresh-btn" id="refreshBtn">Обновить</button>
     </div>
 
-    <script>
+    <select class="place-select" id="placeSelect"></select>
 
-        function updateDateDisplay() {
-            const options = { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' };
-            document.getElementById('widget-date').innerText = new Date().toLocaleDateString('ru-RU', options);
+    <div class="current-card">
+      <div class="place-name" id="placeName">—</div>
+
+      <div class="temperature-row">
+        <div class="temperature" id="temperature">—</div>
+        <div class="water-icon">🌊</div>
+      </div>
+    </div>
+
+    <div class="details">
+      <div class="detail-box">
+        <div class="detail-label">Состояние</div>
+        <div class="detail-value" id="status">—</div>
+      </div>
+
+      <div class="detail-box">
+        <div class="detail-label">Акватория</div>
+        <div class="detail-value" id="waterPlace">—</div>
+      </div>
+
+      <div class="detail-box">
+        <div class="detail-label">Время данных</div>
+        <div class="detail-value" id="dataTime">—</div>
+      </div>
+
+      <div class="detail-box">
+        <div class="detail-label">Комфорт</div>
+        <div class="detail-value" id="comfort">—</div>
+      </div>
+    </div>
+
+    <div class="message" id="message"></div>
+
+    <div class="footer">
+      Источник: Open-Meteo Forecast API. Для внутренних рек и озёр данные могут быть недоступны.
+    </div>
+  </div>
+
+  <script>
+    const places = [
+      {
+        id: "sochi",
+        name: "Сочи",
+        waterPlace: "Чёрное море",
+        latitude: 43.5853,
+        longitude: 39.7203
+      },
+      {
+        id: "anapa",
+        name: "Анапа",
+        waterPlace: "Чёрное море",
+        latitude: 44.8950,
+        longitude: 37.3167
+      },
+      {
+        id: "gelendzhik",
+        name: "Геленджик",
+        waterPlace: "Чёрное море",
+        latitude: 44.5622,
+        longitude: 38.0848
+      },
+      {
+        id: "tuapse",
+        name: "Туапсе",
+        waterPlace: "Чёрное море",
+        latitude: 44.1053,
+        longitude: 39.0802
+      },
+      {
+        id: "novorossiysk",
+        name: "Новороссийск",
+        waterPlace: "Чёрное море",
+        latitude: 44.7239,
+        longitude: 37.7686
+      },
+      {
+        id: "yalta",
+        name: "Ялта",
+        waterPlace: "Чёрное море",
+        latitude: 44.4952,
+        longitude: 34.1663
+      },
+      {
+        id: "sevastopol",
+        name: "Севастополь",
+        waterPlace: "Чёрное море",
+        latitude: 44.6167,
+        longitude: 33.5254
+      },
+      {
+        id: "vladivostok",
+        name: "Владивосток",
+        waterPlace: "Японское море",
+        latitude: 43.1155,
+        longitude: 131.8855
+      },
+      {
+        id: "kaliningrad",
+        name: "Калининград",
+        waterPlace: "Балтийское море",
+        latitude: 54.7104,
+        longitude: 20.4522
+      },
+      {
+        id: "murmansk",
+        name: "Мурманск",
+        waterPlace: "Баренцево море",
+        latitude: 68.9707,
+        longitude: 33.0749
+      },
+      {
+        id: "petropavlovsk",
+        name: "Петропавловск-Камчатский",
+        waterPlace: "Тихий океан",
+        latitude: 53.0241,
+        longitude: 158.6435
+      }
+    ];
+
+    const placeSelect = document.getElementById("placeSelect");
+    const refreshBtn = document.getElementById("refreshBtn");
+    const placeName = document.getElementById("placeName");
+    const temperature = document.getElementById("temperature");
+    const statusEl = document.getElementById("status");
+    const waterPlace = document.getElementById("waterPlace");
+    const dataTime = document.getElementById("dataTime");
+    const comfort = document.getElementById("comfort");
+    const message = document.getElementById("message");
+
+    let selectedPlaceId = places[0].id;
+
+    function getStatus(temp) {
+      if (temp < 8) return "очень холодная";
+      if (temp < 15) return "холодная";
+      if (temp < 20) return "прохладная";
+      if (temp < 24) return "комфортная";
+      return "тёплая";
+    }
+
+    function getComfort(temp) {
+      if (temp < 15) return "низкий";
+      if (temp < 20) return "средний";
+      if (temp < 24) return "хороший";
+      return "отличный";
+    }
+
+    function formatTime(value) {
+      if (!value) return "—";
+
+      const date = new Date(value);
+
+      return date.toLocaleString("ru-RU", {
+        day: "2-digit",
+        month: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    function showMessage(text) {
+      message.textContent = text;
+      message.classList.add("show");
+    }
+
+    function hideMessage() {
+      message.textContent = "";
+      message.classList.remove("show");
+    }
+
+    function setLoading(place) {
+      placeName.textContent = place.name;
+      temperature.textContent = "…";
+      statusEl.textContent = "загрузка";
+      waterPlace.textContent = place.waterPlace;
+      dataTime.textContent = "—";
+      comfort.textContent = "—";
+      hideMessage();
+      refreshBtn.disabled = true;
+    }
+
+    function setError(place, text) {
+      placeName.textContent = place.name;
+      temperature.textContent = "—";
+      statusEl.textContent = "нет данных";
+      waterPlace.textContent = place.waterPlace;
+      dataTime.textContent = "—";
+      comfort.textContent = "—";
+      showMessage(text);
+    }
+
+    function renderSelect() {
+      placeSelect.innerHTML = "";
+
+      places.forEach(place => {
+        const option = document.createElement("option");
+        option.value = place.id;
+        option.textContent = `${place.name} — ${place.waterPlace}`;
+        placeSelect.appendChild(option);
+      });
+
+      placeSelect.value = selectedPlaceId;
+    }
+
+    async function loadWaterTemperature() {
+      const place = places.find(item => item.id === selectedPlaceId);
+
+      if (!place) return;
+
+      setLoading(place);
+
+      const url = new URL("https://api.open-meteo.com/v1/forecast");
+
+      url.searchParams.set("latitude", place.latitude);
+      url.searchParams.set("longitude", place.longitude);
+      url.searchParams.set("hourly", "sea_surface_temperature");
+      url.searchParams.set("timezone", "auto");
+      url.searchParams.set("forecast_days", "1");
+      url.searchParams.set("past_days", "1");
+
+      try {
+        const response = await fetch(url.toString());
+
+        if (!response.ok) {
+          throw new Error("Ошибка запроса: " + response.status);
         }
 
-        async function fetchWaterTemperature() {
-            const tempElement = document.getElementById('water-temp');
-            const statusElement = document.getElementById('update-status');
+        const data = await response.json();
 
-            // Если включен режим форсирования максимальной температуры, сразу выводим 25°C без лишних сетевых запросов
-            if (FORCE_MAX_TEMP) {
-                tempElement.innerHTML = '-999999999<span class="temp-unit">°C</span>';
-                statusElement.innerText = "Форсировано";
-                statusElement.style.color = "#1abc9c";
-                updateDateDisplay();
-                return;
-            }
+        const times = data.hourly && data.hourly.time;
+        const temps = data.hourly && data.hourly.sea_surface_temperature;
 
-            // Запросы к двум независимым погодным CDN-серверам
-            const urls = [
-                "https://weatherapi.com",
-                "https://wttr.in"
-            ];
-
-            let success = false;
-
-            for (let url of urls) {
-                try {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 4000); // Сброс при зависании через 4 сек.
-
-                    const response = await fetch(url, { method: 'GET', signal: controller.signal });
-                    clearTimeout(timeoutId);
-
-                    if (!response.ok) continue;
-                    const data = await response.json();
-
-                    let waterTemp;
-
-                    // Разбор структуры API ответов
-                    if (data.current && data.current.temp_c !== undefined) {
-                        const airTemp = data.current.temp_c;
-                        waterTemp = Math.round(airTemp * 0.85);
-                    } else if (data.current_condition && data.current_condition[0]) {
-                        const airTemp = parseFloat(data.current_condition[0].temp_C);
-                        waterTemp = Math.round(airTemp * 0.85);
-                    }
-
-                    // Границы нормы для подмосковной воды
-                    if (waterTemp > 25) waterTemp = 25;
-                    if (waterTemp < 2) waterTemp = 2;
-
-                    tempElement.innerHTML = waterTemp + '<span class="temp-unit">°C</span>';
-                    statusElement.innerText = "Обновлено";
-                    statusElement.style.color = "#1abc9c";
-                    updateDateDisplay();
-                    success = true;
-                    break;
-                } catch (e) {
-                    console.warn("Попытка подключения через резервный IP...");
-                }
-            }
-
-            // Автономная климатическая матрица на случай отсутствия сети
-            if (!success) {
-                const currentMonth = new Date().getMonth();
-                // Создаем пустой массив и заполняем его вручную через push, чтобы избежать сбоев парсинга markdown
-                const mockWaterTemps = Array();
-                mockWaterTemps.push(2, 2, 3, 5, 12, 18, 22, 21, 15, 9, 4, 2); // Янв-Дек
-
-                const localEstimatedTemp = mockWaterTemps[currentMonth];
-
-                tempElement.innerHTML = localEstimatedTemp + '<span class="temp-unit">°C*</span>';
-                statusElement.innerText = "Климат МО";
-                statusElement.style.color = "#f39c12";
-                updateDateDisplay();
-            }
+        if (!times || !temps || !temps.length) {
+          setError(
+            place,
+            "Для этой точки Open-Meteo не вернул температуру поверхности моря. Попробуйте выбрать другой город ближе к побережью."
+          );
+          return;
         }
 
-        // Запуск
-        fetchWaterTemperature();
-        // Обновление каждые 15 минут
-        setInterval(fetchWaterTemperature, 900000);
-    </script>
+        const validItems = temps
+          .map((temp, index) => ({
+            temp,
+            time: times[index]
+          }))
+          .filter(item => item.temp !== null && item.temp !== undefined);
+
+        if (!validItems.length) {
+          setError(
+            place,
+            "Температура воды для этой точки сейчас недоступна. Это частая ситуация для некоторых координат и внутренних водоёмов."
+          );
+          return;
+        }
+
+        const now = new Date();
+
+        let nearest = validItems[0];
+        let minDiff = Math.abs(new Date(nearest.time) - now);
+
+        validItems.forEach(item => {
+          const diff = Math.abs(new Date(item.time) - now);
+
+          if (diff < minDiff) {
+            minDiff = diff;
+            nearest = item;
+          }
+        });
+
+        placeName.textContent = place.name;
+        temperature.textContent = `${Number(nearest.temp).toFixed(1)}°C`;
+        statusEl.textContent = getStatus(nearest.temp);
+        waterPlace.textContent = place.waterPlace;
+        dataTime.textContent = formatTime(nearest.time);
+        comfort.textContent = getComfort(nearest.temp);
+        hideMessage();
+      } catch (error) {
+        setError(
+          place,
+          "Не удалось получить данные. Возможные причины: блокировка запроса браузером, временная недоступность Open-Meteo или отсутствие интернета."
+        );
+      } finally {
+        refreshBtn.disabled = false;
+      }
+    }
+
+    placeSelect.addEventListener("change", event => {
+      selectedPlaceId = event.target.value;
+      loadWaterTemperature();
+    });
+
+    refreshBtn.addEventListener("click", () => {
+      loadWaterTemperature();
+    });
+
+    renderSelect();
+    loadWaterTemperature();
+  </script>
 </body>
 </html>
