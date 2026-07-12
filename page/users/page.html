@@ -30,8 +30,8 @@
 
     @media (min-width: 900px) {
       .container {
-        grid-template-columns: 550px 1fr;
-        height: 700px; /* Фиксированная высота как у экрана устройства */
+        grid-template-columns: 1fr 500px; /* Форма слева, шаги настройки справа */
+        height: 700px; 
       }
     }
 
@@ -52,45 +52,41 @@
       border: none;
     }
 
-    /* Правая колонка: интерфейс пошаговой настройки */
-    .nav-section {
+    /* Правая колонка: Окно мастера настройки */
+    .setup-wizard {
       background: #ffffff;
       border: 1px solid #e0e0e0;
       box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
       display: flex;
       flex-direction: column;
-      overflow: hidden;
+      height: 100%;
+      box-sizing: border-box;
+    }
+
+    /* Контейнер для шагов (динамическая смена) */
+    .steps-container {
+      flex: 1;
+      overflow-y: auto;
       position: relative;
     }
 
-    /* Контейнер для карточек (категорий) */
-    .cards-wrapper {
-      flex: 1;
-      overflow-y: auto;
-    }
-
-    /* Стилизация скроллбара под Android */
-    .cards-wrapper::-webkit-scrollbar {
-      width: 6px;
-    }
-    .cards-wrapper::-webkit-scrollbar-thumb {
-      background-color: rgba(0, 172, 193, 0.2);
-    }
-
-    /* Скрываем все категории по умолчанию. Класс .active покажет нужную */
+    /* Базовый класс для карточки-шага */
     .card {
-      display: none;
+      display: none; /* По умолчанию скрыты все шаги */
       flex-direction: column;
+      height: 100%;
     }
+
+    /* Класс для отображения текущего активного шага */
     .card.active {
       display: flex;
     }
 
-    /* Заголовок карточки в стиле системных подзаголовков Android */
+    /* Заголовок шага в стиле системных подзаголовков Android */
     .card-title {
       font-size: 1.1rem;
       font-weight: 500;
-      color: #00acc1; /* Фирменный бирюзовый */
+      color: #00acc1; 
       padding: 24px 24px 12px 24px;
       margin: 0;
       text-transform: uppercase;
@@ -98,14 +94,14 @@
       border-bottom: 2px solid #00acc1;
     }
 
-    /* Сетка/список кнопок */
+    /* Список кнопок внутри шага */
     .grid-buttons {
       display: flex;
       flex-direction: column;
     }
 
     /* Элементы списка настроек Android */
-    .grid-buttons button {
+    button.menu-item {
       font-family: inherit;
       font-size: 1rem;
       font-weight: 400;
@@ -119,36 +115,30 @@
       justify-content: flex-start;
       text-align: left;
       width: 100%;
-      border-bottom: 1px solid #eeeeee; /* Системный разделитель */
+      border-bottom: 1px solid #eeeeee; 
       transition: background-color 0.15s ease;
       box-sizing: border-box;
     }
 
-    /* Убираем нижнюю черту у последнего пункта */
-    .grid-buttons button:last-child {
+    .grid-buttons button.menu-item:last-child {
       border-bottom: none;
     }
 
-    /* Эффект пульсации/выбора (Material Ripple Color) */
-    .grid-buttons button:hover, .grid-buttons button:active {
+    /* Эффект пульсации при наведении/нажатии */
+    button.menu-item:hover, button.menu-item:active {
       background-color: #e0f7fa !important;
       color: #00838f !important;
     }
 
-    /* Главная кнопка действия (выделенный пункт) */
+    /* Главная кнопка действия */
     .btn-tools.primary-action {
       background-color: #f9f9f9;
       font-weight: 500;
       color: #00796b;
     }
 
-    /* Кнопки статей (PDF) */
-    .btn-pdf {
-      color: #424242;
-    }
-
-    /* Иконки перед текстом на кнопках */
-    .grid-buttons button::before {
+    /* Иконки перед текстом */
+    button.menu-item::before {
       margin-right: 16px;
       font-size: 1.2rem;
       display: inline-block;
@@ -162,21 +152,20 @@
     .icon-well::before { content: "💧"; }
     .icon-a::before { content: "⬆️"; }
 
-    /* Нижняя панель навигации (как серая плашка со скриншота) */
+    /* Нижняя серая панель навигации (как на скриншоте) */
     .setup-navbar {
-      background-color: #eeeeee;
+      background-color: #ededed;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 16px;
+      padding: 0 16px;
       height: 56px;
-      box-sizing: border-box;
-      border-top: 1px solid #e0e0e0;
+      border-top: 1px solid #dbdbdb;
     }
 
-    /* Системные служебные кнопки НАЗАД и ДАЛЕЕ */
+    /* Кнопки Назад / Далее */
     .nav-btn {
-      background: none;
+      background: transparent;
       border: none;
       color: #424242;
       font-size: 0.9rem;
@@ -184,9 +173,10 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
       cursor: pointer;
-      padding: 10px 16px;
+      padding: 12px 16px;
       display: inline-flex;
       align-items: center;
+      gap: 6px;
       transition: background-color 0.2s;
     }
 
@@ -194,9 +184,11 @@
       background-color: rgba(0, 0, 0, 0.05);
     }
 
-    /* Состояние, когда кнопка скрыта (например, Назад на первом шаге) */
-    .nav-btn.hidden {
-      visibility: hidden;
+    /* Состояние, когда кнопка отключена (например, Назад на первом шаге) */
+    .nav-btn:disabled {
+      color: #b0b0b0;
+      cursor: not-allowed;
+      background: transparent;
     }
   </style>
 </head>
@@ -204,67 +196,67 @@
 
   <div class="container">
     
-    <!-- Левая колонка: Форма в виде системного планшетного окна -->
+    <!-- Левая колонка: Форма -->
     <main class="form-section">
       <script src="https://yandex.ru"></script>
       <iframe src="https://yandex.ru" name="ya-form-6a49017c4936398361abeea8"></iframe>
     </main>
 
-    <!-- Правая колонка: Пошаговый мастер настройки категорий -->
-    <aside class="nav-section">
+    <!-- Правая колонка: Интерактивный мастер настроек Android -->
+    <aside class="setup-wizard">
       
-      <!-- Контейнер для переключаемых карточек -->
-      <div class="cards-wrapper">
-
-        <!-- Шаг 1: Блок управления контентом -->
-        <div class="card active">
-          <h2 class="card-title">Панель управления</h2>
+      <!-- Контейнер со всеми шагами -->
+      <div class="steps-container">
+        
+        <!-- Шаг 1: Панель управления -->
+        <div class="card active" data-step="1">
+          <h2 class="card-title">Панель управления (1/4)</h2>
           <div class="grid-buttons">
-            <button class="btn-tools primary-action icon-add" onclick="window.location.href='form.html';">Написать свою статью</button>
-            <button class="btn-tools icon-edit" onclick="window.location.href='editor.html';">Редактировать статью</button>
-            <button class="btn-tools icon-premium" onclick="window.location.href='editorpl.html';">Editor+</button>
-            <button class="btn-tools icon-a" onclick="window.location.href='a/page.html';">a раздел</button>
+            <button class="menu-item btn-tools primary-action icon-add" onclick="window.location.href='form.html';">Написать свою статью</button>
+            <button class="menu-item btn-tools icon-edit" onclick="window.location.href='editor.html';">Редактировать статью</button>
+            <button class="menu-item btn-tools icon-premium" onclick="window.location.href='editorpl.html';">Editor+</button>
+            <button class="menu-item btn-tools icon-a" onclick="window.location.href='a/page.html';">a раздел</button>
           </div>
         </div>
 
-        <!-- Шаг 2: Блок статей о колодцах -->
-        <div class="card">
-          <h2 class="card-title">Всё про колодцы</h2>
+        <!-- Шаг 2: Всё про колодцы -->
+        <div class="card" data-step="2">
+          <h2 class="card-title">Всё про колодцы (2/4)</h2>
           <div class="grid-buttons">
-            <button class="btn-tools icon-well" onclick="window.location.href='form.html';">Раздел для колодцев</button>
-            <button class="btn-pdf icon-doc" onclick="window.location.href='page1.pdf';">Свой колодец</button>
-            <button class="btn-pdf icon-doc" onclick="window.location.href='page5.pdf';">Провести воду из колодца в дом</button>
-            <button class="btn-pdf icon-doc" onclick="window.location.href='page6.pdf';">Погружной насос для колодца ручной</button>
-            <button class="btn-pdf icon-doc" onclick="window.location.href='page7.pdf';">Колодец с ведром</button>
-            <button class="btn-pdf icon-doc" onclick="window.location.href='page10.html';">Калькулятор стоимости колодца</button>
+            <button class="menu-item btn-tools icon-well" onclick="window.location.href='form.html';">Раздел для колодцев</button>
+            <button class="menu-item btn-pdf icon-doc" onclick="window.location.href='page1.pdf';">Свой колодец</button>
+            <button class="menu-item btn-pdf icon-doc" onclick="window.location.href='page5.pdf';">Провести воду из колодца в дом</button>
+            <button class="menu-item btn-pdf icon-doc" onclick="window.location.href='page6.pdf';">Погружной насос для колодца ручной</button>
+            <button class="menu-item btn-pdf icon-doc" onclick="window.location.href='page7.pdf';">Колодец с ведром</button>
+            <button class="menu-item btn-pdf icon-doc" onclick="window.location.href='page10.html';">Калькулятор стоимости колодца</button>
           </div>
         </div>
 
-        <!-- Шаг 3: Блок статей о напитках -->
-        <div class="card">
-          <h2 class="card-title">Напитки</h2>
+        <!-- Шаг 3: Напитки -->
+        <div class="card" data-step="3">
+          <h2 class="card-title">Напитки (3/4)</h2>
           <div class="grid-buttons">
-            <button class="btn-tools icon-well" onclick="window.location.href='page11.html';">Самогон</button>
+            <button class="menu-item btn-tools icon-well" onclick="window.location.href='page11.html';">Самогон</button>
           </div>
         </div>
 
-        <!-- Шаг 4: Блок остальных статей -->
-        <div class="card">
-          <h2 class="card-title">Полезные статьи</h2>
+        <!-- Шаг 4: Полезные статьи -->
+        <div class="card" data-step="4">
+          <h2 class="card-title">Полезные статьи (4/4)</h2>
           <div class="grid-buttons">
-            <button class="btn-pdf icon-doc" onclick="window.location.href='page2.pdf';">Как посадить голубику</button>
-            <button class="btn-pdf icon-doc" onclick="window.location.href='page3.pdf';">Volkswagen Tiguan для семьи</button>
-            <button class="btn-pdf icon-doc" onclick="window.location.href='page4.pdf';">2 санузел как сделать</button>
-            <button class="btn-pdf icon-doc" onclick="window.location.href='page8.pdf';">Ягодная настойка</button>
-            <button class="btn-pdf icon-doc" onclick="window.location.href='page9.html';">Подготовить дом к зиме</button>
+            <button class="menu-item btn-pdf icon-doc" onclick="window.location.href='page2.pdf';">Как посадить голубику</button>
+            <button class="menu-item btn-pdf icon-doc" onclick="window.location.href='page3.pdf';">Volkswagen Tiguan для семьи</button>
+            <button class="menu-item btn-pdf icon-doc" onclick="window.location.href='page4.pdf';">2 санузел как сделать</button>
+            <button class="menu-item btn-pdf icon-doc" onclick="window.location.href='page8.pdf';">Ягодная настойка</button>
+            <button class="menu-item btn-pdf icon-doc" onclick="window.location.href='page9.html';">Подготовить дом к зиме</button>
           </div>
         </div>
 
       </div>
 
-      <!-- Фирменная нижняя панель навигации Android -->
+      <!-- Фирменная нижняя панель переключения -->
       <div class="setup-navbar">
-        <button class="nav-btn hidden" id="prevBtn">〈 Назад</button>
+        <button class="nav-btn" id="prevBtn" disabled>〈 Назад</button>
         <button class="nav-btn" id="nextBtn">Далее 〉</button>
       </div>
 
@@ -272,51 +264,58 @@
 
   </div>
 
-  <!-- Скрипт для пошагового переключения категорий -->
+  <!-- Скрипт логики переключения шагов -->
   <script>
-    const cards = document.querySelectorAll('.card');
+    let currentStep = 1;
+    const totalSteps = 4;
+
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
-    let currentStep = 0;
+    const cards = document.querySelectorAll('.card');
 
-    function updateNavigation() {
+    function updateWizard() {
       // Переключаем видимость карточек
-      cards.forEach((card, index) => {
-        if (index === currentStep) {
+      cards.forEach(card => {
+        if (parseInt(card.getAttribute('data-step')) === currentStep) {
           card.classList.add('active');
         } else {
           card.classList.remove('active');
         }
       });
 
-      // Управляем кнопкой "Назад" (скрываем на первом шаге)
-      if (currentStep === 0) {
-        prevBtn.classList.add('hidden');
+      // Управляем доступностью кнопки "Назад"
+      if (currentStep === 1) {
+        prevBtn.disabled = true;
       } else {
-        prevBtn.classList.remove('hidden');
+        prevBtn.disabled = false;
       }
 
       // Изменяем текст кнопки "Далее" на последнем шаге
-      if (currentStep === cards.length - 1) {
-        nextBtn.textContent = 'Готово ✓';
+      if (currentStep === totalSteps) {
+        nextBtn.innerText = 'Готово ✓';
       } else {
-        nextBtn.textContent = 'Далее 〉';
+        nextBtn.innerText = 'Далее 〉';
       }
     }
 
-    nextBtn.addEventListener('click', () => {
-      if (currentStep < cards.length - 1) {
-        currentStep++;
-        updateNavigation();
-      } else {
-        // Действие при нажатии "Готово" на последнем шаге
-        alert('Вы просмотрели все разделы меню!');
+    // Обработчик кнопки Назад
+    prevBtn.addEventListener('click', () => {
+      if (currentStep > 1) {
+        currentStep--;
+        updateWizard();
       }
     });
 
-    prevBtn.addEventListener('click', () => {
-      if (currentStep > 0) {
-        currentStep--;
-        updateNavigation();
+    // Обработчик кнопки Далее
+    nextBtn.addEventListener('click', () => {
+      if (currentStep < totalSteps) {
+        currentStep++;
+        updateWizard();
+      } else {
+        alert('Все категории закончились');
       }
     });
+  </script>
+
+</body>
+</html>
