@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Дурак против ИИ</title>
+</head>
+<body>
+
+<h1>Карты: Дурак против ИИ</h1>
+
+<p>
+    <b>Козырь:</b> <span id="trumpText"></span>
+</p>
+
+<p>
+    <b>Карт в колоде:</b> <span id="deckCount"></span>
+</p>
+
+<p>
+    <b>Ход:</b> <span id="turnText"></span>
+</p>
+
+<hr>
+
+<h2>Компьютер</h2>
+<p>
+    Карт у компьютера: <span id="aiCount"></span>
+</p>
+
+<h2>Стол</h2>
+<div id="table"></div>
+
+<p>
+    <button onclick="playerTake()">Взять карты</button>
+    <button onclick="playerDone()">Бито / закончить ход</button>
+</p>
+
+<hr>
+
+<h2>Твои карты</h2>
+<div id="playerHand"></div>
+
+<hr>
+
+<h2>Журнал игры</h2>
+<div id="log"></div>
+
+<script>
+var suits = ["♠", "♥", "♦", "♣"];
+var ranks = [
+    {name:"6", value:6},
+    {name:"7", value:7},
+    {name:"8", value:8},
+    {name:"9", value:9},
+    {name:"10", value:10},
+    {name:"В", value:11},
+    {name:"Д", value:12},
+    {name:"К", value:13},
+    {name:"Т", value:14}
+];
+
+var deck = [];
+var player = [];
+var ai = [];
+var table = [];
+var trumpSuit = "";
+var trumpCard = null;
+
+var attacker = "player";
+var defender = "ai";
+var phase = "attack";
+
+var gameOver = false;
+
+function cardText(card) {
+    return card.rank + card.suit;
+}
+
+function log(text) {
+    var div = document.getElementById("log");
+    div.innerHTML = text + "<br>" + div.innerHTML;
+}
+
+function createDeck() {
+    deck = [];
+    for (var s = 0; s < suits.length; s++) {
+        for (var r = 0; r < ranks.length; r++) {
+            deck.push({
+                suit: suits[s],
+                rank: ranks[r].name,
+                value: ranks[r].value
+            });
+        }
+    }
+}
+
+function shuffleDeck() {
+    for (var i = deck.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var t = deck[i];
+        deck[i] = deck[j];
+        deck[j] = t;
+    }
+}
+
+function startGame() {
+    createDeck();
+    shuffleDeck();
+
+    trumpCard = deck[deck.length - 1];
+    trumpSuit = trumpCard.suit;
+
+    player = [];
+    ai = [];
+    table = [];
+
+    for (var i = 0; i < 6; i++) {
+        player.push(deck.shift());
+        ai.push(deck.shift());
+    }
+
+    attacker = chooseFirstAttacker();
+    defender = attacker == "player" ? "ai" : "player";
+    phase = "attack";
+    gameOver = false;
+
+    log("Игра началась. Козырь: " + trumpSuit);
+    log(attacker == "player" ? "Ты ходишь первым." : "Компьютер ходит первым.");
+
+    render();
+
+    if (attacker == "ai") {
+        setTimeout(aiAttack, 700);
+    }
+}
+
+function chooseFirstAttacker() {
+    var pMin = 100;
+    var aMin = 100;
+
+    for (var i = 0; i < player.length; i++) {
+        if (player[i].suit == trumpSuit && player[i].value < pMin) {
+            pMin = player[i].value;
+        }
+    }
+
+    for (var j = 0; j < ai.length; j++) {
+        if (ai[j].suit == trumpSuit && ai[j].value < aMin) {
+            aMin = ai[j].value;
+        }
+    }
+
+    if (pMin == 100 && aMin == 100) {
+        return Math.random() < 0.5 ? "player" : "ai";
+    }
+
+    if (pMin < aMin) return "player";
+    return "ai";
+}
+
+function sortHand(hand) {
+    hand.sort(function(a, b) {
+        if (a.suit == trumpSuit && b.suit != trumpSuit) return 1;
+        if (a.suit != trumpSuit && b.suit == trumpSuit) return -1;
+        if (a.suit == b.suit) return a.value - b.value;
+        return a.suit > b.suit ? 1 : -1;
+    });
+}
+
+function render() {
+    sortHand(player);
+    sortHand(ai);
+
+    document.getElementById("trumpText").innerHTML = cardText(trumpCard) + " — козырная масть " + trumpSuit;
+    document.getElementById("deckCount").innerHTML = deck.length;
+    document.getElementById("aiCount").innerHTML = ai.length;
+
+    var turn = "";
+    if (gameOver) {
+        turn = "игра окончена";
+    } else if (attacker == "player" && phase == "attack") {
+        turn = "ты атакуешь";
+    } else if (defender == "player" && phase == "defend") {
+        turn = "ты защищаешься";
+    } else if (attacker == "player" && phase == "throw") {
+        turn = "ты можешь подкинуть или нажать «Бито»";
+    } else if (attacker == "ai" && phase == "attack") {
+        turn = "компьютер атакует";
+    } else if (defender == "ai" && phase == "defend") {
+        turn = "компьютер защищается";
+    } else if (attacker == "ai" && phase == "throw") {
+        turn = "компьютер думает, подкидывать ли";
+    }
+
+    document.getElementById("turnText").innerHTML = turn;
+
+    renderTable();
+    renderPlayerHand();
+}
+
+function renderTable() {
+    var div = document.getElementById("table");
+    var html = "";
+
+    if (table.length == 0) {
+        html = "<p>На столе пока нет карт.</p>";
+    } else {
+        for (var i = 0; i < table.length; i++) {
+            html += "<p>";
+            html += "Атака: <b>" + cardText(table[i].attack) + "</b>";
+            if (table[i].defense) {
+                html += " — защита: <b>" + cardText(table[i].defense) + "</b>";
+            } else {
+                html += " — не покрыта";
+            }
+            html += "</p>";
+        }
+    }
+
+    div.innerHTML = html;
+}
+
+function renderPlayerHand() {
+    var div = document.getElementById("playerHand");
+    var html = "";
+
+    if (player.length == 0) {
+        html = "<p>У тебя нет карт.</p>";
+    } else {
+        for (var i = 0; i < player.length; i++) {
+            html += "<button onclick='playerCardClick(" + i + ")'>" + cardText(player[i]) + "</button> ";
+        }
+    }
+
+    div.innerHTML = html;
+}
+
+function canBeat(defCard, atkCard) {
+    if (defCard.suit == atkCard.suit && defCard.value > atkCard.value) return true;
+    if (defCard.suit == trumpSuit && atkCard.suit != trumpSuit) return true;
+    return false;
+}
+
+function ranksOnTable() {
+    var arr = [];
+    for (var i = 0; i < table.length; i++) {
+        arr.push(table[i].attack.rank);
+        if (table[i].defense) arr.push(table[i].defense.rank);
+    }
+    return arr;
+}
+
+function canThrow(card) {
+    if (table.length == 0) return true;
+
+    var arr = ranksOnTable();
+    for (var i = 0; i < arr.length; i++) {
+        if (arr[i] == card.rank) return true;
+    }
+
+    return false;
+}
+
+function allCovered() {
+    if (table.length == 0) return false;
+
+    for (var i = 0; i < table.length; i++) {
+        if (!table[i].defense) return false;
+    }
+
+    return true;
+}
+
+function uncoveredIndex() {
+    for (var i = 0; i < table.length; i++) {
+        if (!table[i].defense) return i;
+    }
+    return -1;
+}
+
+function playerCardClick(index) {
+    if (gameOver) return;
+
+    var card = player[index];
+
+    if (attacker == "player" && (phase == "attack" || phase == "throw")) {
+        if (!canThrow(card)) {
+            log("Эту карту нельзя подкинуть.");
+            return;
+        }
+
+        var maxCards = Math.min(6, ai.length + countUncoveredDefenderCards());
+        if (table.length >= maxCards) {
+            log("Больше подкидывать нельзя.");
+            return;
+        }
+
+        player.splice(index, 1);
+        table.push({attack: card, defense: null});
+        log("Ты походил картой " + cardText(card));
+
+        phase = "defend";
+        render();
+
+        setTimeout(aiDefend, 700);
+        return;
+    }
+
+    if (defender == "player" && phase == "defend") {
+        var u = uncoveredIndex();
+        if (u == -1) {
+            log("Все карты уже покрыты.");
+            return;
+        }
+
+        var atk = table[u].attack;
+
+        if (!canBeat(card, atk)) {
+            log("Эта карта не бьёт " + cardText(atk));
+            return;
+        }
+
+        player.splice(index, 1);
+        table[u].defense = card;
+
+        log("Ты покрыл " + cardText(atk) + " картой " + cardText(card));
+
+        if (allCovered()) {
+            phase = "throw";
+            render();
+            setTimeout(aiThrowDecision, 900);
+        } else {
+            render();
+        }
+
+        return;
+    }
+
+    log("Сейчас эту карту сыграть нельзя.");
+}
+
+function countUncoveredDefenderCards() {
+    var count = defender == "ai" ? ai.length : player.length;
+    return count;
+}
+
+function aiAttack() {
+    if (gameOver) return;
+    if (attacker != "ai") return;
+
+    var index = chooseAiAttackCard();
+
+    if (index == -1) {
+        endRoundBeaten();
+        return;
+    }
+
+    var card = ai.splice(index, 1)[0];
+    table.push({attack: card, defense: null});
+    phase = "defend";
+
+    log("Компьютер атакует картой " + cardText(card));
+    render();
+}
+
+function chooseAiAttackCard() {
+    var candidates = [];
+
+    for (var i = 0; i < ai.length; i++) {
+        if (canThrow(ai[i])) {
+            candidates.push(i);
+        }
+    }
+
+    if (candidates.length == 0) return -1;
+
+    var best = candidates[0];
+
+    for (var c = 0; c < candidates.length; c++) {
+        var idx = candidates[c];
+        var card = ai[idx];
+
+        var bestCard = ai[best];
+
+        if (card.suit != trumpSuit && bestCard.suit == trumpSuit) {
+            best = idx;
+        } else if (card.suit == bestCard.suit && card.value < bestCard.value) {
+            best = idx;
+        } else if (card.suit != trumpSuit && bestCard.suit != trumpSuit && card.value < bestCard.value) {
+            best = idx;
+        }
+    }
+
+    return best;
+}
+
+function aiDefend() {
+    if (gameOver) return;
+    if (defender != "ai") return;
+
+    var u = uncoveredIndex();
+    if (u == -1) return;
+
+    var atk = table[u].attack;
+    var best = -1;
+
+    for (var i = 0; i < ai.length; i++) {
+        if (canBeat(ai[i], atk)) {
+            if (best == -1) {
+                best = i;
+            } else {
+                var c = ai[i];
+                var b = ai[best];
+
+                if (c.suit != trumpSuit && b.suit == trumpSuit) {
+                    best = i;
+                } else if (c.suit == b.suit && c.value < b.value) {
+                    best = i;
+                } else if (c.suit == trumpSuit && b.suit == trumpSuit && c.value < b.value) {
+                    best = i;
+                }
+            }
+        }
+    }
+
+    if (best == -1) {
+        log("Компьютер не может покрыть карту и берёт.");
+        aiTake();
+        return;
+    }
+
+    var def = ai.splice(best, 1)[0];
+    table[u].defense = def;
+
+    log("Компьютер покрыл " + cardText(atk) + " картой " + cardText(def));
+
+    if (allCovered()) {
+        phase = "throw";
+        render();
+        log("Можешь подкинуть карту такого же достоинства или нажать «Бито».");
+    } else {
+        render();
+        setTimeout(aiDefend, 600);
+    }
+}
+
+function aiThrowDecision() {
+    if (gameOver) return;
+    if (attacker != "ai") return;
+    if (phase != "throw") return;
+
+    if (!allCovered()) return;
+
+    var maxCards = Math.min(6, player.length + table.length);
+    if (table.length >= maxCards) {
+        endRoundBeaten();
+        return;
+    }
+
+    var possible = [];
+
+    for (var i = 0; i < ai.length; i++) {
+        if (canThrow(ai[i])) possible.push(i);
+    }
+
+    if (possible.length == 0) {
+        endRoundBeaten();
+        return;
+    }
+
+    if (Math.random() < 0.55) {
+        endRoundBeaten();
+        return;
+    }
+
+    var idx = possible[0];
+
+    for (var p = 0; p < possible.length; p++) {
+        if (ai[possible[p]].value < ai[idx].value) idx = possible[p];
+    }
+
+    var card = ai.splice(idx, 1)[0];
+    table.push({attack: card, defense: null});
+
+    log("Компьютер подкинул " + cardText(card));
+    phase = "defend";
+    render();
+}
+
+function playerTake() {
+    if (gameOver) return;
+
+    if (defender != "player" || phase != "defend") {
+        log("Сейчас брать нельзя.");
+        return;
+    }
+
+    for (var i = 0; i < table.length; i++) {
+        player.push(table[i].attack);
+        if (table[i].defense) player.push(table[i].defense);
+    }
+
+    table = [];
+    log("Ты взял карты со стола.");
+
+    refillHandsAfterTake("player");
+
+    attacker = "ai";
+    defender = "player";
+    phase = "attack";
+
+    checkGameOver();
+    render();
+
+    if (!gameOver) {
+        setTimeout(aiAttack, 900);
+    }
+}
+
+function aiTake() {
+    for (var i = 0; i < table.length; i++) {
+        ai.push(table[i].attack);
+        if (table[i].defense) ai.push(table[i].defense);
+    }
+
+    table = [];
+
+    log("Компьютер взял карты со стола.");
+
+    refillHandsAfterTake("ai");
+
+    attacker = "player";
+    defender = "ai";
+    phase = "attack";
+
+    checkGameOver();
+    render();
+}
+
+function playerDone() {
+    if (gameOver) return;
+
+    if (attacker != "player" || phase != "throw") {
+        log("Сейчас нельзя закончить ход.");
+        return;
+    }
+
+    if (!allCovered()) {
+        log("Не все карты покрыты.");
+        return;
+    }
+
+    endRoundBeaten();
+}
+
+function endRoundBeaten() {
+    if (!allCovered() && table.length > 0) {
+        return;
+    }
+
+    if (table.length > 0) {
+        log("Бито. Карты уходят в сброс.");
+    }
+
+    table = [];
+
+    refillHandsAfterBeat();
+
+    var oldAttacker = attacker;
+    attacker = defender;
+    defender = oldAttacker;
+    phase = "attack";
+
+    checkGameOver();
+    render();
+
+    if (!gameOver && attacker == "ai") {
+        setTimeout(aiAttack, 900);
+    }
+}
+
+function refillHandsAfterBeat() {
+    if (attacker == "player") {
+        drawUntilSix(player);
+        drawUntilSix(ai);
+    } else {
+        drawUntilSix(ai);
+        drawUntilSix(player);
+    }
+}
+
+function refillHandsAfterTake(taker) {
+    if (taker == "player") {
+        drawUntilSix(ai);
+        drawUntilSix(player);
+    } else {
+        drawUntilSix(player);
+        drawUntilSix(ai);
+    }
+}
+
+function drawUntilSix(hand) {
+    while (hand.length < 6 && deck.length > 0) {
+        hand.push(deck.shift());
+    }
+}
+
+function checkGameOver() {
+    if (deck.length > 0) return;
+
+    if (player.length == 0 && ai.length == 0) {
+        gameOver = true;
+        log("Ничья. У обоих игроков закончились карты.");
+        alert("Ничья!");
+        return;
+    }
+
+    if (player.length == 0) {
+        gameOver = true;
+        log("Ты выиграл! У тебя закончились карты.");
+        alert("Ты выиграл!");
+        return;
+    }
+
+    if (ai.length == 0) {
+        gameOver = true;
+        log("Компьютер выиграл. Ты остался с картами.");
+        alert("Ты проиграл!");
+        return;
+    }
+}
+
+startGame();
+</script>
+
+</body>
+</html>
