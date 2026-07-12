@@ -5,68 +5,89 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Список статей</title>
     <style>
-        /* Общие стили для всей страницы */
+        /* Оригинальный градиентный фон Android Ice Cream Sandwich / Jelly Bean */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
+            font-family: 'Roboto', 'Helvetica Neue', Helvetica, sans-serif;
+            background: radial-gradient(circle, #1a2634 0%, #0d1117 100%);
             margin: 0;
             padding: 40px 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
         }
 
+        /* Заголовок в стиле системного меню Android */
         h1 {
-            color: #2c3e50;
-            margin-bottom: 30px;
-            text-align: center;
+            color: #33b5e5; /* Фирменный цвет Holo Blue */
+            font-weight: 300;
+            text-transform: uppercase;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+            margin-bottom: 25px;
+            text-align: left;
+            width: 100%;
+            max-width: 560px;
+            padding-left: 10px;
+            border-bottom: 2px solid #33b5e5;
+            padding-bottom: 10px;
         }
 
-        /* Контейнер для кнопок-переходов */
+        /* Квадратный контейнер настроек */
         .article-container {
             display: flex;
             flex-direction: column;
-            gap: 15px; /* Отступ между кнопками */
+            background-color: #161f2b; /* Темный блок меню */
+            border: 1px solid #283747;
             width: 100%;
-            max-width: 600px; /* Ограничение ширины на ПК */
+            max-width: 560px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
         }
 
-        /* Стиль кнопки-ссылки */
+        /* Кнопки-пункты меню */
         .article-btn {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background-color: #ffffff;
-            color: #34495e;
-            text-decoration: none; /* Убираем подчеркивание ссылки */
-            padding: 20px 25px;
-            border-radius: 10px;
-            border-left: 5px solid #3498db; /* Синяя полоска слева */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease; /* Плавная анимация при наведении */
-            font-size: 1.1rem;
-            font-weight: 500;
-        }
-
-        /* Эффект при наведении курсора */
-        .article-btn:hover {
-            background-color: #3498db;
+            background-color: transparent;
             color: #ffffff;
-            transform: translateY(-2px); /* Легкий подъем вверх */
-            box-shadow: 0 6px 12px rgba(52, 152, 219, 0.3);
-            border-left-color: #2980b9;
+            text-decoration: none;
+            padding: 22px 20px;
+            font-size: 1.1rem;
+            font-weight: 400;
+            border-bottom: 1px solid #283747; /* Тонкий разделитель пунктов */
+            transition: background-color 0.1s ease;
+            box-sizing: border-box;
         }
 
-        /* Стрелочка внутри кнопки */
+        /* Удаляем нижнюю границу у последнего пункта */
+        .article-btn:last-child {
+            border-bottom: none;
+        }
+
+        /* Фирменное неоново-синее свечение при наведении и нажатии */
+        .article-btn:hover, .article-btn:active {
+            background-color: rgba(51, 181, 229, 0.2); /* Holo Blue с прозрачностью */
+            color: #33b5e5;
+            outline: none;
+        }
+
+        /* Минималистичный индикатор перехода в стиле старого Android */
         .article-btn::after {
-            content: "➔";
-            font-size: 1.2rem;
-            transition: transform 0.3s ease;
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-top: 2px solid #555555;
+            border-right: 2px solid #555555;
+            transform: rotate(45deg);
+            transition: border-color 0.1s ease;
+            margin-right: 5px;
         }
 
-        /* Анимация стрелочки при наведении */
+        /* Подсветка стрелочки при наведении */
         .article-btn:hover::after {
-            transform: translateX(5px); /* Стрелка сдвигается вправо */
+            border-color: #33b5e5;
         }
     </style>
 </head>
@@ -79,8 +100,8 @@
         <a href="page1.html" class="article-btn">Список целей</a>
         <a href="page2.html" class="article-btn">Видео</a>
         <a href="page3.html" class="article-btn">Шашки с ии</a>
-        <a href="page4.html" class="article-btn">Игра/<a>
-        <a href="page5.html" class="article-btn">Игра дурак/<a>
+        <a href="page4.html" class="article-btn">Игра</a>
+        <a href="page5.html" class="article-btn">Игра дурак</a>
         
     </div>
 
