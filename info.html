@@ -5,70 +5,184 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Введите код</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+        * {
+            box-sizing: border-box;
             margin: 0;
-            background-color: #f0f2f5;
+            padding: 0;
         }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            text-align: center;
+
+        body {
+            font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background-color: #2196F3; /* Фирменный синий фон */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 16px;
         }
+
+        /* Карточка в стиле Android Setup Wizard */
+        .wizard-card {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 400px;
+            height: 550px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Синяя верхняя плашка */
+        .wizard-header {
+            background-color: #2196F3;
+            color: #ffffff;
+            padding: 40px 24px 30px 24px;
+            flex-shrink: 0;
+        }
+
+        .wizard-title {
+            font-size: 1.6rem;
+            font-weight: 400;
+        }
+
+        /* Контентная зона */
+        .wizard-content {
+            padding: 32px 24px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Имитация цветного брендинга Google */
+        .brand-text {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+        .brand-text span:nth-child(1) { color: #4285F4; }
+        .brand-text span:nth-child(2) { color: #EA4335; }
+        .brand-text span:nth-child(3) { color: #FBBC05; }
+        .brand-text span:nth-child(4) { color: #4285F4; }
+        .brand-text span:nth-child(5) { color: #34A853; }
+        .brand-text span:nth-child(6) { color: #EA4335; }
+
+        /* Поле ввода в стиле Material Design 1.0 (просто линия снизу) */
+        .input-container {
+            position: relative;
+            margin-top: 24px;
+        }
+
         input {
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            width: 200px;
-            text-align: center;
+            width: 100%;
+            padding: 10px 0;
+            font-size: 1rem;
+            color: #212121;
+            border: none;
+            border-bottom: 1px solid #bcbcbc;
+            outline: none;
+            background: transparent;
+            transition: border-color 0.2s;
         }
+
+        input:focus {
+            border-bottom: 2px solid #2196F3;
+        }
+
+        /* Плейсхолдер, который выглядит как стандартная подсказка */
+        input::placeholder {
+            color: #9e9e9e;
+            font-weight: 400;
+        }
+
+        /* Сообщение об ошибке */
         .error {
-            color: red;
-            margin-top: 10px;
-            font-size: 14px;
+            color: #dd2c00; /* Родной красный Android для ошибок */
+            margin-top: 12px;
+            font-size: 0.85rem;
             display: none;
+            font-weight: 500;
+        }
+
+        /* Нижняя панель с кнопками */
+        .wizard-footer {
+            border-top: 1px solid #e0e0e0;
+            padding: 8px 16px;
+            display: flex;
+            justify-content: flex-end;
+            background-color: #ffffff;
+        }
+
+        /* Плоская кнопка Android */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 64px;
+            height: 36px;
+            padding: 0 16px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            color: #2196F3;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: rgba(33, 150, 243, 0.04);
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Введите код к админ панели</h2>
-    <!-- Поле для ввода кода -->
-    <input type="text" id="codeInput" placeholder="Введите код здесь" autocomplete="off">
-    <div id="errorMessage" class="error">Неверный код</div>
-</div>
+    <div class="wizard-card">
+        <div class="wizard-header">
+            <h1 class="wizard-title">Вход в систему</h1>
+        </div>
+
+        <div class="wizard-content">
+            <div class="brand-text">
+                <span>A</span><span>d</span><span>m</span><span>i</span><span>n</span>
+            </div>
+            
+            <div class="input-container">
+                <!-- Поле ввода кода -->
+                <input type="text" id="codeInput" placeholder="Введите код доступа" autocomplete="off">
+                <div id="errorMessage" class="error">Неверный код доступа. Повторите попытку.</div>
+            </div>
+        </div>
+
+        <!-- Нижняя панель с кнопкой (неактивна, так как проверка идет на лету) -->
+        <div class="wizard-footer">
+            <button class="btn" style="color: #bcbcbc; cursor: default;">Далее</button>
+        </div>
+    </div>
 
 <script>
     const inputField = document.getElementById('codeInput');
     const errorMessage = document.getElementById('errorMessage');
     
-    // Правильное значение и целевая страница
     const secretCode = "N553R";
-    const targetUrl = "⠀.html"; // Замените на нужный адрес
+    const targetUrl = "⠀.html"; 
 
-    // Отслеживаем ввод пользователя в реальном времени
     inputField.addEventListener('input', function() {
-        // Убираем лишние пробелы по краям
         const enteredValue = this.value.trim();
 
-        // Проверяем, совпадает ли длина, чтобы не выводить ошибку раньше времени
         if (enteredValue.length === secretCode.length) {
             if (enteredValue === secretCode) {
                 errorMessage.style.display = 'none';
-                window.location.href = targetUrl; // Перенаправление
+                window.location.href = targetUrl; 
             } else {
-                errorMessage.style.display = 'block'; // Показываем ошибку
+                errorMessage.style.display = 'block'; 
+                inputField.style.borderBottom = "2px solid #dd2c00"; // Красная линия при ошибке
             }
         } else {
-            errorMessage.style.display = 'none'; // Прячем ошибку, пока пользователь пишет
+            errorMessage.style.display = 'none'; 
+            inputField.style.borderBottom = inputField === document.activeElement ? "2px solid #2196F3" : "1px solid #bcbcbc";
         }
     });
 </script>
