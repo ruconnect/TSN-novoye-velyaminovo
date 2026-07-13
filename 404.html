@@ -12,85 +12,139 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f8fafc;
-            color: #0f172a;
+            font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background-color: #2196F3; /* Фирменный синий фон Android */
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 16px;
         }
 
-        .container {
-            text-align: center;
-            max-width: 450px;
+        /* Имитация карточки мастера настройки (Экран 3) */
+        .wizard-card {
+            background-color: #ffffff;
             width: 100%;
+            max-width: 400px;
+            height: 550px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Верхняя синяя плашка */
+        .wizard-header {
+            background-color: #2196F3;
+            color: #ffffff;
+            padding: 40px 24px 30px 24px;
+            flex-shrink: 0;
         }
 
         .error-code {
-            font-size: 8rem;
-            font-weight: 800;
-            line-height: 1;
-            color: #3b82f6;
-            letter-spacing: -0.05em;
-            margin-bottom: 10px;
-            animation: pulse 2s infinite ease-in-out;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+            margin-bottom: 8px;
         }
 
         .error-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 16px;
+            font-size: 1.6rem;
+            font-weight: 400;
         }
+
+        /* Контентная часть внутри карточки */
+        .wizard-content {
+            padding: 32px 24px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Стилизация под логотип Google */
+        .brand-text {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 24px;
+            letter-spacing: -0.5px;
+        }
+        .brand-text span:nth-child(1) { color: #4285F4; }
+        .brand-text span:nth-child(2) { color: #EA4335; }
+        .brand-text span:nth-child(3) { color: #FBBC05; }
+        .brand-text span:nth-child(4) { color: #4285F4; }
+        .brand-text span:nth-child(5) { color: #34A853; }
+        .brand-text span:nth-child(6) { color: #EA4335; }
 
         .error-message {
-            font-size: 1rem;
-            color: #64748b;
-            line-height: 1.6;
-            margin-bottom: 32px;
+            font-size: 0.95rem;
+            color: #5f6368;
+            line-height: 1.5;
         }
 
+        /* Нижняя панель с кнопками навигации */
+        .wizard-footer {
+            border-top: 1px solid #e0e0e0;
+            padding: 8px 16px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            background-color: #ffffff;
+        }
+
+        /* Плоские текстовые кнопки в стиле Material Design */
         .btn {
-            display: inline-block;
-            background-color: #3b82f6;
-            color: #ffffff;
-            padding: 12px 24px;
-            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 64px;
+            height: 36px;
+            padding: 0 16px;
+            font-size: 0.875rem;
             font-weight: 500;
             text-decoration: none;
-            border-radius: 8px;
-            transition: background-color 0.2s ease, transform 0.1s ease;
-            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
+            text-transform: uppercase;
+            color: #757575;
+            border-radius: 2px;
+            transition: background-color 0.2s;
         }
 
         .btn:hover {
-            background-color: #2563eb;
+            background-color: rgba(0, 0, 0, 0.04);
         }
 
-        .btn:active {
-            transform: scale(0.98);
+        .btn-primary {
+            color: #2196F3;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-
-        @media (max-width: 480px) {
-            .error-code { font-size: 6rem; }
-            .error-title { font-size: 1.25rem; }
+        .btn-primary:hover {
+            background-color: rgba(33, 150, 243, 0.04);
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="error-code">404</div>
-        <h1 class="error-title">Ошибка 404</h1>
-        <p class="error-message">Похоже, эта страница куда-то исчезла или её никогда не существовало.</p>
-        <a href="/" class="btn">Вернуться на главную</a>
+    <div class="wizard-card">
+        <!-- Шапка экрана -->
+        <div class="wizard-header">
+            <div class="error-code">Status 404</div>
+            <h1 class="error-title">Страница не найдена</h1>
+        </div>
+
+        <!-- Тело экрана -->
+        <div class="wizard-content">
+            <div class="brand-text">
+                <span>4</span><span>0</span><span>4</span><span>E</span><span>r</span><span>r</span>
+            </div>
+            <p class="error-message">Похоже, эта страница куда-то исчезла или её никогда не существовало.</p>
+        </div>
+
+        <!-- Навигация снизу -->
+        <div class="wizard-footer">
+            <a href="javascript:history.back()" class="btn">Назад</a>
+            <a href="/" class="btn btn-primary">Главная</a>
+        </div>
     </div>
 
 </body>
