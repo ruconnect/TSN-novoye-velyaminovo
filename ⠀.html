@@ -1,14 +1,276 @@
-<p>Команда сервера</p>
-<input type="text" placeholder="команда">
-<button type="button" onclick="alert('Сайт сбрасывается')">сброс</button>
-<a href="sitemap.xml" class="my-button">sitemap 0</a>
-<a href="sitemap1.xml" class="my-button">sitemap 1</a>
-<!-- 1. Само окно -->
-<dialog id=reser">
-    <p>Данное действие сбросит сайт</p>
-    <!-- Кнопка внутри окна для его закрытия -->
-    <button onclick="document.getElementById('myWindow').close()">Отмена</button>
-</dialog>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель управления</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-<!-- 2. Кнопка, которая вызывает окно -->
-<button onclick="document.getElementById('myWindow').showModal()">Сбросить сайт полностью</button>
+        body {
+            font-family: 'Roboto', 'Segoe UI', -apple-system, sans-serif;
+            background-color: #2196F3; /* Фирменный синий фон Android */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+        }
+
+        /* Карточка в стиле Android Setup Wizard */
+        .setup-window {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 400px;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        /* Синяя шапка */
+        .setup-header {
+            background-color: #2196F3;
+            color: #ffffff;
+            padding: 40px 24px 24px 24px;
+            flex-shrink: 0;
+        }
+
+        .setup-header h1 {
+            font-size: 1.5rem;
+            font-weight: 400;
+        }
+
+        /* Основной контент (Консоль) */
+        .setup-content {
+            padding: 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        .section-title {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #757575;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: -8px;
+        }
+
+        /* Поле ввода в стиле Material Design */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px 0;
+            font-size: 1rem;
+            color: #212121;
+            border: none;
+            border-bottom: 1px solid #bcbcbc;
+            outline: none;
+            background: transparent;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-bottom: 2px solid #2196F3;
+        }
+
+        /* Ссылки sitemap в стиле списка Wi-Fi сетей */
+        .sitemap-list {
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #e0e0e0;
+            border-radius: 2px;
+        }
+
+        .my-button {
+            display: block;
+            padding: 14px 16px;
+            color: #212121;
+            text-decoration: none;
+            font-size: 0.95rem;
+            border-bottom: 1px solid #e0e0e0;
+            background: transparent;
+            transition: background-color 0.15s;
+        }
+
+        .my-button:last-child {
+            border-bottom: none;
+        }
+
+        .my-button:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Кнопки действий */
+        .actions-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        /* Системные кнопки Android */
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #bcbcbc;
+            color: #424242;
+            padding: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: background-color 0.15s;
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(0,0,0,0.04);
+        }
+
+        .btn-danger {
+            background-color: #e53935; /* Красный Android */
+            border: none;
+            color: #ffffff;
+            padding: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            border-radius: 2px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            transition: background-color 0.15s;
+        }
+
+        .btn-danger:hover {
+            background-color: #d32f2f;
+        }
+
+        /* Нижний статус-бар мастера */
+        .setup-footer {
+            border-top: 1px solid #e0e0e0;
+            padding: 8px 16px;
+            display: flex;
+            justify-content: flex-end;
+            background-color: #ffffff;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: #bcbcbc;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            padding: 8px 16px;
+            cursor: default;
+        }
+
+        /* Системное модальное окно Android (Dialog) */
+        dialog {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: none;
+            background: #ffffff;
+            width: 85%;
+            max-width: 320px;
+            padding: 24px 24px 8px 24px;
+            box-shadow: 0 24px 38px rgba(0,0,0,0.3);
+            border-radius: 2px;
+        }
+
+        dialog::backdrop {
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        dialog p {
+            color: #757575;
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+
+        .dialog-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .dialog-btn {
+            background: none;
+            border: none;
+            color: #2196F3;
+            padding: 8px 12px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+
+        .dialog-btn:hover {
+            background-color: rgba(33, 150, 243, 0.04);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="setup-window">
+        <!-- Шапка панели -->
+        <div class="setup-header">
+            <h1>Команда сервера</h1>
+        </div>
+
+        <!-- Тело управления -->
+        <div class="setup-content">
+            <!-- Блок ввода -->
+            <div class="input-group">
+                <input type="text" placeholder="Введите команду">
+            </div>
+
+            <!-- Блок карт сайта -->
+            <div class="input-group">
+                <div class="section-title">Карты сайта</div>
+                <div class="sitemap-list">
+                    <a href="sitemap.xml" class="my-button">sitemap 0</a>
+                    <a href="sitemap1.xml" class="my-button">sitemap 1</a>
+                </div>
+            </div>
+
+            <!-- Блок кнопок сброса -->
+            <div class="actions-group">
+                <button type="button" class="btn-outline" onclick="alert('Сайт сбрасывается')">Быстрый сброс</button>
+                <button type="button" class="btn-danger" onclick="document.getElementById('resetDialog').showModal()">Сбросить сайт полностью</button>
+            </div>
+        </div>
+
+        <!-- Нижняя сервисная панель -->
+        <div class="setup-footer">
+            <span class="nav-btn">Далее</span>
+        </div>
+
+        <!-- Модальное окно в стиле Android -->
+        <dialog id="resetDialog">
+            <p>Данное действие сбросит сайт. Вы уверены?</p>
+            <div class="dialog-buttons">
+                <button class="dialog-btn" onclick="document.getElementById('resetDialog').close()">Отмена</button>
+            </div>
+        </dialog>
+    </div>
+
+</body>
+</html>
