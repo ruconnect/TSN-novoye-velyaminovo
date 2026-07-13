@@ -108,13 +108,13 @@
             display: none;
         }
 
-        /* Изначально скрываем все секции, управление через JS */
+        /* Скрываем все секции по умолчанию */
         .category-section {
             display: none;
             margin-bottom: 16px;
         }
 
-        /* Класс для отображения активной секции */
+        /* Показываем только активную */
         .category-section.active {
             display: block;
         }
@@ -194,20 +194,20 @@
             <p>Раздел b</p>
         </div>
 
-        <!-- Кнопки переключения категорий -->
+        <!-- Кнопки переключения (data-target связывает кнопку со списком ниже) -->
         <div class="tabs-nav">
-            <button class="tab-btn active" onclick="switchCategory('cat1', this)">Вода</button>
-            <button class="tab-btn" onclick="switchCategory('cat2', this)">Категория 2</button>
+            <button class="tab-btn active" data-target="cat1">Вода</button>
+            <button class="tab-btn" data-target="cat2">Категория 2</button>
         </div>
 
         <!-- Контент со списками по категориям -->
         <div class="setup-content">
             
-            <!-- Категория 1 -->
+            <!-- Категория 1 (изначально активна) -->
             <div id="cat1" class="category-section active">
                 <a href="page1" class="article-item">
                     <span>Водопровод колодца</span>
-                    <span class="article-meta">Вода in доме</span>
+                    <span class="article-meta">Вода в доме</span>
                 </a>
                 
                 <a href="ссылка_2.html" class="article-item">
@@ -229,27 +229,58 @@
         <!-- Нижняя панель -->
         <div class="setup-footer">
             <a href="#" class="btn">Назад</a>
-            <button class="btn btn-primary">Далее</button>
+            <button class="btn btn-primary" id="nextTabBtn">Далее</button>
         </div>
     </div>
 
     <script>
-        function switchCategory(categoryId, buttonElement) {
-            // Скрываем все секции категорий
-            const sections = document.querySelectorAll('.category-section');
-            sections.forEach(section => {
-                section.classList.remove('active');
+        // Находим все кнопки вкладок и списки категорий
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const categorySections = document.querySelectorAll('.category-section');
+        const nextTabBtn = document.getElementById('nextTabBtn');
+
+        // Функция переключения
+        function setActiveTab(targetId) {
+            categorySections.forEach(section => {
+                if (section.id === targetId) {
+                    section.classList.add('active');
+                } else {
+                    section.classList.remove('active');
+                }
             });
 
-            // Убираем активный класс со всех кнопок вкладок
-            const buttons = document.querySelectorAll('.tab-btn');
-            buttons.forEach(btn => {
-                btn.classList.remove('active');
+            tabButtons.forEach(btn => {
+                if (btn.getAttribute('data-target') === targetId) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
             });
+        }
 
-            // Показываем выбранную секцию и делаем кнопку активной
-            document.getElementById(categoryId).classList.add('active');
-            buttonElement.classList.add('active');
+        // Навешиваем клики на верхние кнопки
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault(); // Предотвращаем баги сборщиков кода
+                const targetId = this.getAttribute('data-target');
+                setActiveTab(targetId);
+            });
+        });
+
+        // Логика для нижней кнопки "Далее" (автоматически переключает на следующую вкладку)
+        if (nextTabBtn) {
+            nextTabBtn.addEventListener('click', function() {
+                const currentActiveBtn = document.querySelector('.tab-btn.active');
+                if (currentActiveBtn) {
+                    const nextBtn = currentActiveBtn.nextElementSibling;
+                    if (nextBtn && nextBtn.classList.contains('tab-btn')) {
+                        setActiveTab(nextBtn.getAttribute('data-target'));
+                    } else {
+                        // Если это была последняя вкладка, вызываем действие "Готово"
+                        alert('Все вкладки пройдены!');
+                    }
+                }
+            });
         }
     </script>
 </body>
