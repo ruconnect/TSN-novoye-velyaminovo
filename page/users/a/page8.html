@@ -1,133 +1,256 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Умный калькулятор процентов</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Умный калькулятор процентов</title>
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --accent: #2563eb;
+            --accent-light: #eff6ff;
+            --border: #e2e8f0;
+            --success-bg: #f0fdf4;
+            --success-text: #166534;
+        }
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            padding: 2rem 1rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .calculator {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+        }
+
+        /* Стиль предложения с инпутами */
+        .sentence-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.05rem;
+            line-height: 2rem;
+            color: #334155;
+        }
+
+        input[type="number"] {
+            background: #f1f5f9;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            padding: 0.4rem 0.75rem;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-main);
+            width: 110px;
+            outline: none;
+            transition: all 0.2s;
+            -moz-appearance: textfield;
+        }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"]:focus {
+            background: #fff;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px var(--accent-light);
+        }
+
+        input[type="number"]::placeholder {
+            font-weight: 400;
+            color: #cbd5e1;
+        }
+
+        /* Блок вывода результата */
+        .result-view {
+            margin-top: 1.25rem;
+            padding: 0.75rem 1rem;
+            background: var(--success-bg);
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #22c55e;
+        }
+
+        .result-view .label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--success-text);
+            font-weight: 600;
+        }
+
+        .result-view .value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--success-text);
+        }
+
+        @media (max-width: 480px) {
+            .sentence-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+            input[type="number"] {
+                width: 100%;
+            }
+            .result-view {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="calculator">
+    <div class="header">
+        <h1>Процентный калькулятор</h1>
+        <p>Заполните пропуски в нужной строке — результат появится мгновенно</p>
+    </div>
+
+    <!-- Кейс 1 -->
+    <div class="card">
+        <div class="sentence-row">
+            <span>Сколько будет</span>
+            <input type="number" id="c1-p" placeholder="15" oninput="calc1()">
+            <span>% от числа</span>
+            <input type="number" id="c1-v" placeholder="200" oninput="calc1()">
+            <span>?</span>
+        </div>
+        <div class="result-view">
+            <span class="label">Ответ:</span>
+            <span class="value" id="c1-r">0</span>
+        </div>
+    </div>
+
+    <!-- Кейс 2 -->
+    <div class="card">
+        <div class="sentence-row">
+            <span>Число</span>
+            <input type="number" id="c2-v1" placeholder="30" oninput="calc2()">
+            <span>— это сколько % от числа</span>
+            <input type="number" id="c2-v2" placeholder="150" oninput="calc2()">
+            <span>?</span>
+        </div>
+        <div class="result-view">
+            <span class="label">Ответ:</span>
+            <span class="value" id="c2-r">0%</span>
+        </div>
+    </div>
+
+    <!-- Кейс 3 -->
+    <div class="card">
+        <div class="sentence-row">
+            <span>Прибавить к числу</span>
+            <input type="number" id="c3-v" placeholder="500" oninput="calc3()">
+            <input type="number" id="c3-p" placeholder="10" oninput="calc3()">
+            <span>%</span>
+        </div>
+        <div class="result-view">
+            <span class="label">Итоговое число:</span>
+            <span class="value" id="c3-r">0</span>
+        </div>
+    </div>
+
+    <!-- Кейс 4 -->
+    <div class="card">
+        <div class="sentence-row">
+            <span>Вычесть из числа</span>
+            <input type="number" id="c4-v" placeholder="1000" oninput="calc4()">
+            <input type="number" id="c4-p" placeholder="20" oninput="calc4()">
+            <span>%</span>
+        </div>
+        <div class="result-view">
+            <span class="label">Остаток:</span>
+            <span class="value" id="c4-r">0</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Умное форматирование: убирает бесконечные хвосты дробей (макс 4 знака)
+    function format(num) {
+        if (isNaN(num) || !isFinite(num)) return 0;
+        return Number(num.toFixed(4)).toString();
     }
 
-    body {
-      min-height: 100vh;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      color: #222;
+    function calc1() {
+        const p = parseFloat(document.getElementById('c1-p').value);
+        const v = parseFloat(document.getElementById('c1-v').value);
+        document.getElementById('c1-r').innerText = (p && v) ? format((v * p) / 100) : '0';
     }
 
-    .calculator {
-      width: 100%;
-      max-width: 520px;
-      background: #ffffff;
-      border-radius: 24px;
-      padding: 28px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+    function calc2() {
+        const v1 = parseFloat(document.getElementById('c2-v1').value);
+        const v2 = parseFloat(document.getElementById('c2-v2').value);
+        document.getElementById('c2-r').innerText = (v1 && v2) ? format((v1 / v2) * 100) + '%' : '0%';
     }
 
-    .calculator h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
-      color: #2d2d2d;
-      text-align: center;
+    function calc3() {
+        const v = parseFloat(document.getElementById('c3-v').value);
+        const p = parseFloat(document.getElementById('c3-p').value);
+        document.getElementById('c3-r').innerText = (v && p) ? format(v + (v * p / 100)) : '0';
     }
 
-    .subtitle {
-      text-align: center;
-      color: #666;
-      font-size: 15px;
-      margin-bottom: 24px;
-      line-height: 1.5;
+    function calc4() {
+        const v = parseFloat(document.getElementById('c4-v').value);
+        const p = parseFloat(document.getElementById('c4-p').value);
+        document.getElementById('c4-r').innerText = (v && p) ? format(v - (v * p / 100)) : '0';
     }
+</script>
 
-    .mode-box {
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: #333;
-    }
-
-    select,
-    input {
-      width: 100%;
-      padding: 14px 15px;
-      border-radius: 12px;
-      border: 1px solid #d6d6d6;
-      font-size: 16px;
-      outline: none;
-      transition: 0.2s;
-    }
-
-    select:focus,
-    input:focus {
-      border-color: #667eea;
-      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
-    }
-
-    .fields {
-      display: grid;
-      gap: 16px;
-      margin-bottom: 20px;
-    }
-
-    .hint {
-      background: #f5f7ff;
-      color: #4d5fa8;
-      border-left: 4px solid #667eea;
-      padding: 12px 14px;
-      border-radius: 10px;
-      font-size: 14px;
-      line-height: 1.45;
-      margin-bottom: 20px;
-    }
-
-    button {
-      width: 100%;
-      border: none;
-      padding: 15px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white;
-      border-radius: 14px;
-      font-size: 17px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 24px rgba(102, 126, 234, 0.35);
-    }
-
-    button:active {
-      transform: translateY(0);
-    }
-
-    .result {
-      margin-top: 22px;
-      padding: 18px;
-      background: #f7f7fb;
-      border-radius: 16px;
-      border: 1px solid #e5e5ef;
-      display: none;
-    }
-
-    .result.show {
-      display: block;
-    }
-
-    .result-title {
-      color: #666;
-      font-size: 14px;
-      margin-b
+</body>
+</html>
