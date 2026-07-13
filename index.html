@@ -1,264 +1,232 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Главная панель навигации</title>
-    
-    <!-- Yandex.Metrika counter -->
-    <script type="text/javascript">
-        (function(m,e,t,r,i,k,a){
-            m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-            m[i].l=1*new Date();
-            for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-            k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
-        })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=110388619', 'ym');
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Стиль экранов Android</title>
 
-        ym(110388619, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
-    </script>
-    <noscript><div><img src="https://mc.yandex.ru/watch/110388619" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-    <!-- /Yandex.Metrika counter -->
+<style>
+:root {
+    --bg-color: #e3f2fd;
+    --card-bg: #ffffff;
+    --text-main: #263238;
+    --text-muted: #546e7a;
+    --primary: #2196f3;
+    --primary-hover: #1976d2;
+    --light: #90caf9;
+    --dark: #0d47a1;
+    --radius: 16px;
+    --shadow: 0 8px 16px rgba(0,0,0,0.2);
+    --font-family: 'Arial', sans-serif;
+}
 
-    <style>
-        :root {
-            --bg-color: #f4f7f6;
-            --card-bg: #ffffff;
-            --text-main: #2d3748;
-            --text-muted: #718096;
-            --primary: #3182ce;
-            --primary-hover: #2b6cb0;
-            --success: #38a169;
-            --success-hover: #2f855a;
-            --accent: #ed8936;
-            --accent-hover: #dd6b20;
-            --dark: #1a202c;
-            --radius: 12px;
-            --shadow: 0 4px 6px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.1);
-            --transition: all 0.25s ease;
-        }
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+body {
+    font-family: var(--font-family);
+    background-color: var(--bg-color);
+    padding: 20px;
+    color: var(--text-main);
+}
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            line-height: 1.6;
-            padding: 40px 20px;
-        }
+h1 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: var(--dark);
+}
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+.main-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
 
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
+@media (min-width: 992px) {
+    .main-layout {
+        grid-template-columns: 2fr 1fr;
+    }
+}
 
-        header h1 {
-            font-size: 2rem;
-            color: var(--dark);
-            margin-bottom: 8px;
-        }
+/* Карточки по стилю */
+.card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
-        header p {
-            color: var(--text-muted);
-        }
+/* Заголовки секций */
+.card h2 {
+    margin-bottom: 12px;
+    font-size: 1.2rem;
+    color: var(--dark);
+    border-bottom: 2px solid #cfd8dc;
+    padding-bottom: 8px;
+    width: 100%;
+    text-align: center;
+}
 
-        /* Сетка для основного контента */
-        .main-layout {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 30px;
-            margin-bottom: 40px;
-        }
+/* Кнопки в стиле Android */
+.btn {
+    padding: 14px 24px;
+    margin: 8px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-block;
+    min-width: 200px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
 
-        @media (min-width: 992px) {
-            .main-layout {
-                grid-template-columns: 3fr 2fr;
-            }
-        }
+.btn-primary {
+    background-color: var(--primary);
+    color: #fff;
+}
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+}
+.btn-success {
+    background-color: #4caf50;
+    color: #fff;
+}
+.btn-success:hover {
+    background-color: #388e3c;
+}
+.btn-outline {
+    background-color: transparent;
+    border: 2px solid #90caf9;
+    color: var(--text-main);
+}
+.btn-outline:hover {
+    background-color: #e3f2fd;
+}
+.btn-accent {
+    background-color: #ff9800;
+    color: #fff;
+}
+.btn-accent:hover {
+    background-color: #fb8c00;
+}
+.btn-dark {
+    background-color: #212121;
+    color: #fff;
+}
+.btn-dark:hover {
+    background-color: #000;
+}
 
-        /* Карточки секций */
-        .card {
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            padding: 30px;
-            box-shadow: var(--shadow);
-        }
+/* Внутренние блоки и стили */
+.widgets-section {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+}
 
-        .card h2 {
-            font-size: 1.3rem;
-            margin-bottom: 20px;
-            color: var(--dark);
-            border-bottom: 2px solid #edf2f7;
-            padding-bottom: 10px;
-        }
+.iframe-wrapper {
+    background: #f3f3f3;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    padding: 10px;
+}
 
-        /* Сетка кнопок */
-        .btn-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 15px;
-        }
+h3 {
+    text-align: center;
+    font-size: 1rem;
+    margin-bottom: 10px;
+    color: var(--text-muted);
+}
 
-        /* Базовые стили для обновленных кнопок */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 14px 20px;
-            font-size: 15px;
-            font-weight: 600;
-            text-decoration: none;
-            border-radius: var(--radius);
-            cursor: pointer;
-            border: none;
-            transition: var(--transition);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-        }
+/* Инлайн стилиция для iframe */
+iframe {
+    width: 100%;
+    height: 400px;
+    border-radius: 12px;
+    border: none;
+}
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        /* Цветовые модификаторы кнопок */
-        .btn-primary { background-color: var(--primary); color: white; }
-        .btn-primary:hover { background-color: var(--primary-hover); }
-
-        .btn-success { background-color: var(--success); color: white; }
-        .btn-success:hover { background-color: var(--success-hover); }
-
-        .btn-accent { background-color: var(--accent); color: white; }
-        .btn-accent:hover { background-color: #0066cc; } /* Синий при наведении по вашему коду */
-
-        .btn-dark { background-color: var(--primary); color: white; }
-        .btn-dark:hover { background-color: var(--dark); } /* Черный при наведении по вашему коду */
-
-        .btn-outline { background-color: transparent; border: 2px solid #e2e8f0; color: var(--text-main); }
-        .btn-outline:hover { background-color: #edf2f7; border-color: #cbd5e0; }
-
-        /* Секция фреймов и виджетов */
-        .widgets-section {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .iframe-wrapper {
-            position: relative;
-            width: 100%;
-            background: #fff;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            padding: 15px;
-        }
-
-        .iframe-wrapper h3 {
-            font-size: 1rem;
-            margin-bottom: 10px;
-            color: var(--text-muted);
-        }
-
-        iframe {
-            width: 100%;
-            border: none;
-            border-radius: 6px;
-            background: #fafafa;
-        }
-
-        /* Ограничение для Яндекс Формы */
-        .form-wrapper iframe {
-            min-height: 500px;
-        }
-    </style>
+</style>
 </head>
+    
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+    (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=110388619', 'ym');
+
+    ym(110388619, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/110388619" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+
+
+
 <body>
 
-    <div class="container">
-        
-        <header>
-            <h1>Панель управления проектом</h1>
-            <p>Добро пожаловать. Выберите необходимый раздел или заполните форму ниже.</p>
-        </header>
+<h1>Настройка проекта</h1>
 
-        <div class="main-layout">
-            
-            <!-- Левая колонка: Кнопки и Ссылки -->
-            <div class="widgets-section">
-                
-                <div class="card">
-                    <h2>Рецепты и статьи</h2>
-                    <div class="btn-grid">
-                        <a href="page/page1.html" class="btn btn-outline">Варенье из шишек</a>
-                        <a href="page/info.html" class="btn btn-success">Клубника и малина</a>
-                        <a href="page/яблочный пирог.html" class="btn btn-primary">Яблочный пирог</a>
-                        <a href="page/users/page.html" class="btn btn-outline">Другие статьи</a>
-                    </div>
-                </div>
+<div class="main-layout">
 
-                <div class="card">
-                    <h2>Строительство и презентации</h2>
-                    <div class="btn-grid">
-                        <a href="page/page4.html" class="btn btn-primary">Бурение колодца ямобуром</a>
-                        <a href="page/page3.html" class="btn btn-outline">Как открыть магазин</a>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h2>Управление и участие</h2>
-                    <div class="btn-grid">
-                        <a href="TCH/README.html" class="btn btn-primary">Перейти к README</a>
-                        <a href="campaign/2026/form.html" class="btn btn-success">Участвовать</a>
-                        
-                        <!-- Исправлено: заменена кнопка-пустышка button на полноценную ссылку a -->
-                        <a href="campaign/2026/form.html" class="btn btn-accent">ТСН Вельяминово</a>
-                        
-                        <a href="info.html" class="btn btn-dark">Админ панель</a>
-                    </div>
-                </div>
-
-                <!-- Яндекс.Форма перемещена в логичный блок контента -->
-                <div class="card form-wrapper">
-                    <h2>Обратная связь</h2>
-                    <script src="https://forms.yandex.ru/_static/embed.js"></script>
-                    <iframe src="https://forms.yandex.ru/u/6a43c9b49029020029ba2b35?iframe=1" name="ya-form-6a43c9b49029020029ba2b35"></iframe>
-                </div>
-
+    <!-- Левая часть -->
+    <div>
+        <div class="card">
+            <h2>Рецепты и статьи</h2>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <a href="page/page1.html" class="btn btn-outline">Варенье из шишек</a>
+                <a href="page/info.html" class="btn btn-success">Клубника и малина</a>
+                <a href="page/яблочный%20пирог.html" class="btn btn-primary">Яблочный пирог</a>
+                <a href="page/users/page.html" class="btn btn-outline">Другие статьи</a>
             </div>
+        </div>
 
-            <!-- Правая колонка: Информационные фреймы/виджеты -->
-            <div class="widgets-section">
-                
-                <div class="iframe-wrapper">
-                    <h3>Температура воды</h3>
-                    <iframe
-                      src="wid/water.html"
-                      width="560"
-                      height="520"
-                      frameborder="0"
-                      style="border: none; border-radius: 18px; overflow: hidden;"
-                    ></iframe>
-                </div>
-
-
+        <div class="card">
+            <h2>Строительство и презентации</h2>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <a href="page/page4.html" class="btn btn-primary">Бурение колодца</a>
+                <a href="page/page3.html" class="btn btn-outline">Как открыть магазин</a>
             </div>
+        </div>
 
+        <div class="card">
+            <h2>Управление и участие</h2>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <a href="TCH/README.html" class="btn btn-primary">Перейти к README</a>
+                <a href="campaign/2026/form.html" class="btn btn-success">Участвовать</a>
+                <a href="campaign/2026/form.html" class="btn btn-accent">ТСН Вельяминово</a>
+                <a href="info.html" class="btn btn-dark">Админ панель</a>
+            </div>
+        </div>
+
+        <!-- Форма обратной связи -->
+        <div class="card" style="margin-top:20px;">
+            <h2>Обратная связь</h2>
+            <iframe src="https://forms.yandex.ru/u/6a43c9b49029020029ba2b35" allowfullscreen></iframe>
         </div>
     </div>
+
+    <!-- Правая часть: Виджеты -->
+    <div>
+        <div class="iframe-wrapper">
+            <h3>Температура воды</h3>
+            <iframe src="wid/water.html"></iframe>
+        </div>
+    </div>
+
+</div>
 
 </body>
 </html>
