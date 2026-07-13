@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>b</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', 'Segoe UI', -apple-system, sans-serif;
+            background-color: #2196F3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+        }
+
+        .setup-window {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 420px;
+            height: 650px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .setup-header {
+            background-color: #2196F3;
+            color: #ffffff;
+            padding: 40px 24px 20px 24px;
+            flex-shrink: 0;
+        }
+
+        .setup-header h1 {
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin-bottom: 4px;
+        }
+
+        .setup-header p {
+            font-size: 0.875rem;
+            opacity: 0.85;
+        }
+
+        .setup-content {
+            padding: 16px 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+        
+        .setup-content::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-section {
+            margin-bottom: 16px;
+        }
+
+        .category-title {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #2196F3;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 12px 24px 8px 24px;
+        }
+
+        .article-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            color: #212121;
+            text-decoration: none;
+            font-size: 1rem;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.15s ease;
+            background: transparent;
+        }
+
+        .article-item:last-child {
+            border-bottom: none;
+        }
+
+        .article-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .article-meta {
+            font-size: 0.8rem;
+            color: #757575;
+            white-space: nowrap;
+            margin-left: 16px;
+        }
+
+        .setup-footer {
+            border-top: 1px solid #e0e0e0;
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            background-color: #ffffff;
+            flex-shrink: 0;
+        }
+
+        .btn {
+            background: none;
+            border: none;
+            color: #757575;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: background-color 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn:hover {
+            background-color: rgba(0, 0, 0, 0.04);
+        }
+
+        .btn-primary {
+            color: #2196F3;
+        }
+
+        .btn-primary:hover {
+            background-color: rgba(33, 150, 243, 0.04);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="setup-window">
+        <!-- Шапка -->
+        <div class="setup-header">
+            <h1>Страницы</h1>
+            <p>Раздел b</p>
+        </div>
+
+        <!-- Контент со списками по категориям -->
+        <div class="setup-content">
+            
+            <!-- Категория 1 -->
+            <div class="category-section">
+                <div class="category-title">Вода</div>
+                
+                <a href="page1" class="article-item">
+                    <span>Водопровод колодца</span>
+                    <span class="article-meta">Вода в доме</span>
+                </a>
+                
+                <a href="ссылка_2.html" class="article-item">
+                    <span>Название статьи или пункта 2</span>
+                    <span class="article-meta">Доп. инфо 2</span>
+                </a>
+            </div>
+
+            <!-- Категория 2 -->
+            <div class="category-section">
+                <div class="category-title">Название категории 2</div>
+                
+                <a href="ссылка_3.html" class="article-item">
+                    <span>Название статьи или пункта 3</span>
+                    <span class="article-meta">Доп. инфо 3</span>
+                </a>
+            </div>
+
+        </div>
+
+        <!-- Нижняя панель -->
+        <div class="setup-footer">
+            <a href="#" class="btn">Назад</a>
+            <button class="btn btn-primary">Далее</button>
+        </div>
+    </div>
+
+</body>
+</html>
