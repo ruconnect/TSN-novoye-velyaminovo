@@ -1,52 +1,23 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Документация проекта</title>
-    <!-- Подключаем стили, чтобы Markdown выглядел аккуратно -->
-    <link rel="stylesheet" href="https://yastatic.net">
-    <style>
-        body { 
-            max-width: 850px; 
-            margin: 0 auto; 
-            padding: 30px; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; 
-        }
-    </style>
-</head>
-<body>
+<script>
+    // Слэш в начале гарантирует поиск файла в корне сайта Vercel
+    const fileUrl = '/README.md'; 
 
-    <!-- Сюда вставится сконвертированный HTML -->
-    <article id="markdown-container" class="markdown-body">
-        Загрузка документации...
-    </article>
-
-    <!-- Подключаем библиотеку marked через рабочий CDN -->
-    <script src="https://yastatic.net"></script>
-
-    <script>
-        // Запрашиваем файл README.md, лежащий в той же папке
-        fetch('./README.md')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Не удалось загрузить README.md (Статус: ${response.status})`);
-                }
-                return response.text();
-            })
-            .then(markdownText => {
-                // Рендерим Markdown в HTML
-                document.getElementById('markdown-container').innerHTML = marked.parse(markdownText);
-            })
-            .catch(error => {
-                document.getElementById('markdown-container').innerHTML = `
-                    <div style="color: #cf222e; padding: 15px; background: #ffebe9; border-radius: 6px;">
-                        <strong>Ошибка отображения:</strong> ${error.message}
-                    </div>
-                `;
-                console.error(error);
-            });
-    </script>
-
-</body>
-</html>
+    fetch(fileUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Не удалось загрузить README.md (Статус: ${response.status})`);
+            }
+            return response.text();
+        })
+        .then(markdownText => {
+            document.getElementById('markdown-container').innerHTML = marked.parse(markdownText);
+        })
+        .catch(error => {
+            document.getElementById('markdown-container').innerHTML = `
+                <div style="color: #cf222e; padding: 15px; background: #ffebe9; border-radius: 6px;">
+                    <strong>Ошибка отображения:</strong> ${error.message}
+                </div>
+            `;
+            console.error(error);
+        });
+</script>
