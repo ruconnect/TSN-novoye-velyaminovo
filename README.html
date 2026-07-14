@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>README</title>
+    <!-- Подключаем красивые стили, чтобы Markdown выглядел как на GitHub -->
+    <link rel="stylesheet" href="https://cloudflare.com">
+    <style>
+        body {
+            box-sizing: border-box;
+            min-width: 200px;
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 45px;
+        }
+        @media (max-width: 767px) {
+            body { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Контейнер со специальным классом markdown-body для стилей -->
+    <article id="content" class="markdown-body">
+        Загрузка содержимого...
+    </article>
+
+    <!-- 1. Подключаем скрипт библиотеки marked -->
+    <script src="https://jsdelivr.net"></script>
+
+    <!-- 2. Скрипт загрузки и отрисовки вашего файла -->
+    <script>
+        // Укажите точное имя вашего файла вместо 'document.md'
+        const fileUrl = 'README.md'; 
+
+        fetch(fileUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Файл не найден или произошла ошибка сервера');
+                }
+                return response.text();
+            })
+            .then(markdownText => {
+                // Превращаем текст в HTML и вставляем в элемент
+                document.getElementById('content').innerHTML = marked.parse(markdownText);
+            })
+            .catch(error => {
+                document.getElementById('content').innerHTML = `<p style="color: red;">Ошибка: ${error.message}</p>`;
+                console.error(error);
+            });
+    </script>
+
+</body>
+</html>
