@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Информация и Статистика</title>
+    <title>Сайт в поиске</title>
     <style>
         * {
             box-sizing: border-box;
@@ -185,8 +185,8 @@
     <div class="setup-window">
         <!-- Шапка страницы -->
         <div class="setup-header">
-            <h1>Заголовок отчета</h1>
-            <p>Краткое описание или период данных</p>
+            <h1>Страницы в поиске</h1>
+            <p>Условий для индексации страниц</p>
         </div>
 
         <!-- Контентная зона -->
@@ -196,7 +196,7 @@
             <div class="info-section">
                 <div class="info-title">Основная информация</div>
                 <p class="info-text">
-                    Сюда вы можете вставить любой текст описания. Шаблон использует системные шрифты и отступы, характерные для классического интерфейса Android Setup Wizard.
+                    Чем больше процент, тем больше вероятность появления сайта в поиске
                 </p>
             </div>
 
@@ -208,9 +208,9 @@
                 
                 <div class="percentage-container">
                     <!-- Значение процентов -->
-                    <div class="percentage-value" id="percentValue">75%</div>
+                    <div class="percentage-value" id="percentValue">45%</div>
                     
-                    <div class="percentage-label">Доля выполнения поставленной задачи</div>
+                    <div class="percentage-label">Чем больше пользователей, тем больше процент</div>
                     
                     <!-- Полоса прогресса -->
                     <div class="progress-bar-bg">
@@ -225,7 +225,7 @@
             <div class="info-section">
                 <div class="info-title">Дополнительные сведения</div>
                 <p class="info-text">
-                    Любые сопутствующие данные, примечания или системные сноски для пользователя.
+                    Сайт использует Vercel
                 </p>
             </div>
 
@@ -234,7 +234,7 @@
         <!-- Нижняя панель управления -->
         <div class="setup-footer">
             <a href="#" class="btn">Назад</a>
-            <button class="btn btn-primary" onclick="changePercent(100)">Обновить</button>
+            <button class="btn btn-primary" onclick="changePercent(45)">Обновить</button>
         </div>
     </div>
 
