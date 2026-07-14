@@ -4,45 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>README</title>
-    <!-- Подключаем красивые стили, чтобы Markdown выглядел как на GitHub -->
-    <script src="https://yastatic.net"></script>
+    <!-- Стабильный CDN для стилей -->
+    <link rel="stylesheet" href="https://yastatic.net">
     <style>
-        body {
-            box-sizing: border-box;
-            min-width: 200px;
-            max-width: 980px;
-            margin: 0 auto;
-            padding: 45px;
-        }
-        @media (max-width: 767px) {
-            body { padding: 15px; }
-        }
+        body { max-width: 800px; margin: 0 auto; padding: 20px; font-family: sans-serif; }
     </style>
 </head>
 <body>
 
-    <!-- Контейнер со специальным классом markdown-body для стилей -->
     <article id="content" class="markdown-body">
         Загрузка содержимого...
     </article>
 
-    <!-- 1. Подключаем скрипт библиотеки marked -->
+    <!-- ИССПРАВЛЕНИЕ 1: Используем Яндекс CDN, который не выдаст TIMED_OUT -->
     <script src="https://yastatic.net"></script>
 
-    <!-- 2. Скрипт загрузки и отрисовки вашего файла -->
     <script>
-        // Укажите точное имя вашего файла вместо 'document.md'
+        // ИСПРАВЛЕНИЕ 2: Убедитесь, что тут написано ТОЧНОЕ имя вашего файла!
+        // Если у вас файл называется README.md, замените 'document.md' на 'README.md'
         const fileUrl = 'README.md'; 
 
         fetch(fileUrl)
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Файл не найден или произошла ошибка сервера');
+                    throw new Error(`Файл не найден. Сервер вернул статус: ${response.status}`);
                 }
                 return response.text();
             })
             .then(markdownText => {
-                // Превращаем текст в HTML и вставляем в элемент
                 document.getElementById('content').innerHTML = marked.parse(markdownText);
             })
             .catch(error => {
