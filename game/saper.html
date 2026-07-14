@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Сапёр</title>
+    ⠀.html
+</head>
+<body>
+    <h1>Сапёр</h1>
+    <div>
+        <label>Ширина: <input type="number" id="width" value="10" min="5" max="20"></label>
+        <label>Высота: <input type="number" id="height" value="10" min="5" max="20"></label>
+        <label>Мины: <input type="number" id="mines" value="15" min="1"></label>
+        <button onclick="startGame()">Новая игра</button>
+    </div>
+    <p>Оставшиеся флаги: <span id="flags-count">15</span></p>
+    <div id="game-board"></div>
+    <p id="game-status"></p>
+
+    <script>
+        let board = [];
+        let revealed = [];
+        let flags = [];
+        let gameOver = false;
+        let width = 10;
+        let height = 10;
+        let mineCount = 15;
+        let flagsRemaining = mineCount;
+
+        function startGame() {
+            width = parseInt(document.getElementById('width').value);
+            height = parseInt(document.getElementById('height').value);
+            // Исправлено: был неверный ID 'mineCount', теперь 'mines'
+            mineCount = parseInt(document.getElementById('mines').value);
+            flagsRemaining = mineCount;
+            document.getElementById('flags-count').textContent = flagsRemaining;
+            gameOver = false;
+            document.getElementById('game-status').textContent = '';
+
+            initializeBoard();
+            renderBoard();
+        }
+
+        function initializeBoard() {
+            board = Array(height).fill().map(() => Array(width).fill(0));
+            revealed = Array(height).fill().map(() => Array(width).fill(false));
+            flags = Array(height).fill().map(() => Array(width).fill(false));
+
+
+            // Расставляем мины
+            let minesPlaced = 0;
+            while (minesPlaced < mineCount) {
+                const x = Math.floor(Math.random() * width);
+                const y = Math.floor(Math.random() * height);
+                if (board[y][x] !== -1) {
+                    board[y][x] = -1;
+                    minesPlaced++;
+                }
+            }
+
+            // Подсчитываем числа вокруг мин
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    if (board[y][x] === -1) continue;
+
+                    let count = 0;
+                    for (let dy = -1; dy <= 1; dy++) {
+                        for (let dx = -1; dx <= 1; dx++) {
+                            const nx = x + dx;
+                            const ny = y + dy;
+                            if (nx >= 0 && nx < width && ny >= 0 && ny < height && board[ny][nx] === -1) {
+                        count++;
+                    }
+        }
+    }
+    board[y][x] = count;
+}
+}
+}
+
+function renderBoard() {
+    const boardElement = document.getElementById('game-board');
+    boardElement.innerHTML = '';
+    const table = document.createElement('table');
+    table.border = '1'; // Простая граница без CSS
+
+    for (let y = 0; y < height; y++) {
+        const row = document.createElement('tr');
+        for (let x = 0; x < width; x++) {
+            const cell = document.createElement('td');
+            cell.style.width = '30px';
+            cell.style.height = '30px';
+            cell.style.textAlign = 'center';
+            cell.style.cursor = 'pointer';
+
+            if (revealed[y][x]) {
+                if (board[y][x] === -1) {
+                    cell.textContent = 'X';
+                    cell.style.backgroundColor = 'red';
+                } else if (board[y][x] > 0) {
+                    cell.textContent = board[y][x];
+                }
+            } else if (flags[y][x]) {
+                cell.textContent = 'F';
+                cell.style.backgroundColor = 'yellow';
+            } else {
+                cell.textContent = '.';
+                cell.style.backgroundColor = '#ccc';
+            }
+
+            cell.onclick = () => handleClick(x, y);
+            cell.oncontextmenu = (e) => {
+                e.preventDefault();
+                handleRightClick(x, y);
+            };
+
+            row.appendChild(cell);
+        }
+        table.appendChild(row);
+    }
+    boardElement.appendChild(table);
+}
+
+function handleClick(x, y) {
+    if (gameOver || revealed[y][x] || flags[y][x]) return;
+
+    revealed[y][x] = true;
+
+    if (board[y][x] === -1) {
+        gameOver = true;
+        document.getElementById('game-status').textContent = 'Игра окончена! Вы попали на мину.';
+        revealAllMines();
+        return;
+    }
+
+    if (board[y][x] === 0) {
+        // Автоматическое открытие соседних клеток
+        for (let dy = -1; dy <= 1; dy++) {
+            for (let dx = -1; dx <= 1; dx++) {
+                const nx = x + dx;
+                const ny = y + dy;
+                if (nx >= 0 && nx < width && ny >= 0 && ny < height && !revealed[ny][nx]) {
+                    handleClick(nx, ny);
+                }
+            }
+        }
+    }
+
+    checkWin();
+    renderBoard();
+}
+
+function handleRightClick(x, y) {
+    if (gameOver || revealed[y][x]) return;
+
+    if (!flags[y][x] && flagsRemaining > 0) {
+        flags[y][x] = true;
+        flagsRemaining--;
+    } else if (flags[y][x]) {
+        flags[y][x] = false;
+        flagsRemaining++;
+    }
+
+    document.getElementById('flags-count').textContent = flagsRemaining;
+    renderBoard();
+}
+
+function revealAllMines() {
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            if (board[y][x] === -1) {
+                revealed[y][x] = true;
+            }
+        }
+    }
+    renderBoard();
+}
+
+function checkWin() {
+    let allSafeCellsRevealed = true;
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            if (board[y][x] !== -1 && !revealed[y][x]) {
+                allSafeCellsRevealed = false;
+                break;
+            }
+        }
+        if (!allSafeCellsRevealed) break;
+    }
+
+    if (allSafeCellsRevealed) {
+        gameOver = true;
+        document.getElementById('game-status').textContent = 'Поздравляем! Вы выиграли!';
+    }
+}
+
+// Начальная инициализация
+startGame();
+</script>
+</body>
+</html>
