@@ -1,20 +1,19 @@
-from http.server import BaseHTTPRequestHandler
-import json
+from flask import Flask, request, jsonify
 
+app = Flask(__name__)
 
-class handler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        # Устанавливаем заголовки ответа
-        self.send_response(200)
-        self.send_header('Content-type', 'application/json')
-        self.end_headers()
-
-        # Данные, которые вернет скрипт
-        response_data = {
-            "status": "success",
-            "message": "Привет из Python на Vercel!"
-        }
-
-        # Отправляем ответ на сайт
-        self.wfile.write(json.dumps(response_data).encode('utf-8'))
-        return
+@app.route('/api', methods=['GET'])
+def home():
+    # Получаем параметр "user" из URL
+    name = request.args.get('name', 'guest')
+    
+    # Стандартная команда print (уйдет в логи Vercel)
+    print(f"Получен запрос для пользователя: {name}")
+    
+    # Стандартная конструкция if
+    if name == 'admin':
+        message = "Добро пожаловать в панель управления!"
+    else:
+        message = f"Привет, {name}!"
+        
+    return jsonify({"status": "success", "message": message})
