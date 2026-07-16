@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Панель управления</title>
+</head>
+<body>
+    <h1>Запуск Python скрипта</h1>
+    <button id="runBtn">Выполнить скрипт</button>
+    <p id="result"></p>
+
+    <script>
+        document.getElementById('runBtn').addEventListener('click', async () => {
+            try {
+                // Делаем запрос к нашей Python-функции
+                const response = await fetch('/ruconnect');
+                const data = await response.json();
+                
+                // Выводим результат на экран
+                document.getElementById('result').innerText = data.message;
+            } catch (error) {
+                document.getElementById('result').innerText = 'Ошибка выполнения';
+            }
+        });
+    </script>
+</body>
+</html>
