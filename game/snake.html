@@ -1,33 +1,165 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <p>Игра от Floppa game</p>
-    <button onclick="window.location.href='snake.html';">Новая игра змейка</button>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Змейка буквами</title>
     <style>
-        /* Минимальные стили для корректного отображения */
-        body {
-            font-family: monospace;
-            margin: 20px;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
+
+        body {
+            font-family: 'Roboto', 'Segoe UI', -apple-system, sans-serif;
+            background-color: #2196F3; /* Фирменный синий фон Android */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+        }
+
+        /* Окно мастера настройки Android Setup Wizard */
+        .setup-window {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 420px;
+            height: 650px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        /* Синяя однотонная шапка */
+        .setup-header {
+            background-color: #2196F3;
+            color: #ffffff;
+            padding: 40px 24px 16px 24px;
+            flex-shrink: 0;
+        }
+
+        .setup-header h1 {
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin-bottom: 4px;
+        }
+
+        /* Игровая статистика в стиле системной строки */
+        .game-info {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.85);
+            display: flex;
+            gap: 16px;
+        }
+
+        /* Контентная зона */
+        .setup-content {
+            padding: 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f5f5f5; /* Светло-серая подложка для игрового экрана */
+        }
+
+        /* Моноширинное игровое поле, стилизованное под аккуратный терминал */
         #game-container {
+            font-family: 'Courier New', Courier, monospace;
             white-space: pre;
-            font-size: 16px;
-            line-height: 1;
+            font-size: 15px;
+            line-height: 1.05;
+            letter-spacing: 2px;
+            color: #212121;
+            background-color: #ffffff;
+            padding: 16px;
+            border-radius: 2px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            user-select: none;
+        }
+
+        /* Сообщение о конце игры */
+        .game-over-text {
+            color: #dd2c00; /* Фирменный красный Android */
+            font-weight: 500;
+            margin-top: 12px;
+            font-size: 0.9rem;
+            text-align: center;
+            min-height: 20px;
+        }
+
+        /* Нижний статус-бар мастера с кнопками навигации */
+        .setup-footer {
+            border-top: 1px solid #e0e0e0;
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            background-color: #ffffff;
+            flex-shrink: 0;
+        }
+
+        /* Сервисные плоские кнопки */
+        .btn {
+            background: none;
+            border: none;
+            color: #757575;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: background-color 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn:hover {
+            background-color: rgba(0, 0, 0, 0.04);
+        }
+
+        .btn-primary {
+            color: #2196F3;
+        }
+
+        .btn-primary:hover {
+            background-color: rgba(33, 150, 243, 0.04);
         }
     </style>
 </head>
 <body>
-    <h1>Змейка (буквами)</h1>
-    <div id="game-info">
-        Счёт: <span id="score">0</span> |
-        Длина: <span id="length">3</span>
+
+    <div class="setup-window">
+        <!-- Шапка с названием игры и счетом -->
+        <div class="setup-header">
+            <h1>Змейка (буквами)</h1>
+            <div class="game-info">
+                <span>Счёт: <strong id="score">0</strong></span>
+                <span>Длина: <strong id="length">3</strong></span>
+            </div>
+        </div>
+
+        <!-- Поле с игрой -->
+        <div class="setup-content">
+            <div id="game-container"></div>
+            <div id="status-message" class="game-over-text"></div>
+        </div>
+
+        <!-- Нижняя панель управления и сброса -->
+        <div class="setup-footer">
+            <button class="btn" onclick="window.location.href='snake.html';">Сброс</button>
+            <button class="btn btn-primary" onclick="restartGame()">Новая игра</button>
+        </div>
     </div>
-    <div id="game-container"></div>
+
     <script>
-        // Настройки игры
-        const WIDTH = 20;
-        const HEIGHT = 15;
+        // Изменили размеры под пропорции мобильного экрана карточки
+        const WIDTH = 16;
+        const HEIGHT = 14;
         let score = 0;
         let snake = [];
         let food = {};
@@ -35,42 +167,46 @@
         let gameInterval;
         let isGameOver = false;
 
-        // Инициализация игры
         function initGame() {
-            // Создаём змею (начальная позиция)
             snake = [
                 {x: 5, y: 7},
                 {x: 4, y: 7},
                 {x: 3, y: 7}
             ];
+            score = 0;
+            isGameOver = false;
+            direction = 'right';
+            
+            document.getElementById('score').textContent = score;
+            document.getElementById('length').textContent = snake.length;
+            document.getElementById('status-message').textContent = '';
 
-            // Создаём еду
             createFood();
-
-            // Запускаем игровой цикл
+            clearInterval(gameInterval);
             gameInterval = setInterval(gameLoop, 200);
 
-            // Обработчики клавиш
+            document.removeEventListener('keydown', handleKeyPress);
             document.addEventListener('keydown', handleKeyPress);
         }
 
-        // Создание еды в случайном месте
+        function restartGame() {
+            initGame();
+        }
+
         function createFood() {
             food = {
                 x: Math.floor(Math.random() * WIDTH),
                 y: Math.floor(Math.random() * HEIGHT)
             };
 
-            // Проверяем, что еда не появилась на змее
             for (let part of snake) {
                 if (food.x === part.x && food.y === part.y) {
-                    createFood(); // Пересоздаём
+                    createFood();
                     return;
                 }
             }
         }
 
-        // Обработка нажатий клавиш
         function handleKeyPress(e) {
             if (isGameOver) return;
 
@@ -90,11 +226,9 @@
             }
         }
 
-        // Основной игровой цикл
         function gameLoop() {
             if (isGameOver) return;
 
-            // Двигаем змею
             const head = {...snake[0]};
 
             switch (direction) {
@@ -104,13 +238,11 @@
                 case 'right': head.x++; break;
             }
 
-            // Проверка столкновения со стеной
             if (head.x < 0 || head.x >= WIDTH || head.y < 0 || head.y >= HEIGHT) {
                 gameOver();
                 return;
             }
 
-            // Проверка столкновения с собой
             for (let part of snake) {
                 if (head.x === part.x && head.y === part.y) {
                     gameOver();
@@ -118,66 +250,57 @@
                 }
             }
 
-            // Добавляем новую голову
             snake.unshift(head);
 
-            // Проверка поедания еды
             if (head.x === food.x && head.y === food.y) {
                 score += 10;
                 document.getElementById('score').textContent = score;
                 document.getElementById('length').textContent = snake.length;
                 createFood();
             } else {
-                // Удаляем хвост, если не съели еду
                 snake.pop();
             }
 
-            // Отрисовываем поле
             drawField();
         }
 
-        // Отрисовка игрового поля
         function drawField() {
             let field = '';
 
             for (let y = 0; y < HEIGHT; y++) {
                 for (let x = 0; x < WIDTH; x++) {
-                    let symbol = '·'; // Пустое место
+                    let symbol = '·'; 
 
-                    // Рисуем змею
                     for (let i = 0; i < snake.length; i++) {
                         if (snake[i].x === x && snake[i].y === y) {
                             if (i === 0) {
-                                symbol = '@'; // Голова змеи
+                                symbol = '@'; 
                             } else {
-                                symbol = 'O'; // Тело змеи
+                                symbol = 'O'; 
                             }
                             break;
                         }
                     }
 
-                    // Рисуем еду
                     if (food.x === x && food.y === y) {
-                symbol = '*';
+                        symbol = '*';
+                    }
+
+                    field += symbol;
+                }
+                if (y < HEIGHT - 1) field += '\n'; 
             }
 
-            field += symbol;
+            document.getElementById('game-container').textContent = field;
         }
-        field += '\n'; // Переход на новую строку
-    }
 
-    document.getElementById('game-container').textContent = field;
-}
+        function gameOver() {
+            isGameOver = true;
+            clearInterval(gameInterval);
+            document.getElementById('status-message').textContent = 'ИГРА ОКОНЧЕНА';
+        }
 
-// Конец игры
-function gameOver() {
-    isGameOver = true;
-    clearInterval(gameInterval);
-    document.getElementById('game-container').textContent += '\n=== ИГРА ОКОНЧЕНА ===\nНаберите F5 для перезапуска';
-}
-
-// Запускаем игру при загрузке страницы
-window.onload = initGame;
-</script>
+        window.onload = initGame;
+    </script>
 </body>
 </html>
