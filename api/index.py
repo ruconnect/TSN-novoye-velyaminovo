@@ -17,5 +17,4 @@ class handler(BaseHTTPRequestHandler):
 
         # Отправляем ответ на сайт
         self.wfile.write(json.dumps(response_data).encode('utf-8'))
-        print("Панель управления сайтом")
         return
