@@ -2,41 +2,195 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Код</title>
     <style>
-        body { font-family: sans-serif; margin: 50px; }
-        .error { color: red; display: none; margin-top: 10px; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', 'Segoe UI', -apple-system, sans-serif;
+            background-color: #2196F3; /* Фирменный синий фон Android */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+        }
+
+        /* Окно мастера настройки Android Setup Wizard */
+        .setup-window {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 400px;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        /* Синяя однотонная шапка */
+        .setup-header {
+            background-color: #2196F3;
+            color: #ffffff;
+            padding: 40px 24px 24px 24px;
+            flex-shrink: 0;
+        }
+
+        .setup-header h1 {
+            font-size: 1.5rem;
+            font-weight: 400;
+        }
+
+        /* Контентная зона */
+        .setup-content {
+            padding: 32px 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Заголовок над полем ввода */
+        .input-label {
+            font-size: 1rem;
+            color: #212121;
+            margin-bottom: 20px;
+        }
+
+        /* Поле ввода в стиле Material Design (просто линия снизу) */
+        .input-group {
+            position: relative;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px 0;
+            font-size: 1rem;
+            color: #212121;
+            border: none;
+            border-bottom: 1px solid #bcbcbc;
+            outline: none;
+            background: transparent;
+            transition: border-color 0.2s;
+        }
+
+        /* Синяя подсветка линии при фокусе */
+        input[type="text"]:focus {
+            border-bottom: 2px solid #2196F3;
+        }
+
+        input[type="text"]::placeholder {
+            color: #9e9e9e;
+        }
+
+        /* Сообщение об ошибке (фирменный красный цвет Android) */
+        .error {
+            color: #dd2c00;
+            margin-top: 12px;
+            font-size: 0.875rem;
+            display: none;
+            font-weight: 500;
+        }
+
+        /* Класс для окрашивания линии в красный при ошибке */
+        input.input-error {
+            border-bottom: 2px solid #dd2c00 !important;
+        }
+
+        /* Нижний статус-бар мастера с кнопками навигации */
+        .setup-footer {
+            border-top: 1px solid #e0e0e0;
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            background-color: #ffffff;
+            flex-shrink: 0;
+        }
+
+        /* Сервисные плоские кнопки */
+        .btn {
+            background: none;
+            border: none;
+            color: #757575;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: background-color 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn:hover {
+            background-color: rgba(0, 0, 0, 0.04);
+        }
+
+        .btn-primary {
+            color: #2196F3;
+        }
+
+        .btn-primary:hover {
+            background-color: rgba(33, 150, 243, 0.04);
+        }
     </style>
 </head>
 <body>
 
-    <h2>Введите код участника:</h2>
-    
-    <input type="text" id="userInput" placeholder="Введите значение...">
-    <button onclick="checkValue()">Войти</button>
+    <div class="setup-window">
+        <!-- Шапка -->
+        <div class="setup-header">
+            <h1>Авторизация</h1>
+        </div>
 
-    <p id="errorMessage" class="error">Ошибка</p>
+        <!-- Основная часть экрана -->
+        <div class="setup-content">
+            <div class="input-label">Введите код участника:</div>
+            
+            <div class="input-group">
+                <input type="text" id="userInput" placeholder="Введите значение..." autocomplete="off">
+                <p id="errorMessage" class="error">Ошибка: Неверный код участника</p>
+            </div>
+        </div>
+
+        <!-- Нижняя панель с кнопками навигации -->
+        <div class="setup-footer">
+            <a href="javascript:history.back()" class="btn">Назад</a>
+            <button type="button" class="btn btn-primary" onclick="checkValue()">Войти</button>
+        </div>
+    </div>
 
     <script>
-        // Список разрешенных значений
         const allowedValues = ["ДОСТУП", "КОНФЕТА", "ДОМ", "ПОЧТА"];
-
-        // URL-адрес для перенаправления
         const redirectUrl = "final.html";
 
-        function checkValue() {
-            // Получаем значение из поля ввода и убираем лишние пробелы
-            const input = document.getElementById("userInput").value.trim();
-            const errorText = document.getElementById("errorMessage");
+        const inputField = document.getElementById("userInput");
+        const errorText = document.getElementById("errorMessage");
 
-            // Проверяем, есть ли введенное значение в нашем списке
+        function checkValue() {
+            const input = inputField.value.trim();
+
             if (allowedValues.includes(input)) {
                 errorText.style.display = "none";
-                window.location.href = redirectUrl; // Перенаправление
+                inputField.classList.remove("input-error");
+                window.location.href = redirectUrl; 
             } else {
-                errorText.style.display = "block"; // Показываем ошибку
+                errorText.style.display = "block"; 
+                inputField.classList.add("input-error"); // Делаем линию под полем ввода красной
             }
         }
+
+        // Убираем ошибку и красную линию, когда пользователь снова начинает вводить текст
+        inputField.addEventListener('input', function() {
+            errorText.style.display = "none";
+            this.classList.remove("input-error");
+        });
     </script>
 
 </body>
