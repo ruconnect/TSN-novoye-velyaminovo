@@ -13,7 +13,7 @@
         document.getElementById('runBtn').addEventListener('click', async () => {
             try {
                 // Делаем запрос к нашей Python-функции
-                const response = await fetch('/ruconnect');
+                const response = await fetch('/api');
                 const data = await response.json();
                 
                 // Выводим результат на экран
