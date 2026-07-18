@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список статей</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', 'Segoe UI', -apple-system, sans-serif;
+            /* Насыщенный бирюзово-синий фон, как на первом экране Welcome */
+            background: #2196F3; 
+            margin: 0;
+            padding: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Имитация экрана мобильного устройства */
+        .setup-window {
+            background-color: #2196F3;
+            width: 100%;
+            max-width: 400px;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            padding: 40px 24px 24px 24px;
+        }
+
+        /* Однотонный заголовок в строгом стиле Material Design */
+        .setup-header {
+            text-align: center;
+            color: #ffffff;
+            margin-bottom: 32px;
+            flex-shrink: 0;
+        }
+
+        .setup-header h1 {
+            font-size: 2rem;
+            font-weight: 400;
+            margin-bottom: 8px;
+        }
+
+        .setup-header p {
+            font-size: 0.95rem;
+            opacity: 0.85;
+        }
+
+        /* Контейнер для списка статей — центральное белое окно (как выбор языка) */
+        .article-container {
+            flex: 1;
+            background: #ffffff;
+            border-radius: 2px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+            margin-bottom: 32px;
+            /* Скрытие полосы прокрутки для чистоты интерфейса */
+            scrollbar-width: none; 
+        }
+        .article-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Пункты меню — строгие, однотонные, разделенные тонкими линиями */
+        .article-btn {
+            display: block;
+            text-align: center;
+            color: #212121; /* Строгий темно-серый цвет */
+            text-decoration: none;
+            padding: 16px 12px;
+            font-size: 0.95rem;
+            font-weight: 400;
+            border-bottom: 1px solid #e0e0e0;
+            transition: background-color 0.15s ease;
+        }
+
+        /* Подсветка при наведении или клике */
+        .article-btn:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Последний элемент без нижней рамки */
+        .article-btn:last-child {
+            border-bottom: none;
+        }
+
+        /* Нижняя часть с круглой кнопкой */
+        .setup-footer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        /* Круглая кнопка перехода из оригинального интерфейса Android */
+        .circle-next-btn {
+            width: 56px;
+            height: 56px;
+            background-color: #4CAF50; /* Фирменный зеленый цвет */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+            text-decoration: none;
+            transition: background-color 0.2s, box-shadow 0.2s;
+        }
+
+        .circle-next-btn:hover {
+            background-color: #43A047;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+        }
+
+        /* Иконка стрелки внутри кнопки */
+        .circle-next-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="setup-window">
+        
+        <!-- Однотонная строгая шапка -->
+        <div class="setup-header">
+            <h1>Приветствие</h1>
+            <p>Чтобы начать, пожалуйста, выберите статью</p>
+        </div>
+
+        <!-- Центральный список (выбор опций) -->
+        <div class="article-container">
+            <a href="page1.html" class="article-btn">Список целей</a>
+            <a href="page2.html" class="article-btn">Видео</a>
+            <a href="page3.html" class="article-btn">Шашки с ии</a>
+            <a href="page4.html" class="article-btn">Игра</a>
+            <a href="page5.html" class="article-btn">Игра дурак</a>
+            <a href="page6.html" class="article-btn">Браузер</a>
+            <a href="page7.pdf" class="article-btn">Книга Катя в селе</a>
+            <a href="page8.html" class="article-btn">Калькулятор процентов</a>
+            <a href="page9.html" class="article-btn">Калькулятор колодца</a>
+        </div>
+
+        <!-- Футер с оригинальной круглой кнопкой -->
+        <div class="setup-footer">
+            <a href="page1.html" class="circle-next-btn" id="nextAction" title="Далее">
+                <svg viewBox="0 0 24 24">
+                    <path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42 5.43 5.43H5v2z"/>
+                </svg>
+            </a>
+        </div>
+
+    </div>
+
+    <script>
+        // Скрипт делает так, чтобы круглая кнопка вела на последнюю выбранную пользователем статью
+        const links = document.querySelectorAll('.article-btn');
+        const nextBtn = document.getElementById('nextAction');
+
+        links.forEach(link => {
+            link.addEventListener('click', function(e) {
+                // Если нужно просто подсветить выбор без мгновенного перехода:
+                // e.preventDefault(); 
+                
+                // Меняем ссылку на круглой кнопке на адрес выбранной статьи
+                nextBtn.href = this.href;
+                
+                // Визуально выделяем выбранный пункт
+                links.forEach(l => l.style.backgroundColor = 'transparent');
+                this.style.backgroundColor = '#e8f5e9';
+            });
+        });
+    </script>
+</body>
+</html>
+<meta http-equiv="refresh" content="0; url=https://velyminovo.vercel.app/home/home0/in">
