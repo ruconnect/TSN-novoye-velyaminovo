@@ -1,0 +1,163 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f3f5f9;
+  color: #222;
+  line-height: 1.5;
+}
+
+.profile {
+  width: 90%;
+  max-width: 900px;
+  margin: 40px auto;
+}
+
+.profile-card {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  background: #ffffff;
+  padding: 28px;
+  border-radius: 18px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  margin-bottom: 28px;
+}
+
+.avatar {
+  width: 110px;
+  height: 110px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4f7cff, #7a5cff);
+  color: white;
+  font-size: 48px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-info h1 {
+  font-size: 32px;
+  margin-bottom: 6px;
+}
+
+.status {
+  color: #4f7cff;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.description {
+  color: #555;
+  max-width: 600px;
+}
+
+.achievements-section {
+  background: #ffffff;
+  padding: 28px;
+  border-radius: 18px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.achievements-section h2 {
+  font-size: 26px;
+  margin-bottom: 20px;
+}
+
+.achievements-list {
+  display: grid;
+  gap: 16px;
+}
+
+.achievement {
+  padding: 18px;
+  border-radius: 14px;
+  background: #f8f9fc;
+  border-left: 8px solid #ccc;
+  transition: 0.2s;
+}
+
+.achievement:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.achievement-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.achievement h3 {
+  font-size: 20px;
+}
+
+.achievement p {
+  color: #555;
+}
+
+.achievement-date {
+  font-size: 14px;
+  color: #777;
+  white-space: nowrap;
+}
+
+/* Высшей пробы */
+.achievement.highest {
+  border-left-color: #006400;
+}
+
+.achievement.highest h3 {
+  color: #006400;
+}
+
+/* Золото */
+.achievement.gold {
+  border-left-color: #f2b705;
+}
+
+.achievement.gold h3 {
+  color: #d49a00;
+}
+
+/* Серебро */
+.achievement.silver {
+  border-left-color: #b8bcc6;
+}
+
+.achievement.silver h3 {
+  color: #7d8491;
+}
+
+/* Бронза */
+.achievement.bronze {
+  border-left-color: #cd7f32;
+}
+
+.achievement.bronze h3 {
+  color: #a65f24;
+}
+
+@media (max-width: 650px) {
+  .profile-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .achievement-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .profile-info h1 {
+    font-size: 26px;
+  }
+}
