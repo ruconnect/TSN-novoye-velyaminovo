@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Конструктор переписок</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: #eef2f5;
+      color: #111;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 24px;
+      padding: 24px;
+    }
+
+    .panel {
+      background: #fff;
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 12px 35px rgba(0,0,0,.08);
+      height: fit-content;
+    }
+
+    .panel h1 {
+      font-size: 22px;
+      margin: 0 0 6px;
+    }
+
+    .panel p {
+      margin: 0 0 18px;
+      color: #69737d;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      color: #53606b;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid #d8e0e7;
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 11px 12px;
+      font-size: 14px;
+      outline: none;
+      transition: .15s;
+      font-family: inherit;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: #51aee6;
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(81, 174, 230, .13);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 11px 14px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: .15s;
+    }
+
+    .primary {
+      background: #229ed9;
+      color: #fff;
+    }
+
+    .primary:hover {
+      background: #168ac1;
+    }
+
+    .secondary {
+      background: #eef5fa;
+      color: #177fb3;
+    }
+
+    .secondary:hover {
+      background: #ddeef8;
+    }
+
+    .danger {
+      background: #fff1f1;
+      color: #d73b3b;
+    }
+
+    .danger:hover {
+      background: #ffe2e2;
+    }
+
+    .preview-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .phone {
+      width: 360px;
+      height: 760px;
+      background: #f6fbff;
+      border-radius: 38px;
+      padding: 12px;
+      box-shadow: 0 22px 55px rgba(0,0,0,.18);
+      position: sticky;
+      top: 24px;
+    }
+
+    .screen {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #94d7fb;
+      border-radius: 30px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .screen::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: .18;
+      background-image:
+        radial-gradient(circle at 20px 20px, rgba(255,255,255,.6) 0 2px, transparent 3px),
+        radial-gradient(circle at 80px 90px, rgba(255,255,255,.5) 0 2px, transparent 3px),
+        linear-gradient(45deg, transparent 48%, rgba(255,255,255,.35) 49%, rgba(255,255,255,.35) 51%, transparent 52%);
+      background-size: 90px 90px, 120px 120px, 70px 70px;
+      pointer-events: none;
+    }
+
+    .ios-status {
+      height: 30px;
+      background: rgba(255,255,255,.95);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      font-size: 13px;
+      font-weight: 700;
+      position: relative;
+      z-index: 2;
+    }
+
+    .icons {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+    }
+
+    .header {
+      height: 54px;
+      background: rgba(255,255,255,.97);
+      display: flex;
+      align-items: center;
+      padding: 6px 9px;
+      gap: 8px;
+      position: relative;
+      z-index: 2;
+      border-bottom: 1px solid rgba(0,0,0,.06);
+    }
+
+    .back {
+      font-size: 28px;
+      line-height: 1;
+      color: #222;
+      padding-bottom: 4px;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 800;
+      font-size: 17px;
+      flex: none;
+      overflow: hidden;
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .chat-title {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .chat-title .name {
+      font-size: 15px;
+      font-weight: 800;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .chat-title .status {
+      color: #6b7480;
+      font-size: 12px;
+      margin-top: 1px;
+    }
+
+    .menu {
+      font-size: 22px;
+      font-weight: 700;
+      width: 24px;
+      text-align: center;
+    }
+
+    .messages {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      overflow: auto;
+      padding: 8px 7px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .bubble {
+      max-width: 84%;
+      padding: 8px 9px 15px;
+      border-radius: 10px;
+      line-height: 1.22;
+      font-size: 14px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      position: relative;
+      box-shadow: 0 1px 1px rgba(0,0,0,.08);
+    }
+
+    .bubble.bot {
+      background: #fff;
+      align-self: flex-start;
+      border-top-left-radius: 4px;
+    }
+
+    .bubble.me {
+      background: #d8fdd2;
+      align-self: flex-end;
+      border-top-right-radius: 4px;
+    }
+
+    .bubble.system {
+      max-width: 100%;
+      width: 100%;
+      align-self: center;
+      background: #33a6cf;
+      color: #fff;
+      text-align: center;
+      border-radius: 9px;
+      padding: 8px 10px;
+      font-weight: 700;
+      box-shadow: none;
+    }
+
+    .meta {
+      position: absolute;
+      right: 7px;
+      bottom: 3px;
+      color: #8d99a3;
+      font-size: 10px;
+      white-space: nowrap;
+    }
+
+    .me .meta {
+      color: #65a365;
+    }
+
+    .system .meta {
+      display: none;
+    }
+
+    .inputbar {
+      height: 48px;
+      background: rgba(241,248,252,.97);
+      display: flex;
+      align-items: center;
+      padding: 6px 8px;
+      gap: 7px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .attach,
+    .mic,
+    .smile {
+      color: #61717c;
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .fake-input {
+      flex: 1;
+      height: 34px;
+      background: #fff;
+      border-radius: 17px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      color: #a5adb5;
+      font-size: 14px;
+    }
+
+    .homebar {
+      height: 18px;
+      background: rgba(241,248,252,.97);
+      position: relative;
+      z-index: 2;
+    }
+
+    .homebar::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 5px;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 4px;
+      background: #111;
+      border-radius: 99px;
+    }
+
+    .small-note {
+      margin-top: 14px;
+      font-size: 12px;
+      color: #7a8792;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 900px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .preview-wrap {
+        order: -1;
+      }
+
+      .phone {
+        position: relative;
+        top: 0;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      .panel {
+        display: none;
+      }
+
+      .app {
+        display: block;
+        padding: 0;
+      }
+
+      .preview-wrap {
+        display: block;
+      }
+
+      .phone {
+        box-shadow: none;
+        margin: 0 auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="panel">
+      <h1>Конструктор переписок</h1>
+      <p>Создавай макеты чатов в стиле мобильного мессенджера. Используй для дизайна, прототипов, мемов и демонстраций.</p>
+
+      <div class="row">
+        <div class="field">
+          <label>Время на телефоне</label>
+          <input id="phoneTime" value="20:22" />
+        </div>
+        <div class="field">
+          <label>Статус под названием</label>
+          <input id="chatStatus" value="бот" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Название чата</label>
+        <input id="chatName" value="Делитесь эмоциями в MAX" />
+      </div>
+
+      <div class="field">
+        <label>Буква/символ аватара</label>
+        <input id="avatarText" value="●" />
+      </div>
+
+      <hr style="border:none;border-top:1px solid #edf1f5;margin:18px 0;">
+
+      <div class="field">
+        <label>Текст сообщения</label>
+        <textarea id="msgText">Ваше имя: Анна
+Ваш город: Москва</textarea>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Тип сообщения</label>
+          <select id="msgType">
+            <option value="bot">Слева, белое</option>
+            <option value="me">Справа, зелёное</option>
+            <option value="system">Системная кнопка</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Время сообщения</label>
+          <input id="msgTime" value="18:50" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Пометка</label>
+        <input id="msgMark" value="ред." placeholder="например: ред., ✓, ✓✓" />
+      </div>
+
+      <div class="buttons">
+        <button class="primary" onclick="addMessage()">Добавить сообщение</button>
+        <button class="secondary" onclick="addPreset()">Добавить пример</button>
+        <button class="danger" onclick="clearMessages()">Очистить</button>
+        <button class="secondary" onclick="window.print()">Печать / PDF</button>
+      </div>
+
+      <div class="small-note">
+        Совет: чтобы сохранить картинку, сделай скриншот области телефона или используй печать в PDF. Не выдавай созданные макеты за реальные переписки.
+      </div>
+    </div>
+
+    <div class="preview-wrap">
+      <div class="phone">
+        <div class="screen">
+          <div class="ios-status">
+            <div id="phoneTimeView">20:22</div>
+            <div class="icons">
+              <span>▮▮▮</span>
+              <span>⌁</span>
+              <span>▰</span>
+            </div>
+          </div>
+
+          <div class="header">
+            <div class="back">‹</div>
+            <div class="avatar" id="avatarView">●</div>
+            <div class="chat-title">
+              <div class="name" id="chatNameView">Делитесь эмоциями в MAX</div>
+              <div class="status" id="chatStatusView">бот</div>
+            </div>
+            <div class="menu">⋯</div>
+          </div>
+
+          <div class="messages" id="messages"></div>
+
+          <div class="inputbar">
+            <div class="attach">⌕</div>
+            <div class="fake-input">Сообщение</div>
+            <div class="smile">☺</div>
+            <div class="mic">♩</div>
+          </div>
+
+          <div class="homebar"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const messagesEl = document.getElementById("messages");
+
+    const state = [
+      {
+        text: "Ваше послание отправлено на модерацию. Если все в порядке, мы сообщим дату и время показа.",
+        type: "bot",
+        time: "18:50",
+        mark: ""
+      },
+      {
+        text: "Новое сообщение",
+        type: "system",
+        time: "",
+        mark: ""
+      },
+      {
+        text: "Ваше сообщение прошло автоматическую модерацию.",
+        type: "bot",
+        time: "18:50",
+        mark: ""
+      },
+      {
+        text: "Ваше послание готово к показу 🎉\nВремя: 30 августа, 06:00 до 06:30\nМесто: медиафасад на ул. Большая Тульская, 2\n\nПриходите сами или с близкими, чтобы увидеть реакцию!\nЕсли прийти не получится — мы пришлем фото.\n📸 Хотите получить фото после показа?",
+        type: "bot",
+        time: "19:11",
+        mark: "ред."
+      },
+      {
+        text: "Отлично! Мы отправим фото после показа прямо сюда.",
+        type: "bot",
+        time: "19:12",
+        mark: ""
+      }
+    ];
+
+    function render() {
+      document.getElementById("phoneTimeView").textContent =
+        document.getElementById("phoneTime").value || "20:22";
+
+      document.getElementById("chatNameView").textContent =
+        document.getElementById("chatName").value || "Чат";
+
+      document.getElementById("chatStatusView").textContent =
+        document.getElementById("chatStatus").value || "";
+
+      document.getElementById("avatarView").textContent =
+        document.getElementById("avatarText").value || "●";
+
+      messagesEl.innerHTML = "";
+
+      state.forEach((msg, index) => {
+        const bubble = document.createElement("div");
+        bubble.className = "bubble " + msg.type;
+        bubble.title = "Двойной клик — удалить";
+
+        const text = document.createElement("div");
+        text.textContent = msg.text;
+        bubble.appendChild(text);
+
+        if (msg.type !== "system") {
+          const meta = document.createElement("div");
+          meta.className = "meta";
+          const mark = msg.mark ? msg.mark + " · " : "";
+          meta.textContent = mark + msg.time;
+          bubble.appendChild(meta);
+        }
+
+        bubble.ondblclick = () => {
+          state.splice(index, 1);
+          render();
+        };
+
+        messagesEl.appendChild(bubble);
+      });
+
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function addMessage() {
+      const text = document.getElementById("msgText").value.trim();
+      const type = document.getElementById("msgType").value;
+      const time = document.getElementById("msgTime").value.trim();
+      const mark = document.getElementById("msgMark").value.trim();
+
+      if (!text) return;
+
+      state.push({ text, type, time, mark });
+      render();
+    }
+
+    function addPreset() {
+      state.push(
+        {
+          text: "Ваше имя: Анна\nВаш город: Москва",
+          type: "bot",
+          time: "18:50",
+          mark: "ред."
+        },
+        {
+          text: "Новое сообщение",
+          type: "system",
+          time: "",
+          mark: ""
+        },
+        {
+          text: "Спасибо! Ждём подтверждения.",
+          type: "me",
+          time: "19:13",
+          mark: "✓✓"
+        }
+      );
+      render();
+    }
+
+    function clearMessages() {
+      if (confirm("Удалить все сообщения?")) {
+        state.length = 0;
+        render();
+      }
+    }
+
+    ["phoneTime", "chatName", "chatStatus", "avatarText"].forEach(id => {
+      document.getElementById(id).addEventListener("input", render);
+    });
+
+    render();
+  </script>
+</body>
+</html>
