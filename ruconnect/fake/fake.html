@@ -220,6 +220,50 @@
       text-align: right;
     }
 
+    .chat-buttons {
+      max-width: 78%;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .chat-buttons.left {
+      margin-right: auto;
+    }
+
+    .chat-buttons.right {
+      margin-left: auto;
+    }
+
+    .chat-action-button {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid #111827;
+      background: #ffffff;
+      color: #111827;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      cursor: default;
+      user-select: none;
+      line-height: 1.25;
+      word-wrap: break-word;
+    }
+
+    .chat-buttons.right .chat-action-button {
+      background: #ffffff;
+      color: #111827;
+      border-color: #111827;
+    }
+
+    .chat-buttons.left .chat-action-button {
+      background: #ffffff;
+      color: #111827;
+      border-color: #d1d5db;
+    }
+
     .empty {
       color: #6b7280;
       text-align: center;
@@ -255,6 +299,13 @@
     .message-item strong {
       display: block;
       margin-bottom: 4px;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 6px;
+      line-height: 1.4;
     }
 
     @media (max-width: 850px) {
@@ -295,19 +346,33 @@
       </div>
 
       <div class="field">
-        <label for="messageAuthor">Сторона сообщения</label>
+        <label for="elementType">Тип элемента</label>
+        <select id="elementType" onchange="toggleElementFields()">
+          <option value="message">Сообщение</option>
+          <option value="buttons">Кнопки</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="messageAuthor">Сторона</label>
         <select id="messageAuthor">
           <option value="left">Собеседник</option>
           <option value="right">Вы</option>
         </select>
       </div>
 
-      <div class="field">
+      <div class="field" id="messageTextField">
         <label for="messageText">Текст сообщения</label>
         <textarea id="messageText" placeholder="Введите текст сообщения"></textarea>
       </div>
 
-      <div class="row">
+      <div class="field" id="buttonsTextField" style="display:none;">
+        <label for="buttonsText">Текст кнопок</label>
+        <textarea id="buttonsText" placeholder="Одна кнопка на строку"></textarea>
+        <div class="hint">Каждая новая строка станет отдельной кнопкой.</div>
+      </div>
+
+      <div class="row" id="messageMetaFields">
         <div class="field">
           <label for="messageTime">Время</label>
           <input id="messageTime" type="text" value="12:30" />
@@ -324,14 +389,14 @@
       </div>
 
       <div class="buttons">
-        <button onclick="addMessage()">Добавить сообщение</button>
+        <button onclick="addElement()">Добавить в переписку</button>
         <button class="secondary" onclick="downloadHTML()">Скачать HTML</button>
         <button class="secondary" onclick="downloadImage()">Скачать как изображение</button>
         <button class="danger" onclick="clearMessages()">Очистить переписку</button>
       </div>
 
       <div class="messages-list">
-        <h2>Сообщения</h2>
+        <h2>Элементы</h2>
         <div id="messagesList"></div>
       </div>
     </aside>
@@ -349,7 +414,7 @@
 
         <div class="chat-body" id="chatBody">
           <div class="date-line" id="previewDate">Сегодня</div>
-          <div class="empty" id="emptyText">Добавьте первое сообщение</div>
+          <div class="empty" id="emptyText">Добавьте первый элемент</div>
         </div>
       </section>
     </main>
@@ -361,25 +426,40 @@
     const chatName = document.getElementById("chatName");
     const chatStatus = document.getElementById("chatStatus");
     const chatDate = document.getElementById("chatDate");
+    const elementType = document.getElementById("elementType");
     const messageAuthor = document.getElementById("messageAuthor");
     const messageText = document.getElementById("messageText");
+    const buttonsText = document.getElementById("buttonsText");
     const messageTime = document.getElementById("messageTime");
     const messageStatus = document.getElementById("messageStatus");
 
+    const messageTextField = document.getElementById("messageTextField");
+    const buttonsTextField = document.getElementById("buttonsTextField");
+    const messageMetaFields = document.getElementById("messageMetaFields");
+
     const previewName = document.getElementById("previewName");
     const previewStatus = document.getElementById("previewStatus");
-    const previewDate = document.getElementById("previewDate");
     const avatar = document.getElementById("avatar");
     const chatBody = document.getElementById("chatBody");
-    const emptyText = document.getElementById("emptyText");
     const messagesList = document.getElementById("messagesList");
 
-    let messages = [];
+    let elements = [];
+
+    function toggleElementFields() {
+      if (elementType.value === "message") {
+        messageTextField.style.display = "block";
+        buttonsTextField.style.display = "none";
+        messageMetaFields.style.display = "grid";
+      } else {
+        messageTextField.style.display = "none";
+        buttonsTextField.style.display = "block";
+        messageMetaFields.style.display = "none";
+      }
+    }
 
     function updateHeader() {
       previewName.textContent = chatName.value || "Без имени";
       previewStatus.textContent = chatStatus.value || "";
-      previewDate.textContent = chatDate.value || "";
 
       const words = chatName.value.trim().split(/\s+/);
       let initials = "";
@@ -395,6 +475,14 @@
       avatar.textContent = initials.toUpperCase();
     }
 
+    function addElement() {
+      if (elementType.value === "message") {
+        addMessage();
+      } else {
+        addButtons();
+      }
+    }
+
     function addMessage() {
       const text = messageText.value.trim();
 
@@ -403,7 +491,8 @@
         return;
       }
 
-      messages.push({
+      elements.push({
+        type: "message",
         author: messageAuthor.value,
         text: text,
         time: messageTime.value || "",
@@ -411,10 +500,38 @@
       });
 
       messageText.value = "";
-      renderMessages();
+      renderElements();
     }
 
-    function renderMessages() {
+    function addButtons() {
+      const raw = buttonsText.value.trim();
+
+      if (!raw) {
+        alert("Введите текст кнопок");
+        return;
+      }
+
+      const buttons = raw
+        .split("\n")
+        .map(item => item.trim())
+        .filter(Boolean);
+
+      if (buttons.length === 0) {
+        alert("Введите хотя бы одну кнопку");
+        return;
+      }
+
+      elements.push({
+        type: "buttons",
+        author: messageAuthor.value,
+        buttons: buttons
+      });
+
+      buttonsText.value = "";
+      renderElements();
+    }
+
+    function renderElements() {
       chatBody.innerHTML = "";
 
       const date = document.createElement("div");
@@ -423,28 +540,44 @@
       date.textContent = chatDate.value || "";
       chatBody.appendChild(date);
 
-      if (messages.length === 0) {
+      if (elements.length === 0) {
         const empty = document.createElement("div");
         empty.className = "empty";
         empty.id = "emptyText";
-        empty.textContent = "Добавьте первое сообщение";
+        empty.textContent = "Добавьте первый элемент";
         chatBody.appendChild(empty);
       }
 
-      messages.forEach((msg) => {
-        const message = document.createElement("div");
-        message.className = "message " + msg.author;
+      elements.forEach((item) => {
+        if (item.type === "message") {
+          const message = document.createElement("div");
+          message.className = "message " + item.author;
 
-        const text = document.createElement("div");
-        text.textContent = msg.text;
+          const text = document.createElement("div");
+          text.textContent = item.text;
 
-        const meta = document.createElement("span");
-        meta.className = "meta";
-        meta.textContent = [msg.time, msg.status].filter(Boolean).join(" ");
+          const meta = document.createElement("span");
+          meta.className = "meta";
+          meta.textContent = [item.time, item.status].filter(Boolean).join(" ");
 
-        message.appendChild(text);
-        message.appendChild(meta);
-        chatBody.appendChild(message);
+          message.appendChild(text);
+          message.appendChild(meta);
+          chatBody.appendChild(message);
+        }
+
+        if (item.type === "buttons") {
+          const wrapper = document.createElement("div");
+          wrapper.className = "chat-buttons " + item.author;
+
+          item.buttons.forEach((buttonText) => {
+            const btn = document.createElement("div");
+            btn.className = "chat-action-button";
+            btn.textContent = buttonText;
+            wrapper.appendChild(btn);
+          });
+
+          chatBody.appendChild(wrapper);
+        }
       });
 
       renderMessagesList();
@@ -453,40 +586,50 @@
     function renderMessagesList() {
       messagesList.innerHTML = "";
 
-      if (messages.length === 0) {
-        messagesList.innerHTML = "<div style='font-size:13px;color:#6b7280;'>Нет сообщений</div>";
+      if (elements.length === 0) {
+        messagesList.innerHTML = "<div style='font-size:13px;color:#6b7280;'>Нет элементов</div>";
         return;
       }
 
-      messages.forEach((msg, index) => {
-        const item = document.createElement("div");
-        item.className = "message-item";
+      elements.forEach((item, index) => {
+        const listItem = document.createElement("div");
+        listItem.className = "message-item";
 
-        const side = msg.author === "left" ? "Собеседник" : "Вы";
-        item.innerHTML = `
-          <strong>${index + 1}. ${side} — ${msg.time}</strong>
-          <span>${escapeHTML(msg.text.slice(0, 60))}${msg.text.length > 60 ? "..." : ""}</span>
-        `;
+        const side = item.author === "left" ? "Собеседник" : "Вы";
 
-        item.onclick = () => deleteMessage(index);
-        messagesList.appendChild(item);
+        if (item.type === "message") {
+          listItem.innerHTML = `
+            <strong>${index + 1}. Сообщение — ${side} — ${item.time}</strong>
+            <span>${escapeHTML(item.text.slice(0, 60))}${item.text.length > 60 ? "..." : ""}</span>
+          `;
+        }
+
+        if (item.type === "buttons") {
+          listItem.innerHTML = `
+            <strong>${index + 1}. Кнопки — ${side}</strong>
+            <span>${escapeHTML(item.buttons.join(", ").slice(0, 60))}${item.buttons.join(", ").length > 60 ? "..." : ""}</span>
+          `;
+        }
+
+        listItem.onclick = () => deleteElement(index);
+        messagesList.appendChild(listItem);
       });
     }
 
-    function deleteMessage(index) {
-      const ok = confirm("Удалить это сообщение?");
+    function deleteElement(index) {
+      const ok = confirm("Удалить этот элемент?");
       if (!ok) return;
 
-      messages.splice(index, 1);
-      renderMessages();
+      elements.splice(index, 1);
+      renderElements();
     }
 
     function clearMessages() {
       const ok = confirm("Очистить всю переписку?");
       if (!ok) return;
 
-      messages = [];
-      renderMessages();
+      elements = [];
+      renderElements();
     }
 
     function escapeHTML(str) {
@@ -604,6 +747,32 @@ body {
   opacity: 0.72;
   text-align: right;
 }
+.chat-buttons {
+  max-width: 78%;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.chat-buttons.left {
+  margin-right: auto;
+}
+.chat-buttons.right {
+  margin-left: auto;
+}
+.chat-action-button {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #111827;
+  background: #ffffff;
+  color: #111827;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.25;
+  word-wrap: break-word;
+}
 </style>
 </head>
 <body>
@@ -625,10 +794,11 @@ ${document.getElementById("chatPreview").outerHTML}
 
     chatName.addEventListener("input", updateHeader);
     chatStatus.addEventListener("input", updateHeader);
-    chatDate.addEventListener("input", renderMessages);
+    chatDate.addEventListener("input", renderElements);
 
     updateHeader();
-    renderMessages();
+    toggleElementFields();
+    renderElements();
   </script>
 </body>
 </html>
