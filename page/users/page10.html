@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Это главная страница сайта про Новое Вельяминово. На сайте появилась новая кампания. Кампания - это крупное событие. Кампания называетсч Лето Новое Вельяминово 2026 -->
-    <title>Калькулятор стоимости колодца</title>
+    <title>Новое Вельяминово | Калькулятор стоимости колодца</title>
     <style>
         :root {
             --primary-color: #2b6cb0;
@@ -39,10 +38,17 @@
 
         h2 {
             margin-top: 0;
-            margin-bottom: 25px;
+            margin-bottom: 5px;
             color: var(--primary-color);
             text-align: center;
             font-size: 24px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            font-size: 14px;
+            margin-bottom: 25px;
         }
 
         .form-group {
@@ -61,7 +67,6 @@
             padding: 12px;
             border: 1px solid var(--border-color);
             border-radius: 6px;
-            box-sizing: border-radius;
             font-size: 16px;
             background-color: #fff;
             transition: border-color 0.2s;
@@ -123,6 +128,7 @@
 
 <div class="calc-container">
     <h2>Расчет стоимости колодца</h2>
+    <div class="subtitle">Новое Вельяминово</div>
     
     <!-- Количество колец -->
     <div class="form-group">
@@ -137,7 +143,7 @@
             <option value="0">Без фильтра</option>
             <option value="2500">Речная галька (2 500 ₽)</option>
             <option value="4000">Щебень шунгита (4 000 ₽)</option>
-            <option value="5500">Щебень + щит из осины (5 550 ₽)</option>
+            <option value="5500">Щебень + щит из осины (5 500 ₽)</option>
         </select>
     </div>
 
@@ -164,24 +170,20 @@
 
 <script>
     function calculateWell() {
-        // Базовые тарифы (можно менять под себя)
-        const PRICE_PER_RING_WITH_WORK = 6500; // Цена за 1 кольцо вместе с работой по вкопке
-        const PRICE_CLAY_CASTLE = 5000;       // Стоимость глиняного замка
-        const PRICE_DELIVERY = 3500;          // Стоимость доставки
+        const PRICE_PER_RING_WITH_WORK = 6500; 
+        const PRICE_CLAY_CASTLE = 5000;       
+        const PRICE_DELIVERY = 3500;          
 
-        // Получаем значения из формы
         let ringsCount = parseInt(document.getElementById('rings').value) || 0;
         let filterPrice = parseInt(document.getElementById('filter').value);
         let hasClayCastle = document.getElementById('clayCastle').checked;
         let hasDelivery = document.getElementById('delivery').checked;
 
-        // Защита от отрицательных значений
         if (ringsCount < 0) {
             ringsCount = 0;
             document.getElementById('rings').value = 0;
         }
 
-        // Логика расчета стоимости
         let total = ringsCount * PRICE_PER_RING_WITH_WORK;
         total += filterPrice;
         
@@ -193,11 +195,9 @@
             total += PRICE_DELIVERY;
         }
 
-        // Красивое форматирование числа с разделением тысяч (например, 41 500)
         document.getElementById('totalPrice').innerText = total.toLocaleString('ru-RU');
     }
 
-    // Запускаем расчет при первой загрузке страницы
     window.onload = calculateWell;
 </script>
 
