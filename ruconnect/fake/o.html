@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Конструктор переписок с фото</title>
+
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Arial, sans-serif; background: #f3f4f6; color: #111827; }
+    .app { display: grid; grid-template-columns: 360px 1fr; min-height: 100vh; }
+    .panel { background: #ffffff; border-right: 1px solid #d1d5db; padding: 24px; overflow-y: auto; max-height: 100vh; }
+    .panel h1 { font-size: 20px; margin: 0 0 24px; font-weight: 600; }
+    .field { margin-bottom: 16px; }
+    label { display: block; font-size: 13px; color: #374151; margin-bottom: 6px; font-weight: 600; }
+    input, textarea, select { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 14px; outline: none; background: #ffffff; }
+    textarea { resize: vertical; min-height: 80px; }
+    input:focus, textarea:focus, select:focus { border-color: #111827; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .buttons { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+    button { padding: 11px 14px; border: none; border-radius: 4px; background: #111827; color: #ffffff; font-size: 14px; cursor: pointer; font-weight: 600; }
+    button:hover { background: #1f2937; }
+    button.secondary { background: #e5e7eb; color: #111827; }
+    button.danger { background: #991b1b; }
+    .preview-wrap { display: flex; justify-content: center; align-items: flex-start; padding: 32px; overflow: auto; }
+    .phone { width: 390px; background: #ffffff; border: 1px solid #9ca3af; border-radius: 8px; overflow: hidden; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08); }
+    .chat-header { padding: 16px; border-bottom: 1px solid #d1d5db; display: flex; align-items: center; gap: 12px; background: #fff; }
+    .avatar { width: 42px; height: 42px; border-radius: 50%; background: #111827; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; flex-shrink: 0; }
+    .chat-name { font-size: 15px; font-weight: 700; }
+    .chat-status { font-size: 12px; color: #6b7280; }
+    .chat-body { min-height: 550px; padding: 18px; background: #f9fafb; display: flex; flex-direction: column; }
+    .date-line { text-align: center; font-size: 12px; color: #6b7280; margin-bottom: 18px; }
+    
+    .message { max-width: 80%; margin-bottom: 12px; padding: 10px 12px; border-radius: 6px; font-size: 14px; border: 1px solid #d1d5db; position: relative; word-wrap: break-word; white-space: pre-wrap; }
+    .message.left { background: #ffffff; color: #111827; margin-right: auto; }
+    .message.right { background: #111827; color: #ffffff; margin-left: auto; border-color: #111827; }
+    
+    .chat-image-wrap { max-width: 80%; margin-bottom: 12px; border-radius: 8px; overflow: hidden; border: 1px solid #d1d5db; line-height: 0; }
+    .chat-image-wrap img { width: 100%; height: auto; display: block; }
+    .chat-image-wrap.left { margin-right: auto; }
+    .chat-image-wrap.right { margin-left: auto; border-color: #111827; }
+
+    .chat-buttons { max-width: 80%; margin-bottom: 12px; display: flex; flex-direction: column; gap: 6px; }
+    .chat-buttons.left { margin-right: auto; }
+    .chat-buttons.right { margin-left: auto; }
+    .chat-action-button { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; background: #fff; font-size: 14px; font-weight: 600; text-align: center; }
+
+    .meta { display: block; margin-top: 4px; font-size: 10px; opacity: 0.7; text-align: right; }
+    .empty { color: #9ca3af; text-align: center; margin-top: 200px; font-size: 14px; }
+    .messages-list { margin-top: 24px; border-top: 1px solid #e5e7eb; padding-top: 16px; }
+    .message-item { padding: 8px; border: 1px solid #e5e7eb; border-radius: 4px; margin-bottom: 6px; font-size: 12px; cursor: pointer; background: #fff; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="app">
+    <aside class="panel">
+      <h1>Конструктор</h1>
+      
+      <div class="field">
+        <label>Имя собеседника</label>
+        <input id="chatName" type="text" value="Александр Иванов" />
+      </div>
+
+      <div class="field">
+        <label>Тип элемента</label>
+        <select id="elementType" onchange="toggleFields()">
+          <option value="message">Сообщение</option>
+          <option value="buttons">Кнопки</option>
+          <option value="image">Изображение</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Сторона</label>
+        <select id="messageAuthor">
+          <option value="left">Собеседник</option>
+          <option value="right">Вы</option>
+        </select>
+      </div>
+
+      <div id="textGroup" class="field">
+        <label>Текст сообщения</label>
+        <textarea id="messageText"></textarea>
+      </div>
+
+      <div id="buttonGroup" class="field hidden">
+        <label>Кнопки (каждая с новой строки)</label>
+        <textarea id="buttonsText"></textarea>
+      </div>
+
+      <div id="imageGroup" class="field hidden">
+        <label>Выберите изображение</label>
+        <input type="file" id="imageInput" accept="image/*" />
+      </div>
+
+      <div class="row" id="metaGroup">
+        <div class="field">
+          <label>Время</label>
+          <input id="messageTime" type="text" value="12:00" />
+        </div>
+        <div class="field">
+          <label>Статус</label>
+          <select id="messageStatus">
+            <option value="">Нет</option>
+            <option value="✓">✓</option>
+            <option value="✓✓">✓✓</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button onclick="addElement()">Добавить</button>
+        <button class="secondary" onclick="downloadImage()">Сохранить как PNG</button>
+        <button class="danger" onclick="clearAll()">Очистить всё</button>
+      </div>
+
+      <div class="messages-list" id="messagesList"></div>
+    </aside>
+
+    <main class="preview-wrap">
+      <div class="phone" id="chatPreview">
+        <header class="chat-header">
+          <div class="avatar" id="avatar">АИ</div>
+          <div>
+            <div class="chat-name" id="previewName">Александр Иванов</div>
+            <div class="chat-status">был(а) недавно</div>
+          </div>
+        </header>
+        <div class="chat-body" id="chatBody">
+          <div class="date-line">Сегодня</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <script>
+    let elements = [];
+    
+    function toggleFields() {
+      const type = document.getElementById('elementType').value;
+      document.getElementById('textGroup').classList.toggle('hidden', type !== 'message');
+      document.getElementById('buttonGroup').classList.toggle('hidden', type !== 'buttons');
+      document.getElementById('imageGroup').classList.toggle('hidden', type !== 'image');
+      document.getElementById('metaGroup').classList.toggle('hidden', type === 'buttons');
+    }
+
+    function addElement() {
+      const type = document.getElementById('elementType').value;
+      const author = document.getElementById('messageAuthor').value;
+      const time = document.getElementById('messageTime').value;
+      const status = document.getElementById('messageStatus').value;
+
+      if (type === 'message') {
+        const text = document.getElementById('messageText').value;
+        if (!text) return;
+        elements.push({ type, author, text, time, status });
+        document.getElementById('messageText').value = '';
+      } 
+      else if (type === 'buttons') {
+        const btns = document.getElementById('buttonsText').value.split('\n').filter(t => t.trim());
+        if (!btns.length) return;
+        elements.push({ type, author, buttons: btns });
+        document.getElementById('buttonsText').value = '';
+      } 
+      else if (type === 'image') {
+        const file = document.getElementById('imageInput').files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          elements.push({ type, author, src: e.target.result, time, status });
+          render();
+        };
+        reader.readAsDataURL(file);
+        return;
+      }
+      render();
+    }
+
+    function render() {
+      const body = document.getElementById('chatBody');
+      const list = document.getElementById('messagesList');
+      body.innerHTML = '<div class="date-line">Сегодня</div>';
+      list.innerHTML = '<strong>Список (нажми, чтобы удалить):</strong><br>';
+
+      elements.forEach((el, idx) => {
+        // Рендер в превью
+        if (el.type === 'message') {
+          body.innerHTML += `
+            <div class="message ${el.author}">
+              ${el.text}
+              <span class="meta">${el.time} ${el.status}</span>
+            </div>`;
+        } else if (el.type === 'buttons') {
+          let bHtml = `<div class="chat-buttons ${el.author}">`;
+          el.buttons.forEach(b => bHtml += `<div class="chat-action-button">${b}</div>`);
+          bHtml += `</div>`;
+          body.innerHTML += bHtml;
+        } else if (el.type === 'image') {
+          body.innerHTML += `
+            <div class="chat-image-wrap ${el.author}">
+              <img src="${el.src}">
+              <div style="padding: 4px 8px; background: ${el.author==='right'?'#111827':'#fff'}; color: ${el.author==='right'?'#fff':'#111827'};">
+                <span class="meta">${el.time} ${el.status}</span>
+              </div>
+            </div>`;
+        }
+
+        // Список для удаления
+        const item = document.createElement('div');
+        item.className = 'message-item';
+        item.textContent = `${idx + 1}. [${el.type}] ${el.author}`;
+        item.onclick = () => { elements.splice(idx, 1); render(); };
+        list.appendChild(item);
+      });
+      
+      const name = document.getElementById('chatName').value;
+      document.getElementById('previewName').textContent = name;
+      document.getElementById('avatar').textContent = name.substring(0,2).toUpperCase();
+    }
+
+    function clearAll() { elements = []; render(); }
+
+    async function downloadImage() {
+      const canvas = await html2canvas(document.getElementById('chatPreview'), { scale: 2 });
+      const link = document.createElement('a');
+      link.download = 'chat.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+
+    document.getElementById('chatName').oninput = render;
+  </script>
+</body>
+</html>
