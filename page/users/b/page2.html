@@ -124,6 +124,7 @@
   <script>
     const canvas = document.getElementById("game");
     const ctx = canvas.getContext("2d");
+    console.log("Start game");
 
     const scoreEl = document.getElementById("score");
     const bestEl = document.getElementById("best");
@@ -143,6 +144,7 @@
     let gameOver = false;
     let win = false;
     let muted = false;
+    console.log("level = 1")
 
     const keys = {
       left: false,
@@ -338,6 +340,7 @@
 
       const rows = map.length;
       const cols = map[0].length;
+      console.log("level = 1");
 
       const totalWidth = cols * brick.w + (cols - 1) * brick.gap;
       const startX = (W - totalWidth) / 2;
