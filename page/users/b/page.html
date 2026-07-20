@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>b</title>
+    <title>Страницы - Раздел b</title>
     <style>
         * {
             box-sizing: border-box;
@@ -194,7 +194,7 @@
             <p>Раздел b</p>
         </div>
 
-        <!-- Кнопки переключения (data-target связывает кнопку со списком ниже) -->
+        <!-- Кнопки переключения -->
         <div class="tabs-nav">
             <button class="tab-btn active" data-target="cat1">Вода</button>
             <button class="tab-btn" data-target="cat2">Категория 2</button>
@@ -214,6 +214,11 @@
                     <span>Игры</span>
                     <span class="article-meta">Игры</span>
                 </a>
+                
+                <a href="page2.html" class="article-item">
+                    <span>Арконоид</span>
+                    <span class="article-meta">Арконоид</span>
+                </a>
             </div>
 
             <!-- Категория 2 -->
@@ -228,46 +233,63 @@
 
         <!-- Нижняя панель -->
         <div class="setup-footer">
-            <a href="#" class="btn">Назад</a>
+            <button class="btn" id="prevTabBtn">Назад</button>
             <button class="btn btn-primary" id="nextTabBtn">Далее</button>
         </div>
     </div>
 
     <script>
-        // Находим все кнопки вкладок и списки категорий
         const tabButtons = document.querySelectorAll('.tab-btn');
         const categorySections = document.querySelectorAll('.category-section');
         const nextTabBtn = document.getElementById('nextTabBtn');
+        const prevTabBtn = document.getElementById('prevTabBtn');
 
-        // Функция переключения
+        // Обновление состояния нижних кнопок навигации
+        function updateFooterButtons() {
+            const currentActiveBtn = document.querySelector('.tab-btn.active');
+            
+            // Проверяем, есть ли вкладка сзади и впереди
+            const hasPrev = !!currentActiveBtn.previousElementSibling;
+            const hasNext = !!currentActiveBtn.nextElementSibling;
+
+            // Логика для кнопки "Назад" (скрываем/деактивируем на первом табе)
+            if (!hasPrev) {
+                prevTabBtn.style.visibility = 'hidden';
+            } else {
+                prevTabBtn.style.visibility = 'visible';
+            }
+
+            // Логика для кнопки "Далее / Готово"
+            if (!hasNext) {
+                nextTabBtn.textContent = 'Готово';
+            } else {
+                nextTabBtn.textContent = 'Далее';
+            }
+        }
+
+        // Функция переключения вкладок
         function setActiveTab(targetId) {
             categorySections.forEach(section => {
-                if (section.id === targetId) {
-                    section.classList.add('active');
-                } else {
-                    section.classList.remove('active');
-                }
+                section.classList.toggle('active', section.id === targetId);
             });
 
             tabButtons.forEach(btn => {
-                if (btn.getAttribute('data-target') === targetId) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
+                btn.classList.toggle('active', btn.getAttribute('data-target') === targetId);
             });
+
+            updateFooterButtons();
         }
 
-        // Навешиваем клики на верхние кнопки
+        // Обработка кликов по верхним вкладкам
         tabButtons.forEach(button => {
             button.addEventListener('click', function(e) {
-                e.preventDefault(); // Предотвращаем баги сборщиков кода
+                e.preventDefault();
                 const targetId = this.getAttribute('data-target');
                 setActiveTab(targetId);
             });
         });
 
-        // Логика для нижней кнопки "Далее" (автоматически переключает на следующую вкладку)
+        // Логика для нижней кнопки "Далее"
         if (nextTabBtn) {
             nextTabBtn.addEventListener('click', function() {
                 const currentActiveBtn = document.querySelector('.tab-btn.active');
@@ -276,12 +298,30 @@
                     if (nextBtn && nextBtn.classList.contains('tab-btn')) {
                         setActiveTab(nextBtn.getAttribute('data-target'));
                     } else {
-                        // Если это была последняя вкладка, вызываем действие "Готово"
-                        alert('Все вкладки пройдены!');
+                        // Действие при клике на "Готово" (последний таб)
+                        alert('Все шаги пройдены!'); 
+                        // Здесь можно сделать переход: window.location.href = 'index.html';
                     }
                 }
             });
         }
+
+        // Логика для нижней кнопки "Назад"
+        if (prevTabBtn) {
+            prevTabBtn.addEventListener('click', function() {
+                const currentActiveBtn = document.querySelector('.tab-btn.active');
+                if (currentActiveBtn) {
+                    const prevBtn = currentActiveBtn.previousElementSibling;
+                    if (prevBtn && prevBtn.classList.contains('tab-btn')) {
+                        setActiveTab(prevBtn.getAttribute('data-target'));
+                    }
+                }
+            });
+        }
+
+        // Инициализация кнопок при первой загрузке
+        updateFooterButtons();
     </script>
+
 </body>
 </html>
