@@ -1,0 +1,1621 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Конструктор красивых сайтов</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0f172a;
+      --panel: rgba(15, 23, 42, 0.9);
+      --panel-light: #111827;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #7c3aed;
+      --accent-2: #06b6d4;
+      --border: rgba(255, 255, 255, 0.12);
+      --card: rgba(255, 255, 255, 0.08);
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+      --radius: 22px;
+    }
+
+    body {
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(124, 58, 237, 0.35), transparent 35%),
+        radial-gradient(circle at top right, rgba(6, 182, 212, 0.3), transparent 35%),
+        linear-gradient(135deg, #020617, #0f172a 45%, #111827);
+      overflow: hidden;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 320px 1fr 360px;
+      height: 100vh;
+    }
+
+    .sidebar,
+    .settings {
+      background: rgba(2, 6, 23, 0.72);
+      backdrop-filter: blur(20px);
+      border-color: var(--border);
+      overflow-y: auto;
+      padding: 22px;
+    }
+
+    .sidebar {
+      border-right: 1px solid var(--border);
+    }
+
+    .settings {
+      border-left: 1px solid var(--border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 26px;
+    }
+
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 12px 30px rgba(124, 58, 237, 0.45);
+    }
+
+    .brand h1 {
+      font-size: 19px;
+      line-height: 1.1;
+    }
+
+    .brand p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 3px;
+    }
+
+    .panel-title {
+      font-size: 13px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin: 24px 0 12px;
+    }
+
+    .block-button {
+      width: 100%;
+      text-align: left;
+      padding: 15px;
+      border-radius: 16px;
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      margin-bottom: 10px;
+      transition: 0.2s ease;
+    }
+
+    .block-button:hover {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.13);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .block-button strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .block-button span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .main {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .topbar {
+      height: 74px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(2, 6, 23, 0.55);
+      backdrop-filter: blur(18px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 22px;
+      gap: 16px;
+    }
+
+    .topbar-left {
+      min-width: 0;
+    }
+
+    .topbar h2 {
+      font-size: 18px;
+    }
+
+    .topbar p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 3px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      padding: 11px 15px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text);
+      border: 1px solid var(--border);
+      transition: 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.17);
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border-color: transparent;
+      box-shadow: 0 12px 28px rgba(6, 182, 212, 0.22);
+    }
+
+    .canvas-wrap {
+      flex: 1;
+      overflow: auto;
+      padding: 28px;
+    }
+
+    .canvas {
+      width: min(100%, 1120px);
+      margin: 0 auto;
+      min-height: calc(100vh - 130px);
+      background: #ffffff;
+      color: #0f172a;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .site-section {
+      position: relative;
+      outline: 2px solid transparent;
+      transition: 0.15s;
+    }
+
+    .site-section:hover {
+      outline-color: rgba(124, 58, 237, 0.45);
+    }
+
+    .site-section.active {
+      outline-color: #7c3aed;
+    }
+
+    .section-tools {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: none;
+      gap: 7px;
+      z-index: 5;
+    }
+
+    .site-section:hover .section-tools,
+    .site-section.active .section-tools {
+      display: flex;
+    }
+
+    .tool-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      color: #fff;
+      background: rgba(15, 23, 42, 0.82);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero {
+      min-height: 520px;
+      padding: 80px 70px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 40px;
+      align-items: center;
+      background:
+        radial-gradient(circle at 80% 20%, rgba(124, 58, 237, 0.22), transparent 35%),
+        linear-gradient(135deg, #f8fafc, #eef2ff);
+    }
+
+    .hero h1 {
+      font-size: clamp(38px, 5vw, 72px);
+      line-height: 0.95;
+      letter-spacing: -0.06em;
+      margin-bottom: 22px;
+    }
+
+    .hero p {
+      font-size: 19px;
+      color: #475569;
+      line-height: 1.65;
+      max-width: 620px;
+      margin-bottom: 28px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .site-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 20px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 18px 35px rgba(124, 58, 237, 0.25);
+    }
+
+    .site-btn.secondary {
+      color: #0f172a;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      box-shadow: none;
+    }
+
+    .hero-card {
+      min-height: 340px;
+      border-radius: 34px;
+      background:
+        linear-gradient(145deg, rgba(255,255,255,0.84), rgba(255,255,255,0.38)),
+        url("https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=900&q=80");
+      background-size: cover;
+      background-position: center;
+      box-shadow: 0 30px 70px rgba(15, 23, 42, 0.18);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .floating-card {
+      position: absolute;
+      left: 24px;
+      bottom: 24px;
+      right: 24px;
+      padding: 22px;
+      border-radius: 22px;
+      color: #fff;
+      background: rgba(15, 23, 42, 0.78);
+      backdrop-filter: blur(16px);
+    }
+
+    .features {
+      padding: 76px 70px;
+      background: #fff;
+    }
+
+    .section-heading {
+      max-width: 720px;
+      margin-bottom: 34px;
+    }
+
+    .section-heading h2 {
+      font-size: clamp(30px, 4vw, 48px);
+      letter-spacing: -0.04em;
+      margin-bottom: 12px;
+    }
+
+    .section-heading p {
+      color: #64748b;
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .feature-card {
+      padding: 26px;
+      border-radius: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+    }
+
+    .icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      margin-bottom: 18px;
+    }
+
+    .feature-card h3 {
+      font-size: 21px;
+      margin-bottom: 10px;
+    }
+
+    .feature-card p {
+      color: #64748b;
+      line-height: 1.6;
+    }
+
+    .gallery {
+      padding: 76px 70px;
+      background: #f8fafc;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+    }
+
+    .gallery-img {
+      min-height: 260px;
+      border-radius: 28px;
+      background-size: cover;
+      background-position: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .gallery-img.big {
+      min-height: 540px;
+      background-image: url("https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1200&q=80");
+    }
+
+    .gallery-stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .gallery-img.one {
+      background-image: url("https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=900&q=80");
+    }
+
+    .gallery-img.two {
+      background-image: url("https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=900&q=80");
+    }
+
+    .pricing {
+      padding: 76px 70px;
+      background: #fff;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .price-card {
+      padding: 28px;
+      border-radius: 26px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+    }
+
+    .price-card.featured {
+      background: #0f172a;
+      color: #fff;
+      transform: translateY(-10px);
+      box-shadow: 0 28px 60px rgba(15, 23, 42, 0.22);
+    }
+
+    .price {
+      font-size: 42px;
+      font-weight: 900;
+      margin: 16px 0;
+      letter-spacing: -0.04em;
+    }
+
+    .price-card p,
+    .price-card li {
+      color: #64748b;
+      line-height: 1.7;
+    }
+
+    .price-card.featured p,
+    .price-card.featured li {
+      color: #cbd5e1;
+    }
+
+    .price-card ul {
+      list-style: none;
+      margin: 20px 0;
+    }
+
+    .price-card li::before {
+      content: "✓ ";
+      color: #06b6d4;
+      font-weight: 900;
+    }
+
+    .contact {
+      padding: 76px 70px;
+      background:
+        radial-gradient(circle at top right, rgba(6, 182, 212, 0.25), transparent 32%),
+        linear-gradient(135deg, #0f172a, #1e1b4b);
+      color: #fff;
+    }
+
+    .contact-box {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      align-items: center;
+    }
+
+    .contact h2 {
+      font-size: clamp(34px, 5vw, 58px);
+      letter-spacing: -0.05em;
+      margin-bottom: 14px;
+    }
+
+    .contact p {
+      color: #cbd5e1;
+      font-size: 18px;
+      line-height: 1.7;
+    }
+
+    .form {
+      padding: 26px;
+      border-radius: 26px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255,255,255,0.16);
+      backdrop-filter: blur(16px);
+    }
+
+    .form input,
+    .form textarea {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      margin-bottom: 12px;
+      outline: none;
+    }
+
+    .form textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .form input::placeholder,
+    .form textarea::placeholder {
+      color: #cbd5e1;
+    }
+
+    .footer {
+      padding: 34px 70px;
+      background: #020617;
+      color: #94a3b8;
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .control {
+      margin-bottom: 16px;
+    }
+
+    .control label {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .control input,
+    .control textarea,
+    .control select {
+      width: 100%;
+      padding: 12px 13px;
+      border-radius: 13px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      outline: none;
+    }
+
+    .control textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .control input[type="color"] {
+      padding: 4px;
+      height: 44px;
+    }
+
+    .hint {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.55;
+      padding: 14px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+
+    .empty {
+      padding: 90px 40px;
+      text-align: center;
+      color: #64748b;
+      background: #fff;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.72);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 20;
+    }
+
+    .modal.open {
+      display: flex;
+    }
+
+    .modal-card {
+      width: min(920px, 100%);
+      max-height: 86vh;
+      overflow: auto;
+      border-radius: 24px;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .modal textarea {
+      width: 100%;
+      min-height: 460px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: #020617;
+      color: #dbeafe;
+      padding: 16px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      resize: vertical;
+    }
+
+    [contenteditable="true"] {
+      outline: none;
+      border-radius: 8px;
+    }
+
+    [contenteditable="true"]:focus {
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.25);
+    }
+
+    @media (max-width: 1180px) {
+      body {
+        overflow: auto;
+      }
+
+      .app {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+
+      .sidebar,
+      .settings {
+        border: none;
+      }
+
+      .main {
+        min-height: 800px;
+      }
+
+      .settings {
+        order: 3;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .topbar {
+        height: auto;
+        padding: 16px;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .canvas-wrap {
+        padding: 14px;
+      }
+
+      .canvas {
+        border-radius: 18px;
+      }
+
+      .hero,
+      .contact-box {
+        grid-template-columns: 1fr;
+      }
+
+      .hero,
+      .features,
+      .gallery,
+      .pricing,
+      .contact,
+      .footer {
+        padding: 42px 24px;
+      }
+
+      .feature-grid,
+      .pricing-grid,
+      .gallery-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .gallery-img.big {
+        min-height: 320px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <h1>Site Constructor</h1>
+          <p>Красивые сайты без кода</p>
+        </div>
+      </div>
+
+      <div class="panel-title">Добавить блок</div>
+
+      <button class="block-button" data-add="hero">
+        <strong>Главный экран</strong>
+        <span>Заголовок, описание, кнопки и изображение</span>
+      </button>
+
+      <button class="block-button" data-add="features">
+        <strong>Преимущества</strong>
+        <span>Карточки с описанием услуг или функций</span>
+      </button>
+
+      <button class="block-button" data-add="gallery">
+        <strong>Галерея</strong>
+        <span>Красивый блок с изображениями</span>
+      </button>
+
+      <button class="block-button" data-add="pricing">
+        <strong>Тарифы</strong>
+        <span>Три карточки с ценами</span>
+      </button>
+
+      <button class="block-button" data-add="contact">
+        <strong>Контакты</strong>
+        <span>Форма заявки и призыв к действию</span>
+      </button>
+
+      <button class="block-button" data-add="footer">
+        <strong>Подвал</strong>
+        <span>Копирайт и ссылки</span>
+      </button>
+
+      <div class="panel-title">Шаблоны</div>
+
+      <button class="block-button" id="templateStartup">
+        <strong>Стартап</strong>
+        <span>Современный лендинг для продукта</span>
+      </button>
+
+      <button class="block-button" id="templateAgency">
+        <strong>Агентство</strong>
+        <span>Сайт для студии или портфолио</span>
+      </button>
+
+      <div class="panel-title">Подсказка</div>
+      <div class="hint">
+        Кликни по любому тексту на макете и редактируй его прямо на странице.
+        Кликни по блоку, чтобы настроить цвета справа.
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-left">
+          <h2>Редактор сайта</h2>
+          <p>Собирай страницу из блоков, меняй стиль и экспортируй HTML</p>
+        </div>
+
+        <div class="actions">
+          <button class="btn" id="clearBtn">Очистить</button>
+          <button class="btn" id="saveBtn">Сохранить</button>
+          <button class="btn" id="loadBtn">Загрузить</button>
+          <button class="btn primary" id="exportBtn">Экспорт HTML</button>
+        </div>
+      </header>
+
+      <div class="canvas-wrap">
+        <div class="canvas" id="canvas"></div>
+      </div>
+    </main>
+
+    <aside class="settings">
+      <div class="panel-title">Настройки страницы</div>
+
+      <div class="control">
+        <label>Название сайта</label>
+        <input id="siteTitle" value="Мой красивый сайт" />
+      </div>
+
+      <div class="control">
+        <label>Основной цвет</label>
+        <input id="accentColor" type="color" value="#7c3aed" />
+      </div>
+
+      <div class="control">
+        <label>Второй цвет</label>
+        <input id="accentColor2" type="color" value="#06b6d4" />
+      </div>
+
+      <div class="control">
+        <label>Скругление блоков</label>
+        <select id="radiusSelect">
+          <option value="12px">Малое</option>
+          <option value="22px" selected>Среднее</option>
+          <option value="34px">Большое</option>
+        </select>
+      </div>
+
+      <div class="panel-title">Выбранный блок</div>
+
+      <div class="control">
+        <label>Фон блока</label>
+        <input id="blockBg" type="color" value="#ffffff" />
+      </div>
+
+      <div class="control">
+        <label>Цвет текста блока</label>
+        <input id="blockText" type="color" value="#0f172a" />
+      </div>
+
+      <button class="btn primary" style="width:100%; margin-bottom:12px;" id="duplicateBtn">
+        Дублировать блок
+      </button>
+
+      <button class="btn" style="width:100%;" id="deleteBtn">
+        Удалить блок
+      </button>
+
+      <div class="panel-title">Как пользоваться</div>
+      <div class="hint">
+        1. Добавь блоки слева.<br>
+        2. Редактируй тексты кликом.<br>
+        3. Настрой цвета справа.<br>
+        4. Нажми «Экспорт HTML» и скопируй готовый код.
+      </div>
+    </aside>
+  </div>
+
+  <div class="modal" id="exportModal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <h2>Готовый HTML</h2>
+          <p style="color:#94a3b8; margin-top:4px;">Скопируй код и сохрани как отдельный .html файл</p>
+        </div>
+        <button class="btn" id="closeModal">Закрыть</button>
+      </div>
+      <textarea id="exportCode" readonly></textarea>
+      <div style="display:flex; gap:10px; margin-top:14px; justify-content:flex-end; flex-wrap:wrap;">
+        <button class="btn" id="copyCode">Скопировать код</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("canvas");
+    const siteTitle = document.getElementById("siteTitle");
+    const accentColor = document.getElementById("accentColor");
+    const accentColor2 = document.getElementById("accentColor2");
+    const radiusSelect = document.getElementById("radiusSelect");
+    const blockBg = document.getElementById("blockBg");
+    const blockText = document.getElementById("blockText");
+    const exportModal = document.getElementById("exportModal");
+    const exportCode = document.getElementById("exportCode");
+
+    let selectedSection = null;
+
+    const blocks = {
+      hero: `
+        <section class="site-section hero">
+          <div class="section-tools">
+            <button class="tool-btn" data-action="up">↑</button>
+            <button class="tool-btn" data-action="down">↓</button>
+            <button class="tool-btn" data-action="delete">×</button>
+          </div>
+          <div>
+            <h1 contenteditable="true">Создай сайт, который выглядит дорого</h1>
+            <p contenteditable="true">Современный лендинг для бизнеса, продукта или портфолио. Меняй тексты, цвета и блоки прямо в браузере.</p>
+            <div class="hero-buttons">
+              <a href="#" class="site-btn" contenteditable="true">Начать сейчас</a>
+              <a href="#" class="site-btn secondary" contenteditable="true">Смотреть работы</a>
+            </div>
+          </div>
+          <div class="hero-card">
+            <div class="floating-card">
+              <h3 contenteditable="true">Премиальный дизайн</h3>
+              <p contenteditable="true">Адаптивная структура, мягкие тени и аккуратная типографика.</p>
+            </div>
+          </div>
+        </section>
+      `,
+
+      features: `
+        <section class="site-section features">
+          <div class="section-tools">
+            <button class="tool-btn" data-action="up">↑</button>
+            <button class="tool-btn" data-action="down">↓</button>
+            <button class="tool-btn" data-action="delete">×</button>
+          </div>
+          <div class="section-heading">
+            <h2 contenteditable="true">Почему выбирают нас</h2>
+            <p contenteditable="true">Добавь преимущества, услуги или возможности твоего продукта.</p>
+          </div>
+          <div class="feature-grid">
+            <div class="feature-card">
+              <div class="icon"></div>
+              <h3 contenteditable="true">Быстрый запуск</h3>
+              <p contenteditable="true">Собери готовую страницу за несколько минут без сложных настроек.</p>
+            </div>
+            <div class="feature-card">
+              <div class="icon"></div>
+              <h3 contenteditable="true">Красивый стиль</h3>
+              <p contenteditable="true">Современные блоки, градиенты, карточки и приятная визуальная сетка.</p>
+            </div>
+            <div class="feature-card">
+              <div class="icon"></div>
+              <h3 contenteditable="true">Гибкая настройка</h3>
+              <p contenteditable="true">Редактируй тексты, меняй цвета и экспортируй готовый HTML.</p>
+            </div>
+          </div>
+        </section>
+      `,
+
+      gallery: `
+        <section class="site-section gallery">
+          <div class="section-tools">
+            <button class="tool-btn" data-action="up">↑</button>
+            <button class="tool-btn" data-action="down">↓</button>
+            <button class="tool-btn" data-action="delete">×</button>
+          </div>
+          <div class="section-heading">
+            <h2 contenteditable="true">Визуальная галерея</h2>
+            <p contenteditable="true">Покажи проекты, интерьер, команду, продукт или атмосферу бренда.</p>
+          </div>
+          <div class="gallery-grid">
+            <div class="gallery-img big"></div>
+            <div class="gallery-stack">
+              <div class="gallery-img one"></div>
+              <div class="gallery-img two"></div>
+            </div>
+          </div>
+        </section>
+      `,
+
+      pricing: `
+        <section class="site-section pricing">
+          <div class="section-tools">
+            <button class="tool-btn" data-action="up">↑</button>
+            <button class="tool-btn" data-action="down">↓</button>
+            <button class="tool-btn" data-action="delete">×</button>
+          </div>
+          <div class="section-heading">
+            <h2 contenteditable="true">Простые тарифы</h2>
+            <p contenteditable="true">Опиши пакеты услуг или варианты подписки.</p>
+          </div>
+          <div class="pricing-grid">
+            <div class="price-card">
+              <h3 contenteditable="true">Start</h3>
+              <div class="price" contenteditable="true">₽9k</div>
+              <p contenteditable="true">Для быстрого старта</p>
+              <ul>
+                <li contenteditable="true">Один экран</li>
+                <li contenteditable="true">Базовый дизайн</li>
+                <li contenteditable="true">Адаптация</li>
+              </ul>
+              <a href="#" class="site-btn">Выбрать</a>
+            </div>
+            <div class="price-card featured">
+              <h3 contenteditable="true">Pro</h3>
+              <div class="price" contenteditable="true">₽29k</div>
+              <p contenteditable="true">Лучший выбор</p>
+              <ul>
+                <li contenteditable="true">До 6 блоков</li>
+                <li contenteditable="true">Уникальный стиль</li>
+                <li contenteditable="true">Форма заявки</li>
+              </ul>
+              <a href="#" class="site-btn">Выбрать</a>
+            </div>
+            <div class="price-card">
+              <h3 contenteditable="true">Max</h3>
+              <div class="price" contenteditable="true">₽59k</div>
+              <p contenteditable="true">Для масштабных задач</p>
+              <ul>
+                <li contenteditable="true">Многостраничность</li>
+                <li contenteditable="true">Анимации</li>
+                <li contenteditable="true">Интеграции</li>
+              </ul>
+              <a href="#" class="site-btn">Выбрать</a>
+            </div>
+          </div>
+        </section>
+      `,
+
+      contact: `
+        <section class="site-section contact">
+          <div class="section-tools">
+            <button class="tool-btn" data-action="up">↑</button>
+            <button class="tool-btn" data-action="down">↓</button>
+            <button class="tool-btn" data-action="delete">×</button>
+          </div>
+          <div class="contact-box">
+            <div>
+              <h2 contenteditable="true">Готовы начать?</h2>
+              <p contenteditable="true">Оставь заявку, и мы обсудим задачу, сроки и лучший формат запуска.</p>
+            </div>
+            <div class="form">
+              <input placeholder="Ваше имя">
+              <input placeholder="Email или телефон">
+              <textarea placeholder="Расскажите о проекте"></textarea>
+              <button class="site-btn" style="width:100%;">Отправить заявку</button>
+            </div>
+          </div>
+        </section>
+      `,
+
+      footer: `
+        <footer class="site-section footer">
+          <div class="section-tools">
+            <button class="tool-btn" data-action="up">↑</button>
+            <button class="tool-btn" data-action="down">↓</button>
+            <button class="tool-btn" data-action="delete">×</button>
+          </div>
+          <strong contenteditable="true">Мой бренд</strong>
+          <span contenteditable="true">© 2025. Все права защищены.</span>
+        </footer>
+      `
+    };
+
+    function addBlock(type) {
+      removeEmpty();
+      canvas.insertAdjacentHTML("beforeend", blocks[type]);
+      const section = canvas.lastElementChild;
+      prepareSection(section);
+      selectSection(section);
+    }
+
+    function prepareSection(section) {
+      section.addEventListener("click", function(e) {
+        if (!e.target.closest(".section-tools")) {
+          selectSection(section);
+        }
+      });
+
+      section.querySelectorAll(".tool-btn").forEach(btn => {
+        btn.addEventListener("click", function(e) {
+          e.stopPropagation();
+          const action = btn.dataset.action;
+
+          if (action === "delete") {
+            section.remove();
+            selectedSection = null;
+            checkEmpty();
+          }
+
+          if (action === "up") {
+            const prev = section.previousElementSibling;
+            if (prev) canvas.insertBefore(section, prev);
+          }
+
+          if (action === "down") {
+            const next = section.nextElementSibling;
+            if (next) canvas.insertBefore(next, section);
+          }
+        });
+      });
+    }
+
+    function selectSection(section) {
+      document.querySelectorAll(".site-section").forEach(s => s.classList.remove("active"));
+      selectedSection = section;
+      selectedSection.classList.add("active");
+
+      const styles = getComputedStyle(selectedSection);
+      blockBg.value = rgbToHex(styles.backgroundColor);
+      blockText.value = rgbToHex(styles.color);
+    }
+
+    function checkEmpty() {
+      if (!canvas.querySelector(".site-section")) {
+        canvas.innerHTML = `
+          <div class="empty">
+            <h2>Начни создавать сайт</h2>
+            <p style="margin-top:10px;">Добавь первый блок слева или выбери готовый шаблон.</p>
+          </div>
+        `;
+      }
+    }
+
+    function removeEmpty() {
+      const empty = canvas.querySelector(".empty");
+      if (empty) empty.remove();
+    }
+
+    function rgbToHex(rgb) {
+      const result = rgb.match(/\d+/g);
+      if (!result) return "#ffffff";
+      return "#" + result.slice(0, 3).map(x => {
+        const hex = parseInt(x).toString(16);
+        return hex.length === 1 ? "0" + hex : hex;
+      }).join("");
+    }
+
+    function applyTheme() {
+      document.documentElement.style.setProperty("--accent", accentColor.value);
+      document.documentElement.style.setProperty("--accent-2", accentColor2.value);
+      document.documentElement.style.setProperty("--radius", radiusSelect.value);
+
+      document.querySelectorAll(".feature-card, .price-card, .hero-card, .gallery-img, .form").forEach(el => {
+        el.style.borderRadius = radiusSelect.value;
+      });
+    }
+
+    function buildTemplate(type) {
+      canvas.innerHTML = "";
+
+      if (type === "startup") {
+        ["hero", "features", "gallery", "pricing", "contact", "footer"].forEach(addBlock);
+      }
+
+      if (type === "agency") {
+        ["hero", "gallery", "features", "contact", "footer"].forEach(addBlock);
+
+        const firstH1 = canvas.querySelector(".hero h1");
+        const firstP = canvas.querySelector(".hero p");
+
+        if (firstH1) firstH1.textContent = "Дизайн-студия для сильных брендов";
+        if (firstP) firstP.textContent = "Создаем сайты, визуальные системы и digital-продукты, которые помогают бизнесу выглядеть убедительно.";
+      }
+    }
+
+    function saveProject() {
+      const data = {
+        title: siteTitle.value,
+        accent: accentColor.value,
+        accent2: accentColor2.value,
+        radius: radiusSelect.value,
+        html: canvas.innerHTML
+      };
+
+      localStorage.setItem("beautifulSiteBuilder", JSON.stringify(data));
+      alert("Проект сохранен в браузере");
+    }
+
+    function loadProject() {
+      const raw = localStorage.getItem("beautifulSiteBuilder");
+
+      if (!raw) {
+        alert("Сохраненный проект не найден");
+        return;
+      }
+
+      const data = JSON.parse(raw);
+
+      siteTitle.value = data.title || "Мой красивый сайт";
+      accentColor.value = data.accent || "#7c3aed";
+      accentColor2.value = data.accent2 || "#06b6d4";
+      radiusSelect.value = data.radius || "22px";
+      canvas.innerHTML = data.html || "";
+
+      canvas.querySelectorAll(".site-section").forEach(prepareSection);
+      applyTheme();
+      checkEmpty();
+
+      alert("Проект загружен");
+    }
+
+    function cleanForExport() {
+      const clone = canvas.cloneNode(true);
+
+      clone.querySelectorAll(".section-tools").forEach(el => el.remove());
+      clone.querySelectorAll(".active").forEach(el => el.classList.remove("active"));
+      clone.querySelectorAll("[contenteditable]").forEach(el => {
+        el.removeAttribute("contenteditable");
+      });
+
+      return clone.innerHTML;
+    }
+
+    function generateExportHtml() {
+      const bodyContent = cleanForExport();
+
+      return `<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${escapeHtml(siteTitle.value)}</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --accent: ${accentColor.value};
+      --accent-2: ${accentColor2.value};
+      --radius: ${radiusSelect.value};
+    }
+
+    body {
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #0f172a;
+      background: #ffffff;
+    }
+
+    .page {
+      overflow: hidden;
+    }
+
+    .hero {
+      min-height: 520px;
+      padding: 80px 70px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 40px;
+      align-items: center;
+      background:
+        radial-gradient(circle at 80% 20%, rgba(124, 58, 237, 0.22), transparent 35%),
+        linear-gradient(135deg, #f8fafc, #eef2ff);
+    }
+
+    .hero h1 {
+      font-size: clamp(38px, 5vw, 72px);
+      line-height: 0.95;
+      letter-spacing: -0.06em;
+      margin-bottom: 22px;
+    }
+
+    .hero p {
+      font-size: 19px;
+      color: #475569;
+      line-height: 1.65;
+      max-width: 620px;
+      margin-bottom: 28px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .site-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 20px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 18px 35px rgba(124, 58, 237, 0.25);
+      border: none;
+    }
+
+    .site-btn.secondary {
+      color: #0f172a;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      box-shadow: none;
+    }
+
+    .hero-card {
+      min-height: 340px;
+      border-radius: var(--radius);
+      background:
+        linear-gradient(145deg, rgba(255,255,255,0.84), rgba(255,255,255,0.38)),
+        url("https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=900&q=80");
+      background-size: cover;
+      background-position: center;
+      box-shadow: 0 30px 70px rgba(15, 23, 42, 0.18);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .floating-card {
+      position: absolute;
+      left: 24px;
+      bottom: 24px;
+      right: 24px;
+      padding: 22px;
+      border-radius: 22px;
+      color: #fff;
+      background: rgba(15, 23, 42, 0.78);
+      backdrop-filter: blur(16px);
+    }
+
+    .features,
+    .gallery,
+    .pricing,
+    .contact {
+      padding: 76px 70px;
+    }
+
+    .features,
+    .pricing {
+      background: #fff;
+    }
+
+    .gallery {
+      background: #f8fafc;
+    }
+
+    .section-heading {
+      max-width: 720px;
+      margin-bottom: 34px;
+    }
+
+    .section-heading h2 {
+      font-size: clamp(30px, 4vw, 48px);
+      letter-spacing: -0.04em;
+      margin-bottom: 12px;
+    }
+
+    .section-heading p {
+      color: #64748b;
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    .feature-grid,
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .feature-card,
+    .price-card {
+      padding: 26px;
+      border-radius: var(--radius);
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+    }
+
+    .icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      margin-bottom: 18px;
+    }
+
+    .feature-card h3 {
+      font-size: 21px;
+      margin-bottom: 10px;
+    }
+
+    .feature-card p,
+    .price-card p,
+    .price-card li {
+      color: #64748b;
+      line-height: 1.6;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+    }
+
+    .gallery-img {
+      min-height: 260px;
+      border-radius: var(--radius);
+      background-size: cover;
+      background-position: center;
+      overflow: hidden;
+    }
+
+    .gallery-img.big {
+      min-height: 540px;
+      background-image: url("https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1200&q=80");
+    }
+
+    .gallery-stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .gallery-img.one {
+      background-image: url("https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=900&q=80");
+    }
+
+    .gallery-img.two {
+      background-image: url("https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=900&q=80");
+    }
+
+    .price-card.featured {
+      background: #0f172a;
+      color: #fff;
+      transform: translateY(-10px);
+      box-shadow: 0 28px 60px rgba(15, 23, 42, 0.22);
+    }
+
+    .price {
+      font-size: 42px;
+      font-weight: 900;
+      margin: 16px 0;
+      letter-spacing: -0.04em;
+    }
+
+    .price-card ul {
+      list-style: none;
+      margin: 20px 0;
+    }
+
+    .price-card li::before {
+      content: "✓ ";
+      color: #06b6d4;
+      font-weight: 900;
+    }
+
+    .price-card.featured p,
+    .price-card.featured li {
+      color: #cbd5e1;
+    }
+
+    .contact {
+      background:
+        radial-gradient(circle at top right, rgba(6, 182, 212, 0.25), transparent 32%),
+        linear-gradient(135deg, #0f172a, #1e1b4b);
+      color: #fff;
+    }
+
+    .contact-box {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      align-items: center;
+    }
+
+    .contact h2 {
+      font-size: clamp(34px, 5vw, 58px);
+      letter-spacing: -0.05em;
+      margin-bottom: 14px;
+    }
+
+    .contact p {
+      color: #cbd5e1;
+      font-size: 18px;
+      line-height: 1.7;
+    }
+
+    .form {
+      padding: 26px;
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255,255,255,0.16);
+      backdrop-filter: blur(16px);
+    }
+
+    .form input,
+    .form textarea {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      margin-bottom: 12px;
+      outline: none;
+    }
+
+    .form textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .form input::placeholder,
+    .form textarea::placeholder {
+      color: #cbd5e1;
+    }
+
+    .footer {
+      padding: 34px 70px;
+      background: #020617;
+      color: #94a3b8;
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 760px) {
+      .hero,
+      .contact-box {
+        grid-template-columns: 1fr;
+      }
+
+      .hero,
+      .features,
+      .gallery,
+      .pricing,
+      .contact,
+      .footer {
+        padding: 42px 24px;
+      }
+
+      .feature-grid,
+      .pricing-grid,
+      .gallery-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .gallery-img.big {
+        min-height: 320px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    ${bodyContent}
+  </main>
+</body>
+</html>`;
+    }
+
+    function escapeHtml(text) {
+      return text
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    document.querySelectorAll("[data-add]").forEach(btn => {
+      btn.addEventListener("click", () => addBlock(btn.dataset.add));
+    });
+
+    accentColor.addEventListener("input", applyTheme);
+    accentColor2.addEventListener("input", applyTheme);
+    radiusSelect.addEventListener("change", applyTheme);
+
+    blockBg.addEventListener("input", () => {
+      if (selectedSection) selectedSection.style.background = blockBg.value;
+    });
+
+    blockText.addEventListener("input", () => {
+      if (selectedSection) selectedSection.style.color = blockText.value;
+    });
+
+    document.getElementById("deleteBtn").addEventListener("click", () => {
+      if (!selectedSection) {
+        alert("Сначала выбери блок");
+        return;
+      }
+
+      selectedSection.remove();
+      selectedSection = null;
+      checkEmpty();
+    });
+
+    document.getElementById("duplicateBtn").addEventListener("click", () => {
+      if (!selectedSection) {
+        alert("Сначала выбери блок");
+        return;
+      }
+
+      const clone = selectedSection.cloneNode(true);
+      selectedSection.after(clone);
+      prepareSection(clone);
+      selectSection(clone);
+    });
+
+    document.getElementById("clearBtn").addEventListener("click", () => {
+      if (confirm("Очистить весь макет?")) {
+        canvas.innerHTML = "";
+        selectedSection = null;
+        checkEmpty();
+      }
+    });
+
+    document.getElementById("saveBtn").addEventListener("click", saveProject);
+    document.getElementById("loadBtn").addEventListener("click", loadProject);
+
+    document.getElementById("templateStartup").addEventListener("click", () => buildTemplate("startup"));
+    document.getElementById("templateAgency").addEventListener("click", () => buildTemplate("agency"));
+
+    document.getElementById("exportBtn").addEventListener("click", () => {
+      exportCode.value = generateExportHtml();
+      exportModal.classList.add("open");
+    });
+
+    document.getElementById("closeModal").addEventListener("click", () => {
+      exportModal.classList.remove("open");
+    });
+
+    document.getElementById("copyCode").addEventListener("click", async () => {
+      await navigator.clipboard.writeText(exportCode.value);
+      alert("Код скопирован");
+    });
+
+    exportModal.addEventListener("click", e => {
+      if (e.target === exportModal) {
+        exportModal.classList.remove("open");
+      }
+    });
+
+    checkEmpty();
+    applyTheme();
+  </script>
+</body>
+</html>
