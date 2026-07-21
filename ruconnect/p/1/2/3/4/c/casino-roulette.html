@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Казино Рулетка</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top, #184d2b, #07160d 65%),
+        #07160d;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .casino {
+      width: 100%;
+      max-width: 1100px;
+      background: rgba(0, 0, 0, 0.45);
+      border: 2px solid #d4af37;
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 0 35px rgba(212, 175, 55, 0.35);
+    }
+
+    h1 {
+      text-align: center;
+      color: #ffd86b;
+      margin-bottom: 20px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .top-panel {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 216, 107, 0.45);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .card-title {
+      color: #cfcfcf;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .card-value {
+      font-size: 26px;
+      font-weight: bold;
+      color: #ffd86b;
+    }
+
+    .game-area {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 25px;
+      align-items: start;
+    }
+
+    .roulette-wrapper {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 390px;
+    }
+
+    .pointer {
+      position: absolute;
+      top: 4px;
+      width: 0;
+      height: 0;
+      border-left: 18px solid transparent;
+      border-right: 18px solid transparent;
+      border-top: 34px solid #ffd86b;
+      z-index: 5;
+      filter: drop-shadow(0 0 6px #000);
+    }
+
+    .roulette {
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      border: 10px solid #d4af37;
+      position: relative;
+      overflow: hidden;
+      background: conic-gradient(
+        #0aa33c 0deg 9.73deg,
+        #c91f1f 9.73deg 19.46deg,
+        #111 19.46deg 29.19deg,
+        #c91f1f 29.19deg 38.92deg,
+        #111 38.92deg 48.65deg,
+        #c91f1f 48.65deg 58.38deg,
+        #111 58.38deg 68.11deg,
+        #c91f1f 68.11deg 77.84deg,
+        #111 77.84deg 87.57deg,
+        #c91f1f 87.57deg 97.3deg,
+        #111 97.3deg 107.03deg,
+        #c91f1f 107.03deg 116.76deg,
+        #111 116.76deg 126.49deg,
+        #c91f1f 126.49deg 136.22deg,
+        #111 136.22deg 145.95deg,
+        #c91f1f 145.95deg 155.68deg,
+        #111 155.68deg 165.41deg,
+        #c91f1f 165.41deg 175.14deg,
+        #111 175.14deg 184.87deg,
+        #c91f1f 184.87deg 194.6deg,
+        #111 194.6deg 204.33deg,
+        #c91f1f 204.33deg 214.06deg,
+        #111 214.06deg 223.79deg,
+        #c91f1f 223.79deg 233.52deg,
+        #111 233.52deg 243.25deg,
+        #c91f1f 243.25deg 252.98deg,
+        #111 252.98deg 262.71deg,
+        #c91f1f 262.71deg 272.44deg,
+        #111 272.44deg 282.17deg,
+        #c91f1f 282.17deg 291.9deg,
+        #111 291.9deg 301.63deg,
+        #c91f1f 301.63deg 311.36deg,
+        #111 311.36deg 321.09deg,
+        #c91f1f 321.09deg 330.82deg,
+        #111 330.82deg 340.55deg,
+        #c91f1f 340.55deg 350.28deg,
+        #111 350.28deg 360deg
+      );
+      box-shadow:
+        inset 0 0 25px rgba(0, 0, 0, 0.9),
+        0 0 20px rgba(0, 0, 0, 0.9);
+      transition: transform 4s cubic-bezier(0.12, 0.75, 0.2, 1);
+    }
+
+    .roulette::before {
+      content: "";
+      position: absolute;
+      inset: 65px;
+      background: radial-gradient(circle, #442200, #120900);
+      border-radius: 50%;
+      border: 6px solid #d4af37;
+      z-index: 2;
+    }
+
+    .roulette::after {
+      content: "FLP";
+      position: absolute;
+      inset: 118px;
+      background: #d4af37;
+      color: #2b1600;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      font-size: 28px;
+      z-index: 3;
+      box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.4);
+    }
+
+    .number-ring {
+      position: absolute;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      pointer-events: none;
+      transition: transform 4s cubic-bezier(0.12, 0.75, 0.2, 1);
+    }
+
+    .wheel-number {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      font-size: 10px;
+      font-weight: bold;
+      color: #fff;
+      transform-origin: 0 0;
+      text-shadow: 0 1px 3px #000;
+    }
+
+    .controls {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      padding: 20px;
+      border: 1px solid rgba(255, 216, 107, 0.35);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      color: #ffd86b;
+      font-weight: bold;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #d4af37;
+      outline: none;
+      background: #111;
+      color: #fff;
+      font-size: 16px;
+    }
+
+    input:focus,
+    select:focus {
+      box-shadow: 0 0 8px rgba(255, 216, 107, 0.6);
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    button {
+      padding: 13px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 15px;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.1);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .spin-btn {
+      background: linear-gradient(135deg, #ffd86b, #b88400);
+      color: #271500;
+      grid-column: span 2;
+      font-size: 18px;
+    }
+
+    .save-btn {
+      background: #168f3b;
+      color: #fff;
+    }
+
+    .reset-btn {
+      background: #a51f1f;
+      color: #fff;
+    }
+
+    .quick-bets {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .quick-bets button {
+      background: #222;
+      color: #ffd86b;
+      border: 1px solid #d4af37;
+      padding: 9px;
+      font-size: 13px;
+    }
+
+    .message {
+      margin-top: 18px;
+      min-height: 48px;
+      padding: 14px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      line-height: 1.4;
+      color: #fff;
+    }
+
+    .history {
+      margin-top: 20px;
+    }
+
+    .history h3 {
+      color: #ffd86b;
+      margin-bottom: 10px;
+    }
+
+    .history-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .history-item {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      font-size: 13px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .red {
+      background: #c91f1f;
+    }
+
+    .black {
+      background: #111;
+    }
+
+    .green {
+      background: #0aa33c;
+    }
+
+    .rules {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #d7d7d7;
+      line-height: 1.5;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 14px;
+      border-radius: 12px;
+    }
+
+    @media (max-width: 850px) {
+      .game-area {
+        grid-template-columns: 1fr;
+      }
+
+      .top-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .roulette-wrapper {
+        min-height: 350px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .casino {
+        padding: 15px;
+      }
+
+      .roulette,
+      .number-ring {
+        width: 280px;
+        height: 280px;
+      }
+
+      .roulette::before {
+        inset: 55px;
+      }
+
+      .roulette::after {
+        inset: 105px;
+        font-size: 23px;
+      }
+
+      .quick-bets {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="casino">
+    <h1>Казино Рулетка</h1>
+
+    <div class="top-panel">
+      <div class="card">
+        <div class="card-title">Баланс FLP</div>
+        <div class="card-value" id="flpBalance">25.00</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Фишки казино</div>
+        <div class="card-value" id="chipBalance">2500</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Курс</div>
+        <div class="card-value">1 FLP = 100</div>
+      </div>
+    </div>
+
+    <div class="game-area">
+      <div>
+        <div class="roulette-wrapper">
+          <div class="pointer"></div>
+          <div class="roulette" id="roulette"></div>
+          <div class="number-ring" id="numberRing"></div>
+        </div>
+
+        <div class="history">
+          <h3>История выпадений</h3>
+          <div class="history-list" id="historyList"></div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="form-group">
+          <label for="betAmount">Ставка в фишках</label>
+          <input type="number" id="betAmount" min="1" step="1" value="100" />
+          <div class="quick-bets">
+            <button type="button" onclick="setBet(50)">50</button>
+            <button type="button" onclick="setBet(100)">100</button>
+            <button type="button" onclick="setBet(250)">250</button>
+            <button type="button" onclick="setBet(500)">500</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="betType">Тип ставки</label>
+          <select id="betType" onchange="toggleNumberInput()">
+            <option value="red">Красное x2</option>
+            <option value="black">Чёрное x2</option>
+            <option value="green">Зелёное 0 x14</option>
+            <option value="even">Чётное x2</option>
+            <option value="odd">Нечётное x2</option>
+            <option value="number">Конкретное число x36</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="numberGroup" style="display: none;">
+          <label for="chosenNumber">Выберите число от 0 до 36</label>
+          <input type="number" id="chosenNumber" min="0" max="36" value="7" />
+        </div>
+
+        <div class="buttons">
+          <button class="spin-btn" id="spinButton" onclick="spinRoulette()">Крутить рулетку</button>
+          <button class="save-btn" onclick="saveProgress()">Сохранить</button>
+          <button class="reset-btn" onclick="resetProgress()">Сбросить</button>
+        </div>
+
+        <div class="message" id="message">
+          Добро пожаловать! Вам начислено 25 FLP, что равно 2500 фишкам казино.
+        </div>
+
+        <div class="rules">
+          Сохранение работает через localStorage браузера. Если открыть этот файл в том же браузере, баланс и история загрузятся автоматически.
+          Ставки на красное, чёрное, чётное и нечётное дают x2. Ставка на 0 даёт x14. Ставка на конкретное число даёт x36.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STARTING_CHIPS = 2500;
+    const CHIPS_PER_FLP = 100;
+    const STORAGE_KEY = "flpRouletteSave";
+
+    let chips = STARTING_CHIPS;
+    let currentRotation = 0;
+    let spinning = false;
+    let history = [];
+
+    const rouletteNumbers = [
+      0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27,
+      13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1,
+      20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26
+    ];
+
+    const redNumbers = new Set([
+      1, 3, 5, 7, 9, 12, 14, 16, 18,
+      19, 21, 23, 25, 27, 30, 32, 34, 36
+    ]);
+
+    const roulette = document.getElementById("roulette");
+    const numberRing = document.getElementById("numberRing");
+    const flpBalance = document.getElementById("flpBalance");
+    const chipBalance = document.getElementById("chipBalance");
+    const message = document.getElementById("message");
+    const historyList = document.getElementById("historyList");
+    const spinButton = document.getElementById("spinButton");
+
+    function createNumberRing() {
+      numberRing.innerHTML = "";
+
+      const radius = 137;
+      const step = 360 / rouletteNumbers.length;
+
+      rouletteNumbers.forEach((num, index) => {
+        const angle = index * step + step / 2;
+        const numberElement = document.createElement("div");
+
+        numberElement.className = "wheel-number";
+        numberElement.textContent = num;
+
+        numberElement.style.transform =
+          `rotate(${angle}deg) translate(${radius}px) rotate(90deg)`;
+
+        numberRing.appendChild(numberElement);
+      });
+    }
+
+    function getNumberColor(number) {
+      if (number === 0) return "green";
+      if (redNumbers.has(number)) return "red";
+      return "black";
+    }
+
+    function updateBalances() {
+      chipBalance.textContent = chips;
+      flpBalance.textContent = (chips / CHIPS_PER_FLP).toFixed(2);
+    }
+
+    function updateHistory() {
+      historyList.innerHTML = "";
+
+      history.slice(0, 12).forEach(item => {
+        const div = document.createElement("div");
+        div.className = `history-item ${getNumberColor(item)}`;
+        div.textContent = item;
+        historyList.appendChild(div);
+      });
+    }
+
+    function toggleNumberInput() {
+      const betType = document.getElementById("betType").value;
+      const numberGroup = document.getElementById("numberGroup");
+      numberGroup.style.display = betType === "number" ? "block" : "none";
+    }
+
+    function setBet(amount) {
+      document.getElementById("betAmount").value = amount;
+    }
+
+    function validateBet() {
+      const betAmount = Number(document.getElementById("betAmount").value);
+      const betType = document.getElementById("betType").value;
+      const chosenNumber = Number(document.getElementById("chosenNumber").value);
+
+      if (!Number.isInteger(betAmount) || betAmount <= 0) {
+        message.textContent = "Введите корректную ставку целым числом.";
+        return null;
+      }
+
+      if (betAmount > chips) {
+        message.textContent = "Недостаточно фишек для такой ставки.";
+        return null;
+      }
+
+      if (betType === "number") {
+        if (!Number.isInteger(chosenNumber) || chosenNumber < 0 || chosenNumber > 36) {
+          message.textContent = "Выберите корректное число от 0 до 36.";
+          return null;
+        }
+      }
+
+      return {
+        betAmount,
+        betType,
+        chosenNumber
+      };
+    }
+
+    function checkWin(resultNumber, betType, chosenNumber) {
+      const color = getNumberColor(resultNumber);
+
+      if (betType === "red") {
+        return color === "red" ? 2 : 0;
+      }
+
+      if (betType === "black") {
+        return color === "black" ? 2 : 0;
+      }
+
+      if (betType === "green") {
+        return resultNumber === 0 ? 14 : 0;
+      }
+
+      if (betType === "even") {
+        return resultNumber !== 0 && resultNumber % 2 === 0 ? 2 : 0;
+      }
+
+      if (betType === "odd") {
+        return resultNumber !== 0 && resultNumber % 2 !== 0 ? 2 : 0;
+      }
+
+      if (betType === "number") {
+        return resultNumber === chosenNumber ? 36 : 0;
+      }
+
+      return 0;
+    }
+
+    function getBetName(betType, chosenNumber) {
+      if (betType === "red") return "красное";
+      if (betType === "black") return "чёрное";
+      if (betType === "green") return "зелёное 0";
+      if (betType === "even") return "чётное";
+      if (betType === "odd") return "нечётное";
+      if (betType === "number") return "число " + chosenNumber;
+      return "неизвестно";
+    }
+
+    function spinRoulette() {
+      if (spinning) return;
+
+      const bet = validateBet();
+      if (!bet) return;
+
+      spinning = true;
+      spinButton.disabled = true;
+
+      chips -= bet.betAmount;
+      updateBalances();
+
+      const resultIndex = Math.floor(Math.random() * rouletteNumbers.length);
+      const resultNumber = rouletteNumbers[resultIndex];
+      const resultColor = getNumberColor(resultNumber);
+
+      const segmentAngle = 360 / rouletteNumbers.length;
+      const targetAngle = resultIndex * segmentAngle + segmentAngle / 2;
+
+      const extraSpins = 360 * (5 + Math.floor(Math.random() * 4));
+      const finalRotation = currentRotation + extraSpins + (360 - targetAngle);
+
+      currentRotation = finalRotation;
+
+      roulette.style.transform = `rotate(${finalRotation}deg)`;
+      numberRing.style.transform = `rotate(${finalRotation}deg)`;
+
+      message.textContent = "Рулетка крутится...";
+
+      setTimeout(() => {
+        const multiplier = checkWin(resultNumber, bet.betType, bet.chosenNumber);
+        const winAmount = bet.betAmount * multiplier;
+
+        if (multiplier > 0) {
+          chips += winAmount;
+          message.textContent =
+            `Выпало ${resultNumber} (${translateColor(resultColor)}). ` +
+            `Ваша ставка на ${getBetName(bet.betType, bet.chosenNumber)} выиграла! ` +
+            `Вы получили ${winAmount} фишек.`;
+        } else {
+          message.textContent =
+            `Выпало ${resultNumber} (${translateColor(resultColor)}). ` +
+            `Ставка на ${getBetName(bet.betType, bet.chosenNumber)} проиграла.`;
+        }
+
+        history.unshift(resultNumber);
+        if (history.length > 30) history.pop();
+
+        updateBalances();
+        updateHistory();
+        saveProgress(false);
+
+        spinning = false;
+        spinButton.disabled = false;
+
+        if (chips <= 0) {
+          message.textContent += " Баланс пуст. Можно сбросить прогресс и начать заново.";
+        }
+      }, 4200);
+    }
+
+    function translateColor(color) {
+      if (color === "red") return "красное";
+      if (color === "black") return "чёрное";
+      if (color === "green") return "зелёное";
+      return color;
+    }
+
+    function saveProgress(showMessage = true) {
+      const saveData = {
+        chips,
+        history,
+        currentRotation
+      };
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(saveData));
+
+      if (showMessage) {
+        message.textContent = "Прогресс сохранён.";
+      }
+    }
+
+    function loadProgress() {
+      const rawData = localStorage.getItem(STORAGE_KEY);
+
+      if (!rawData) {
+        chips = STARTING_CHIPS;
+        history = [];
+        currentRotation = 0;
+        updateBalances();
+        updateHistory();
+        return;
+      }
+
+      try {
+        const saveData = JSON.parse(rawData);
+
+        chips = Number.isInteger(saveData.chips) ? saveData.chips : STARTING_CHIPS;
+        history = Array.isArray(saveData.history) ? saveData.history : [];
+        currentRotation = typeof saveData.currentRotation === "number" ? saveData.currentRotation : 0;
+
+        roulette.style.transform = `rotate(${currentRotation}deg)`;
+        numberRing.style.transform = `rotate(${currentRotation}deg)`;
+
+        updateBalances();
+        updateHistory();
+
+        message.textContent =
+          "Сохранённый прогресс загружен. Ваш баланс: " +
+          chips + " фишек, или " + (chips / CHIPS_PER_FLP).toFixed(2) + " FLP.";
+      } catch (error) {
+        chips = STARTING_CHIPS;
+        history = [];
+        currentRotation = 0;
+        updateBalances();
+        updateHistory();
+        message.textContent = "Сохранение повреждено. Начата новая игра.";
+      }
+    }
+
+    function resetProgress() {
+      const confirmReset = confirm("Вы точно хотите сбросить прогресс и начать с 25 FLP?");
+
+      if (!confirmReset) return;
+
+      chips = STARTING_CHIPS;
+      history = [];
+      currentRotation = 0;
+
+      localStorage.removeItem(STORAGE_KEY);
+
+      roulette.style.transition = "none";
+      numberRing.style.transition = "none";
+
+      roulette.style.transform = "rotate(0deg)";
+      numberRing.style.transform = "rotate(0deg)";
+
+      setTimeout(() => {
+        roulette.style.transition = "transform 4s cubic-bezier(0.12, 0.75, 0.2, 1)";
+        numberRing.style.transition = "transform 4s cubic-bezier(0.12, 0.75, 0.2, 1)";
+      }, 50);
+
+      updateBalances();
+      updateHistory();
+
+      message.textContent = "Прогресс сброшен. Вам снова начислено 25 FLP, то есть 2500 фишек.";
+    }
+
+    createNumberRing();
+    loadProgress();
+  </script>
+</body>
+</html>
