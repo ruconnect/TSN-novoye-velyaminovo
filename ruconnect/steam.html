@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Конструктор страницы игры Steam</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #1b2838;
+      color: #c7d5e0;
+    }
+
+    header {
+      background: #171a21;
+      padding: 20px 40px;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 25px;
+      padding: 25px;
+    }
+
+    .editor {
+      background: #16202d;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #2a475e;
+    }
+
+    .editor h2 {
+      margin-top: 0;
+      color: #ffffff;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 6px;
+      color: #acdbf5;
+      font-size: 14px;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 10px;
+      background: #0e141b;
+      color: #ffffff;
+      border: 1px solid #2a475e;
+      border-radius: 4px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    input[type="file"] {
+      padding: 8px;
+    }
+
+    .preview {
+      background: linear-gradient(#1b2838, #0b1118);
+      padding: 25px;
+      border-radius: 8px;
+      border: 1px solid #2a475e;
+    }
+
+    .steam-page {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .game-title {
+      color: #ffffff;
+      font-size: 34px;
+      margin-bottom: 20px;
+      font-weight: normal;
+    }
+
+    .game-layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 18px;
+    }
+
+    .main-image {
+      width: 100%;
+      height: 390px;
+      background: #000;
+      border-radius: 4px;
+      object-fit: cover;
+      border: 1px solid #000;
+    }
+
+    .placeholder {
+      width: 100%;
+      height: 390px;
+      background: #111923;
+      border: 1px dashed #66c0f4;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #66c0f4;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .side-card {
+      background: rgba(0, 0, 0, 0.25);
+      padding: 15px;
+      border-radius: 4px;
+    }
+
+    .short-description {
+      color: #c7d5e0;
+      line-height: 1.5;
+      font-size: 15px;
+      margin-bottom: 20px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding: 8px 0;
+      font-size: 13px;
+    }
+
+    .info-label {
+      color: #556772;
+      text-transform: uppercase;
+    }
+
+    .info-value {
+      color: #66c0f4;
+      text-align: right;
+    }
+
+    .tags {
+      margin-top: 15px;
+    }
+
+    .tag {
+      display: inline-block;
+      background: rgba(103, 193, 245, 0.2);
+      color: #66c0f4;
+      padding: 5px 8px;
+      margin: 4px 4px 0 0;
+      border-radius: 2px;
+      font-size: 12px;
+    }
+
+    .buy-box {
+      margin-top: 25px;
+      background: #00000055;
+      padding: 16px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .buy-title {
+      color: #ffffff;
+      font-size: 18px;
+    }
+
+    .price-area {
+      display: flex;
+      align-items: center;
+      background: #000;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .price {
+      padding: 10px 14px;
+      color: #c7d5e0;
+      background: #0b1118;
+    }
+
+    .buy-button {
+      padding: 10px 18px;
+      background: linear-gradient(#8bc53f, #5c7e10);
+      color: #ffffff;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    .buy-button:hover {
+      background: linear-gradient(#a4d750, #6c9418);
+    }
+
+    .about {
+      margin-top: 25px;
+      background: rgba(0,0,0,0.2);
+      padding: 18px;
+      border-radius: 4px;
+    }
+
+    .about h3 {
+      margin-top: 0;
+      color: #ffffff;
+      font-weight: normal;
+      border-bottom: 1px solid #2a475e;
+      padding-bottom: 10px;
+    }
+
+    .about p {
+      line-height: 1.6;
+      color: #c7d5e0;
+    }
+
+    .buttons {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .control-button {
+      border: none;
+      background: #66c0f4;
+      color: #10202f;
+      padding: 10px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .control-button.secondary {
+      background: #2a475e;
+      color: #c7d5e0;
+    }
+
+    @media (max-width: 900px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+
+      .game-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .main-image,
+      .placeholder {
+        height: 260px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  Конструктор страницы игры Steam
+</header>
+
+<div class="container">
+
+  <section class="editor">
+    <h2>Настройки страницы</h2>
+
+    <label>Название игры</label>
+    <input type="text" id="gameName" value="My Awesome Game">
+
+    <label>Краткое описание</label>
+    <textarea id="shortDescription">Захватывающая игра с красивым миром, интересным сюжетом и динамичным геймплеем.</textarea>
+
+    <label>Полное описание</label>
+    <textarea id="fullDescription">Окунитесь в уникальное приключение, исследуйте огромный мир, выполняйте задания, улучшайте персонажа и открывайте новые возможности.</textarea>
+
+    <label>Фото игры</label>
+    <input type="file" id="gameImage" accept="image/*">
+
+    <label>Цена</label>
+    <input type="text" id="price" value="599 ₽">
+
+    <label>Разработчик</label>
+    <input type="text" id="developer" value="Game Studio">
+
+    <label>Издатель</label>
+    <input type="text" id="publisher" value="Game Publisher">
+
+    <label>Дата выхода</label>
+    <input type="text" id="releaseDate" value="2025">
+
+    <label>Жанры через запятую</label>
+    <input type="text" id="genres" value="Экшен, Приключение, Инди">
+
+    <label>Оценка</label>
+    <select id="rating">
+      <option>Очень положительные</option>
+      <option>Положительные</option>
+      <option>Смешанные</option>
+      <option>Нет отзывов</option>
+    </select>
+
+    <div class="buttons">
+      <button class="control-button" onclick="updatePreview()">Обновить</button>
+      <button class="control-button secondary" onclick="resetForm()">Сбросить</button>
+    </div>
+  </section>
+
+  <section class="preview">
+    <div class="steam-page">
+      <h1 class="game-title" id="previewName">My Awesome Game</h1>
+
+      <div class="game-layout">
+        <div id="imageContainer">
+          <div class="placeholder">
+            Загрузите фото игры
+          </div>
+        </div>
+
+        <div class="side-card">
+          <p class="short-description" id="previewShortDescription">
+            Захватывающая игра с красивым миром, интересным сюжетом и динамичным геймплеем.
+          </p>
+
+          <div class="info-row">
+            <span class="info-label">Недавние обзоры</span>
+            <span class="info-value" id="previewRating">Очень положительные</span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Дата выхода</span>
+            <span class="info-value" id="previewReleaseDate">2025</span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Разработчик</span>
+            <span class="info-value" id="previewDeveloper">Game Studio</span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Издатель</span>
+            <span class="info-value" id="previewPublisher">Game Publisher</span>
+          </div>
+
+          <div class="tags" id="previewGenres">
+            <span class="tag">Экшен</span>
+            <span class="tag">Приключение</span>
+            <span class="tag">Инди</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="buy-box">
+        <div class="buy-title" id="buyTitle">Купить My Awesome Game</div>
+        <div class="price-area">
+          <div class="price" id="previewPrice">599 ₽</div>
+          <button class="buy-button">В корзину</button>
+        </div>
+      </div>
+
+      <div class="about">
+        <h3>Об этой игре</h3>
+        <p id="previewFullDescription">
+          Окунитесь в уникальное приключение, исследуйте огромный мир, выполняйте задания, улучшайте персонажа и открывайте новые возможности.
+        </p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  const gameImageInput = document.getElementById('gameImage');
+  let uploadedImage = '';
+
+  gameImageInput.addEventListener('change', function () {
+    const file = this.files[0];
+
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function (event) {
+      uploadedImage = event.target.result;
+      updatePreview();
+    };
+
+    reader.readAsDataURL(file);
+  });
+
+  function updatePreview() {
+    const gameName = document.getElementById('gameName').value || 'Без названия';
+    const shortDescription = document.getElementById('shortDescription').value || 'Описание отсутствует.';
+    const fullDescription = document.getElementById('fullDescription').value || 'Полное описание отсутствует.';
+    const price = document.getElementById('price').value || 'Бесплатно';
+    const developer = document.getElementById('developer').value || 'Не указан';
+    const publisher = document.getElementById('publisher').value || 'Не указан';
+    const releaseDate = document.getElementById('releaseDate').value || 'Не указана';
+    const genres = document.getElementById('genres').value || '';
+    const rating = document.getElementById('rating').value;
+
+    document.getElementById('previewName').textContent = gameName;
+    document.getElementById('previewShortDescription').textContent = shortDescription;
+    document.getElementById('previewFullDescription').textContent = fullDescription;
+    document.getElementById('previewPrice').textContent = price;
+    document.getElementById('previewDeveloper').textContent = developer;
+    document.getElementById('previewPublisher').textContent = publisher;
+    document.getElementById('previewReleaseDate').textContent = releaseDate;
+    document.getElementById('previewRating').textContent = rating;
+    document.getElementById('buyTitle').textContent = 'Купить ' + gameName;
+
+    const genresContainer = document.getElementById('previewGenres');
+    genresContainer.innerHTML = '';
+
+    genres.split(',').forEach(function (genre) {
+      const cleanGenre = genre.trim();
+
+      if (cleanGenre) {
+        const span = document.createElement('span');
+        span.className = 'tag';
+        span.textContent = cleanGenre;
+        genresContainer.appendChild(span);
+      }
+    });
+
+    const imageContainer = document.getElementById('imageContainer');
+
+    if (uploadedImage) {
+      imageContainer.innerHTML = '<img src="' + uploadedImage + '" class="main-image" alt="Фото игры">';
+    } else {
+      imageContainer.innerHTML = '<div class="placeholder">Загрузите фото игры</div>';
+    }
+  }
+
+  function resetForm() {
+    document.getElementById('gameName').value = 'My Awesome Game';
+    document.getElementById('shortDescription').value = 'Захватывающая игра с красивым миром, интересным сюжетом и динамичным геймплеем.';
+    document.getElementById('fullDescription').value = 'Окунитесь в уникальное приключение, исследуйте огромный мир, выполняйте задания, улучшайте персонажа и открывайте новые возможности.';
+    document.getElementById('price').value = '599 ₽';
+    document.getElementById('developer').value = 'Game Studio';
+    document.getElementById('publisher').value = 'Game Publisher';
+    document.getElementById('releaseDate').value = '2025';
+    document.getElementById('genres').value = 'Экшен, Приключение, Инди';
+    document.getElementById('rating').value = 'Очень положительные';
+    document.getElementById('gameImage').value = '';
+
+    uploadedImage = '';
+    updatePreview();
+  }
+
+  updatePreview();
+</script>
+
+</body>
+</html>
