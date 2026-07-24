@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Конструктор страницы дома</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f6f8;
+      color: #1f2933;
+    }
+
+    header {
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .topbar {
+      max-width: 1280px;
+      margin: 0 auto;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: 800;
+      color: #0468ff;
+      letter-spacing: -1px;
+    }
+
+    .topnav {
+      display: flex;
+      gap: 22px;
+      color: #4b5563;
+      font-size: 14px;
+    }
+
+    .topnav span {
+      cursor: default;
+    }
+
+    .main {
+      max-width: 1280px;
+      margin: 24px auto;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .panel {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 20px;
+      border-bottom: 1px solid #edf2f7;
+    }
+
+    .panel-header h2 {
+      font-size: 20px;
+      margin-bottom: 6px;
+    }
+
+    .panel-header p {
+      font-size: 13px;
+      color: #6b7280;
+      line-height: 1.4;
+    }
+
+    .form {
+      padding: 20px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    label {
+      font-size: 13px;
+      color: #374151;
+      font-weight: 700;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      padding: 12px 13px;
+      font-size: 14px;
+      background: #ffffff;
+      outline: none;
+      transition: 0.15s;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: #0468ff;
+      box-shadow: 0 0 0 3px rgba(4, 104, 255, 0.12);
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .upload-box {
+      border: 2px dashed #cbd5e1;
+      border-radius: 16px;
+      background: #f8fafc;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .upload-box:hover {
+      border-color: #0468ff;
+      background: #f0f6ff;
+    }
+
+    .upload-box strong {
+      display: block;
+      color: #0468ff;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .upload-box small {
+      color: #64748b;
+      font-size: 12px;
+    }
+
+    .thumbs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .thumb {
+      height: 58px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid #e5e7eb;
+      background: #eef2f7;
+      position: relative;
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 12px;
+      padding: 13px 16px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .btn-primary {
+      background: #0468ff;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #0054d6;
+    }
+
+    .btn-light {
+      background: #eef2f7;
+      color: #1f2937;
+    }
+
+    .btn-light:hover {
+      background: #e2e8f0;
+    }
+
+    .preview-wrap {
+      display: grid;
+      gap: 18px;
+    }
+
+    .breadcrumbs {
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 2px;
+    }
+
+    .listing {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+      padding: 24px;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 8px;
+      height: 390px;
+      margin-bottom: 24px;
+    }
+
+    .main-photo,
+    .side-photo {
+      background: linear-gradient(135deg, #dbeafe, #e5e7eb);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .main-photo {
+      border-radius: 18px 0 0 18px;
+    }
+
+    .side-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .side-photo:nth-child(2) {
+      border-radius: 0 18px 0 0;
+    }
+
+    .side-photo:nth-child(4) {
+      border-radius: 0 0 18px 0;
+    }
+
+    .main-photo img,
+    .side-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+/* працяг/окончание файла */
+
+    .photo-placeholder {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      color: #64748b;
+      font-size: 15px;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .photo-count {
+      position: absolute;
+      right: 14px;
+      bottom: 14px;
+      background: rgba(15, 23, 42, 0.78);
+      color: white;
+      padding: 9px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .title-row {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    h1 {
+      font-size: 30px;
+      line-height: 1.18;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+
+    .address {
+      font-size: 15px;
+      color: #4b5563;
+      margin-bottom: 18px;
+    }
+
+    .metro {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #f1f5f9;
+      color: #334155;
+      padding: 8px 11px;
+      border-radius: 999px;
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      background: #22c55e;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .price-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 18px;
+      padding: 18px;
+      background: #ffffff;
+      box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
+      position: sticky;
+      top: 88px;
+    }
+
+    .price {
+      font-size: 30px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
+    }
+
+    .price-meter {
+      color: #6b7280;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    .contact-name {
+      font-weight: 800;
+      margin-bottom: 4px;
+      font-size: 16px;
+    }
+
+    .agency {
+      color: #6b7280;
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+
+    .phone {
+      width: 100%;
+      background: #16a34a;
+      color: #ffffff;
+      border: none;
+      border-radius: 12px;
+      padding: 13px;
+      font-size: 15px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+
+    .message {
+      width: 100%;
+      background: #eef2ff;
+      color: #045cff;
+      border: none;
+      border-radius: 12px;
+      padding: 13px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 18px 0 24px;
+    }
+
+    .stat {
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 15px;
+      background: #fafafa;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .section {
+      border-top: 1px solid #e5e7eb;
+      padding-top: 22px;
+      margin-top: 22px;
+    }
+
+    .section h2 {
+      font-size: 22px;
+      margin-bottom: 14px;
+    }
+
+    .description {
+      color: #374151;
+      line-height: 1.62;
+      font-size: 15px;
+      white-space: pre-line;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px 28px;
+      margin-top: 10px;
+    }
+
+    .feature {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eef2f7;
+      font-size: 15px;
+    }
+
+    .feature span:first-child {
+      color: #6b7280;
+    }
+
+    .feature span:last-child {
+      color: #111827;
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .map {
+      height: 230px;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px),
+        linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px),
+        linear-gradient(135deg, #c7d2fe, #bae6fd, #dcfce7);
+      background-size: 40px 40px, 40px 40px, cover;
+      border-radius: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pin {
+      position: absolute;
+      left: 52%;
+      top: 46%;
+      transform: translate(-50%, -100%);
+      width: 34px;
+      height: 34px;
+      background: #ef4444;
+      border-radius: 50% 50% 50% 0;
+      rotate: -45deg;
+      box-shadow: 0 8px 18px rgba(239, 68, 68, 0.35);
+    }
+
+    .pin::after {
+      content: "";
+      position: absolute;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: white;
+      left: 10px;
+      top: 10px;
+    }
+
+    .similar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .similar-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .similar-img {
+      height: 120px;
+      background: linear-gradient(135deg, #e2e8f0, #bfdbfe);
+    }
+
+    .similar-body {
+      padding: 12px;
+    }
+
+    .similar-price {
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+
+    .similar-text {
+      font-size: 13px;
+      color: #6b7280;
+      line-height: 1.35;
+    }
+
+    .note {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      color: #9a3412;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 1050px) {
+      .main {
+        grid-template-columns: 1fr;
+      }
+
+      .panel {
+        position: static;
+      }
+
+      .title-row {
+        grid-template-columns: 1fr;
+      }
+
+      .price-card {
+        position: static;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .topbar {
+        padding: 0 14px;
+      }
+
+      .topnav {
+        display: none;
+      }
+
+      .main {
+        padding: 0 12px;
+        margin: 14px auto;
+      }
+
+      .listing {
+        padding: 14px;
+      }
+
+      .gallery {
+        height: auto;
+        grid-template-columns: 1fr;
+      }
+
+      .main-photo {
+        height: 280px;
+        border-radius: 16px;
+      }
+
+      .side-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .side-photo {
+        height: 80px;
+        border-radius: 12px !important;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .features {
+        grid-template-columns: 1fr;
+      }
+
+      .similar {
+        grid-template-columns: 1fr;
+      }
+
+      .row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="topbar">
+      <div class="logo">Cian</div>
+      <nav class="topnav">
+        <span>Купить</span>
+        <span>Снять</span>
+        <span>Новостройки</span>
+        <span>Дома</span>
+        <span>Ипотека</span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <aside class="panel">
+      <div class="panel-header">
+        <h2>Конструктор объявления</h2>
+        <p>Заполните поля, добавьте фотографии дома — справа сразу обновится страница объявления.</p>
+      </div>
+
+      <div class="form">
+        <div class="field">
+          <label>Фотографии дома</label>
+          <label class="upload-box">
+            <input id="imagesInput" type="file" accept="image/*" multiple hidden />
+            <strong>Загрузить изображения</strong>
+            <small>Можно выбрать несколько фото</small>
+          </label>
+          <div id="thumbs" class="thumbs"></div>
+        </div>
+
+        <div class="field">
+          <label>Заголовок</label>
+          <input id="titleInput" value="Дом 186 м² на участке 8 сот." />
+        </div>
+
+        <div class="field">
+          <label>Адрес</label>
+          <input id="addressInput" value="Московская область, Одинцовский городской округ, деревня Лесная" />
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label>Цена, ₽</label>
+            <input id="priceInput" type="number" value="24500000" />
+          </div>
+
+          <div class="field">
+            <label>Площадь дома, м²</label>
+            <input id="areaInput" type="number" value="186" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label>Участок, сот.</label>
+            <input id="landInput" type="number" value="8" />
+          </div>
+
+          <div class="field">
+            <label>Этажей</label>
+            <input id="floorsInput" type="number" value="2" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label>Спален</label>
+            <input id="bedroomsInput" type="number" value="4" />
+          </div>
+
+          <div class="field">
+            <label>Материал стен</label>
+            <select id="materialInput">
+              <option>Кирпич</option>
+              <option>Газобетон</option>
+              <option>Монолит</option>
+              <option>Брус</option>
+              <option>Каркасный</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label>Год постройки</label>
+            <input id="yearInput" type="number" value="2021" />
+          </div>
+
+          <div class="field">
+            <label>Санузлов</label>
+            <input id="bathInput" type="number" value="3" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Коммуникации</label>
+          <input id="commInput" value="Газ, электричество, вода, канализация" />
+        </div>
+
+        <div class="field">
+          <label>Описание</label>
+          <textarea id="descInput">Продаётся современный загородный дом для комфортного круглогодичного проживания. Просторная кухня-гостиная с панорамными окнами, несколько спален, кабинет, гардеробные и технические помещения.
+
+Участок ровный, ухоженный, есть парковка на несколько автомобилей. Тихое зелёное место, удобный подъезд, рядом магазины и вся необходимая инфраструктура.</textarea>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label>Имя продавца</label>
+            <input id="sellerInput" value="Александр" />
+          </div>
+
+          <div class="field">
+            <label>Телефон</label>
+            <input id="phoneInput" value="+7 999 123-45-67" />
+          </div>
+        </div>
+
+        <button class="btn btn-primary" id="randomBtn">Заполнить примером</button>
+        <button class="btn btn-light" id="clearImagesBtn">Очистить фото</button>
+
+        <div class="note">
+          Это демонстрационный конструктор интерфейса. Он не копирует реальные данные и не публикует объявление.
+        </div>
