@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Git Branch Viewer</title>
+
+  <style>
+    :root {
+      --bg: #f7efd9;
+      --line: #667984;
+      --text: #ffffff;
+      --panel: rgba(255, 255, 255, 0.55);
+      --shadow: rgba(75, 91, 102, 0.18);
+      --green: #279000;
+      --pink: #df3a85;
+      --orange: #e64600;
+      --purple: #6166c9;
+      --gold: #bd8500;
+      --blue: #2678b8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.35), transparent 35%),
+        var(--bg);
+      color: #2d3a40;
+      overflow-x: hidden;
+    }
+
+    .app {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 48px;
+    }
+
+    .hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 26px;
+    }
+
+    .title {
+      margin: 0;
+      font-size: clamp(30px, 5vw, 58px);
+      line-height: 1;
+      color: #43535b;
+      letter-spacing: -2px;
+    }
+
+    .subtitle {
+      margin: 12px 0 0;
+      font-size: 17px;
+      color: #647780;
+      max-width: 620px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 2px solid rgba(102, 121, 132, 0.25);
+      box-shadow: 0 18px 45px var(--shadow);
+      backdrop-filter: blur(8px);
+      border-radius: 24px;
+      padding: 18px;
+    }
+
+    .form {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    input {
+      width: 100%;
+      border: 3px solid #667984;
+      background: #fff9e8;
+      border-radius: 16px;
+      padding: 16px 18px;
+      font-size: 17px;
+      outline: none;
+      color: #35454c;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,0.8);
+    }
+
+    input:focus {
+      border-color: #3f5967;
+    }
+
+    button {
+      border: none;
+      border-radius: 16px;
+      padding: 0 24px;
+      min-height: 56px;
+      background: #667984;
+      color: white;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 6px 0 #4c5e67;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 0 #4c5e67;
+    }
+
+    button:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 #4c5e67;
+    }
+
+    .status {
+      min-height: 24px;
+      margin: 8px 4px 16px;
+      color: #526973;
+      font-weight: 700;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .graph-wrap {
+      min-height: 560px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 22px;
+      background:
+        linear-gradient(rgba(255,255,255,0.08), rgba(255,255,255,0.08)),
+        #f8efd9;
+      border: 2px solid rgba(102, 121, 132, 0.22);
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .side {
+      border-radius: 22px;
+      border: 2px solid rgba(102, 121, 132, 0.22);
+      background: rgba(255, 249, 232, 0.68);
+      padding: 18px;
+      overflow: hidden;
+    }
+
+    .side h2 {
+      margin: 0 0 14px;
+      font-size: 23px;
+      color: #43535b;
+    }
+
+    .branch-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 490px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .branch-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.52);
+      border: 1px solid rgba(102, 121, 132, 0.18);
+      color: #43535b;
+      font-weight: 700;
+      word-break: break-all;
+    }
+
+    .badge {
+      flex: 0 0 auto;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .empty {
+      color: #697d86;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 900px) {
+      .content {
+        grid-template-columns: 1fr;
+      }
+
+      .side {
+        order: -1;
+      }
+
+      .graph-wrap {
+        min-height: 460px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .form {
+        grid-template-columns: 1fr;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <section class="hero">
+      <div>
+        <h1 class="title">Git Branch Viewer</h1>
+        <p class="subtitle">
+          Вставьте ссылку на GitHub-репозиторий и получите визуальную схему веток.
+        </p>
+      </div>
+    </section>
+
+    <section class="card">
+      <form class="form" id="repoForm">
+        <input
+          id="repoInput"
+          type="url"
+          placeholder="Например: https://github.com/facebook/react"
+          value="https://github.com/facebook/react"
+          required
+        />
+        <button type="submit">Показать ветки</button>
+      </form>
+
+      <div class="status" id="status">Введите ссылку и нажмите кнопку.</div>
+
+      <div class="content">
+        <div class="graph-wrap">
+          <svg id="graph" viewBox="0 0 900 560" preserveAspectRatio="xMidYMid meet"></svg>
+        </div>
+
+        <aside class="side">
+          <h2>Ветки</h2>
+          <div class="branch-list" id="branchList">
+            <div class="empty">Пока данные не загружены.</div>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const form = document.getElementById("repoForm");
+    const input = document.getElementById("repoInput");
+    const statusEl = document.getElementById("status");
+    const graph = document.getElementById("graph");
+    const branchList = document.getElementById("branchList");
+
+    const colors = [
+      "#279000",
+      "#df3a85",
+      "#e64600",
+      "#6166c9",
+      "#bd8500",
+      "#2678b8",
+      "#8b4bc1",
+      "#0f9d8a"
+    ];
+
+    function parseGitHubUrl(url) {
+      try {
+        const parsed = new URL(url.trim());
+        const parts = parsed.pathname.replace(/^\/|\/$/g, "").split("/");
+
+        if (!parsed.hostname.includes("github.com") || parts.length < 2) {
+          return null;
+        }
+
+        return {
+          owner: parts[0],
+          repo: parts[1].replace(".git", "")
+        };
+      } catch {
+        return null;
+      }
+    }
+
+    async function loadBranches(owner, repo) {
+      const url = `https://api.github.com/repos/${owner}/${repo}/branches?per_page=100`;
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error("Репозиторий не найден или он приватный.");
+        }
+
+        if (response.status === 403) {
+          throw new Error("GitHub ограничил количество запросов. Попробуйте позже.");
+        }
+
+        throw new Error("Не удалось получить данные репозитория.");
+      }
+
+      return response.json();
+    }
+
+    function createSvgElement(tag, attrs = {}) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+
+      for (const key in attrs) {
+        el.setAttribute(key, attrs[key]);
+      }
+
+      return el;
+    }
+
+    function drawLine(x1, y1, x2, y2) {
+      const line = createSvgElement("line", {
+        x1, y1, x2, y2,
+        stroke: "#667984",
+        "stroke-width": "6",
+        "stroke-linecap": "round"
+      });
+
+      graph.appendChild(line);
+    }
+
+    function drawCommit(x, y) {
+      const circle = createSvgElement("circle", {
+        cx: x,
+        cy: y,
+        r: 36,
+        fill: "#fff9e8",
+        stroke: "#667984",
+        "stroke-width": "4"
+      });
+
+      graph.appendChild(circle);
+    }
+
+    function drawLabel(text, x, y, color) {
+      const group = createSvgElement("g");
+
+      const approxWidth = Math.max(96, Math.min(220, text.length * 12 + 34));
+      const rect = createSvgElement("rect", {
+        x: x - approxWidth / 2,
+        y: y - 28,
+        width: approxWidth,
+        height: 42,
+        rx: 5,
+        fill: color
+      });
+
+      const pointer = createSvgElement("polygon", {
+        points: `${x - 10},${y + 14} ${x + 10},${y + 14} ${x},${y + 27}`,
+        fill: color
+      });
+
+      const label = createSvgElement("text", {
+        x,
+        y: y + 3,
+        fill: "#ffffff",
+        "font-size": "26",
+        "font-family": "Arial, Helvetica, sans-serif",
+        "font-weight": "700",
+        "text-anchor": "middle",
+        "dominant-baseline": "middle"
+      });
+
+      label.textContent = text;
+
+      group.appendChild(rect);
+      group.appendChild(pointer);
+      group.appendChild(label);
+      graph.appendChild(group);
+    }
+
+    function drawGraph(branches) {
+      graph.innerHTML = "";
+
+      const defs = createSvgElement("defs");
+      const filter = createSvgElement("filter", {
+        id: "softShadow",
+        x: "-20%",
+        y: "-20%",
+        width: "140%",
+        height: "140%"
+      });
+
+      const shadow = createSvgElement("feDropShadow", {
+        dx: "0",
+        dy: "4",
+        stdDeviation: "3",
+        "flood-color": "#4b5b66",
+        "flood-opacity": "0.18"
+      });
+
+      filter.appendChild(shadow);
+      defs.appendChild(filter);
+      graph.appendChild(defs);
+
+      const mainY = 290;
+      const mainPoints = [
+        [65, mainY],
+        [185, mainY],
+        [305, mainY],
+        [425, mainY],
+        [545, mainY],
+        [665, mainY],
+        [785, mainY]
+      ];
+
+      for (let i = 0; i < mainPoints.length - 1; i++) {
+        drawLine(mainPoints[i][0], mainPoints[i][1], mainPoints[i + 1][0], mainPoints[i + 1][1]);
+      }
+
+      mainPoints.forEach(([x, y]) => drawCommit(x, y));
+
+      const shown = branches.slice(0, 8);
+      const masterLike =
+        shown.find(b => ["main", "master"].includes(b.name.toLowerCase())) || shown[0];
+
+      if (masterLike) {
+        drawLabel(masterLike.name, 785, 220, colors[0]);
+      }
+
+      const featureBranches = shown.filter(b => b !== masterLike);
+
+      const lanes = [
+        {
+          start: [305, mainY],
+          points: [[430, 170], [560, 170], [690, 170]],
+          label: [690, 100]
+        },
+        {
+          start: [560, 170],
+          points: [[690, 80], [815, 80]],
+          label: [815, 20]
+        },
+        {
+          start: [305, mainY],
+          points: [[430, 410], [560, 410]],
+          label: [545, 475]
+        },
+        {
+          start: [430, 410],
+          points: [[560, 505], [690, 505]],
+          label: [690, 555]
+        },
+        {
+          start: [425, mainY],
+          points: [[545, 250], [665, 250]],
+          label: [665, 190]
+        },
+        {
+          start: [545, mainY],
+          points: [[660, 360], [780, 360]],
+          label: [780, 420]
+        },
+        {
+          start: [665, mainY],
+          points: [[760, 180], [835, 180]],
+          label: [835, 125]
+        }
+      ];
+
+      featureBranches.forEach((branch, index) => {
+        const lane = lanes[index % lanes.length];
+        const points = [lane.start, ...lane.points];
+
+        for (let i = 0; i < points.length - 1; i++) {
+          drawLine(points[i][0], points[i][1], points[i + 1][0], points[i + 1][1]);
+        }
+
+        lane.points.forEach(([x, y]) => drawCommit(x, y));
+
+        drawLabel(
+          branch.name,
+          lane.label[0],
+          lane.label[1],
+          colors[(index + 1) % colors.length]
+        );
+      });
+
+      if (branches.length > shown.length) {
+        drawLabel(`+${branches.length - shown.length} ещё`, 160, 90, "#667984");
+      }
+    }
+
+    function renderBranchList(branches) {
+      branchList.innerHTML = "";
+
+      if (!branches.length) {
+        branchList.innerHTML = `<div class="empty">Ветки не найдены.</div>`;
+        return;
+      }
+
+      branches.forEach((branch, index) => {
+        const item = document.createElement("div");
+        item.className = "branch-item";
+
+        const name = document.createElement("span");
+        name.textContent = branch.name;
+
+        const badge = document.createElement("span");
+        badge.className = "badge";
+        badge.style.background = colors[index % colors.length];
+
+        item.appendChild(name);
+        item.appendChild(badge);
+        branchList.appendChild(item);
+      });
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const repoInfo = parseGitHubUrl(input.value);
+
+      if (!repoInfo) {
+        statusEl.textContent = "Введите корректную ссылку на GitHub-репозиторий.";
+        return;
+      }
+
+      statusEl.textContent = "Загружаю информацию о ветках...";
+      branchList.innerHTML = `<div class="empty">Загрузка...</div>`;
+      graph.innerHTML = "";
+
+      try {
+        const branches = await loadBranches(repoInfo.owner, repoInfo.repo);
+
+        statusEl.textContent =
+          `Найдено веток: ${branches.length}. Репозиторий: ${repoInfo.owner}/${repoInfo.repo}`;
+
+        renderBranchList(branches);
+        drawGraph(branches);
+      } catch (error) {
+        statusEl.textContent = error.message;
+        branchList.innerHTML = `<div class="empty">Не удалось загрузить данные.</div>`;
+      }
+    });
+
+    drawGraph([
+      { name: "master" },
+      { name: "feature-1" },
+      { name: "feature-2" },
+      { name: "feature-3" },
+      { name: "feature-4" }
+    ]);
+
+    renderBranchList([
+      { name: "master" },
+      { name: "feature-1" },
+      { name: "feature-2" },
+      { name: "feature-3" },
+      { name: "feature-4" }
+    ]);
+  </script>
+</body>
+</html>
