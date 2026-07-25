@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Прокачай колодец</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(#8fd3ff, #dff6ff);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #222;
+    }
+
+    .game {
+      width: 100%;
+      max-width: 1100px;
+      background: #ffffffdd;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 20px;
+    }
+
+    h1 {
+      margin-top: 0;
+      text-align: center;
+    }
+
+    .left {
+      background: #b7ec9c;
+      border-radius: 16px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      min-height: 650px;
+    }
+
+    .sky {
+      height: 130px;
+      position: relative;
+    }
+
+    .sun {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: #ffd84a;
+      position: absolute;
+      right: 40px;
+      top: 10px;
+      box-shadow: 0 0 30px #ffd84a;
+    }
+
+    .ground {
+      height: 70px;
+      background: #66bb44;
+      border-radius: 20px 20px 0 0;
+      position: relative;
+      z-index: 2;
+    }
+
+    .well-area {
+      display: flex;
+      justify-content: center;
+      position: relative;
+      z-index: 3;
+      margin-top: -60px;
+    }
+
+    .well {
+      width: 190px;
+      text-align: center;
+      position: relative;
+    }
+
+    .roof {
+      margin: 0 auto;
+      width: 190px;
+      height: 80px;
+      background: #9b4a22;
+      clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+      display: none;
+    }
+
+    .roof.level-1 {
+      display: block;
+    }
+
+    .roof.level-2 {
+      background: #b85c2a;
+      filter: drop-shadow(0 4px 2px rgba(0,0,0,0.25));
+    }
+
+    .roof.level-3 {
+      background: linear-gradient(45deg, #7a3012, #d16a32);
+      filter: drop-shadow(0 6px 3px rgba(0,0,0,0.35));
+    }
+
+    .posts {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 25px;
+      height: 100px;
+      display: none;
+    }
+
+    .posts.active {
+      display: flex;
+    }
+
+    .post {
+      width: 18px;
+      background: #6b3e1e;
+      border-radius: 4px;
+    }
+
+    .crank {
+      width: 80px;
+      height: 12px;
+      background: #444;
+      margin: -60px auto 45px;
+      position: relative;
+      border-radius: 10px;
+      display: none;
+    }
+
+    .crank.active {
+      display: block;
+    }
+
+    .crank::after {
+      content: "";
+      width: 25px;
+      height: 25px;
+      border: 5px solid #444;
+      border-radius: 50%;
+      position: absolute;
+      right: -20px;
+      top: -7px;
+      background: transparent;
+    }
+
+    .pump {
+      width: 60px;
+      height: 90px;
+      background: #3f83cc;
+      border-radius: 10px 10px 0 0;
+      position: absolute;
+      right: -65px;
+      bottom: 15px;
+      display: none;
+    }
+
+    .pump.active {
+      display: block;
+    }
+
+    .pump::before {
+      content: "";
+      width: 45px;
+      height: 10px;
+      background: #2364a5;
+      position: absolute;
+      right: -35px;
+      top: 25px;
+      border-radius: 10px;
+    }
+
+    .pump::after {
+      content: "";
+      width: 20px;
+      height: 40px;
+      background: #2364a5;
+      position: absolute;
+      left: 20px;
+      top: -35px;
+      border-radius: 8px;
+    }
+
+    .rings {
+      width: 150px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 4;
+    }
+
+    .ring {
+      height: 28px;
+      background: linear-gradient(#c9c9c9, #8d8d8d);
+      border: 3px solid #666;
+      border-radius: 12px;
+      margin-top: -3px;
+      position: relative;
+    }
+
+    .ring::after {
+      content: "";
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      top: 6px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.35);
+    }
+
+    .underground {
+      background: #6b4326;
+      min-height: 350px;
+      margin: 0 -20px -20px;
+      padding-top: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      overflow-y: auto;
+      max-height: 430px;
+      border-radius: 0 0 16px 16px;
+    }
+
+    .depth-column {
+      width: 160px;
+      text-align: center;
+    }
+
+    .water {
+      height: 50px;
+      background: linear-gradient(#34b7ff, #006ec7);
+      border-radius: 0 0 20px 20px;
+      color: white;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: waterMove 2s infinite alternate;
+    }
+
+    @keyframes waterMove {
+      from {
+        filter: brightness(1);
+      }
+      to {
+        filter: brightness(1.25);
+      }
+    }
+
+    .panel {
+      background: #f8f8f8;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .stats {
+      background: #fff;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 15px;
+      line-height: 1.8;
+      font-size: 16px;
+    }
+
+    .money {
+      font-size: 28px;
+      color: #188d2f;
+      font-weight: bold;
+      text-align: center;
+      margin: 10px 0 20px;
+    }
+
+    button {
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      margin: 8px 0;
+      font-size: 16px;
+      cursor: pointer;
+      background: #2d8cff;
+      color: white;
+      transition: 0.2s;
+      font-weight: bold;
+    }
+
+    button:hover {
+      transform: scale(1.03);
+      background: #1f75d6;
+    }
+
+    button:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .collect {
+      background: #1ba33b;
+      font-size: 20px;
+      padding: 18px;
+    }
+
+    .collect:hover {
+      background: #14852f;
+    }
+
+    .danger {
+      background: #d14c33;
+    }
+
+    .danger:hover {
+      background: #aa3824;
+    }
+
+    .hint {
+      font-size: 14px;
+      opacity: 0.75;
+      text-align: center;
+      margin-top: 15px;
+      line-height: 1.4;
+    }
+
+    .message {
+      min-height: 24px;
+      text-align: center;
+      font-weight: bold;
+      color: #444;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 900px) {
+      .game {
+        grid-template-columns: 1fr;
+      }
+
+      .left {
+        min-height: 600px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="game">
+  <div class="left">
+    <h1>Колодец мечты</h1>
+
+    <div class="sky">
+      <div class="sun"></div>
+    </div>
+
+    <div class="well-area">
+      <div class="well">
+        <div id="roof" class="roof"></div>
+
+        <div id="posts" class="posts">
+          <div class="post"></div>
+          <div class="post"></div>
+        </div>
+
+        <div id="crank" class="crank"></div>
+        <div id="pumpVisual" class="pump"></div>
+
+        <div class="rings" id="topRings"></div>
+      </div>
+    </div>
+
+    <div class="ground"></div>
+
+    <div class="underground">
+      <div class="depth-column" id="depthColumn">
+        <div id="deepRings"></div>
+        <div class="water">Вода</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h1>Улучшения</h1>
+
+    <div class="money">
+      💰 <span id="money">0</span>
+    </div>
+
+    <button class="collect" onclick="collectWater()">
+      Добыть воду
+    </button>
+
+    <div class="stats">
+      Колец в колодце: <b id="ringsCount">1</b><br>
+      Глубина: <b id="depth">1</b><br>
+      Уровень домика: <b id="houseLevel">0</b><br>
+      Уровень насоса: <b id="pumpLevel">0</b><br>
+      Доход за клик: <b id="incomeClick">1</b><br>
+      Автодоход в секунду: <b id="autoIncome">0</b>
+    </div>
+
+    <button onclick="buyRing()" id="ringBtn">
+      Добавить кольцо
+    </button>
+
+    <button onclick="upgradeDepth()" id="depthBtn">
+      Углубить колодец
+    </button>
+
+    <button onclick="upgradeHouse()" id="houseBtn">
+      Улучшить домик
+    </button>
+
+    <button onclick="upgradePump()" id="pumpBtn">
+      Улучшить насос
+    </button>
+
+    <button class="danger" onclick="resetGame()">
+      Начать заново
+    </button>
+
+    <div class="message" id="message"></div>
+
+    <div class="hint">
+      Количество колец не ограничено. Чем глубже колодец, тем больше доход.
+      Насос даёт автоматическую добычу воды.
+    </div>
+  </div>
+</div>
+
+<script>
+  let money = 0;
+  let rings = 1;
+  let depth = 1;
+  let houseLevel = 0;
+  let pumpLevel = 0;
+
+  let ringCost = 10;
+  let depthCost = 25;
+  let houseCost = 50;
+  let pumpCost = 75;
+
+  const moneyEl = document.getElementById("money");
+  const ringsCountEl = document.getElementById("ringsCount");
+  const depthEl = document.getElementById("depth");
+  const houseLevelEl = document.getElementById("houseLevel");
+  const pumpLevelEl = document.getElementById("pumpLevel");
+  const incomeClickEl = document.getElementById("incomeClick");
+  const autoIncomeEl = document.getElementById("autoIncome");
+
+  const ringBtn = document.getElementById("ringBtn");
+  const depthBtn = document.getElementById("depthBtn");
+  const houseBtn = document.getElementById("houseBtn");
+  const pumpBtn = document.getElementById("pumpBtn");
+
+  const messageEl = document.getElementById("message");
+
+  const topRingsEl = document.getElementById("topRings");
+  const deepRingsEl = document.getElementById("deepRings");
+
+  const roofEl = document.getElementById("roof");
+  const postsEl = document.getElementById("posts");
+  const crankEl = document.getElementById("crank");
+  const pumpVisualEl = document.getElementById("pumpVisual");
+
+  function getIncomePerClick() {
+    return Math.floor(1 + rings * 1.5 + depth * 2 + houseLevel * 5 + pumpLevel * 3);
+  }
+
+  function getAutoIncome() {
+    return pumpLevel * (depth + rings);
+  }
+
+  function collectWater() {
+    const income = getIncomePerClick();
+    money += income;
+    showMessage("Ты добыл воды на +" + income + " монет");
+    update();
+  }
+
+  function buyRing() {
+    if (money >= ringCost) {
+      money -= ringCost;
+      rings++;
+      ringCost = Math.floor(ringCost * 1.18 + 5);
+      showMessage("Добавлено новое кольцо!");
+      update();
+    } else {
+      showMessage("Недостаточно монет");
+    }
+  }
+
+  function upgradeDepth() {
+    if (money >= depthCost) {
+      money -= depthCost;
+      depth++;
+      rings++;
+      depthCost = Math.floor(depthCost * 1.35 + 10);
+      showMessage("Колодец стал глубже!");
+      update();
+    } else {
+      showMessage("Недостаточно монет");
+    }
+  }
+
+  function upgradeHouse() {
+    if (money >= houseCost) {
+      money -= houseCost;
+      houseLevel++;
+      houseCost = Math.floor(houseCost * 1.75 + 30);
+      showMessage("Домик улучшен!");
+      update();
+    } else {
+      showMessage("Недостаточно монет");
+    }
+  }
+
+  function upgradePump() {
+    if (money >= pumpCost) {
+      money -= pumpCost;
+      pumpLevel++;
+      pumpCost = Math.floor(pumpCost * 1.8 + 50);
+      showMessage("Насос стал мощнее!");
+      update();
+    } else {
+      showMessage("Недостаточно монет");
+    }
+  }
+
+  function updateVisual() {
+    topRingsEl.innerHTML = "";
+    deepRingsEl.innerHTML = "";
+
+    const visibleTop = Math.min(rings, 3);
+    const visibleDeep = Math.min(rings, 80);
+
+    for (let i = 0; i < visibleTop; i++) {
+      const ring = document.createElement("div");
+      ring.className = "ring";
+      topRingsEl.appendChild(ring);
+    }
+
+    for (let i = 0; i < visibleDeep; i++) {
+      const ring = document.createElement("div");
+      ring.className = "ring";
+      deepRingsEl.appendChild(ring);
+    }
+
+    if (rings > 80) {
+      const more = document.createElement("div");
+      more.style.color = "white";
+      more.style.fontWeight = "bold";
+      more.style.padding = "10px";
+      more.textContent = "+ ещё " + (rings - 80) + " колец ниже";
+      deepRingsEl.appendChild(more);
+    }
+
+    roofEl.className = "roof";
+
+    if (houseLevel >= 1) {
+      roofEl.classList.add("level-1");
+      postsEl.classList.add("active");
+      crankEl.classList.add("active");
+    } else {
+      postsEl.classList.remove("active");
+      crankEl.classList.remove("active");
+    }
+
+    if (houseLevel >= 2) {
+      roofEl.classList.add("level-2");
+    }
+
+    if (houseLevel >= 3) {
+      roofEl.classList.add("level-3");
+    }
+
+    if (pumpLevel >= 1) {
+      pumpVisualEl.classList.add("active");
+    } else {
+      pumpVisualEl.classList.remove("active");
+    }
+
+    if (pumpLevel >= 3) {
+      pumpVisualEl.style.background = "#d33f9f";
+    } else if (pumpLevel >= 2) {
+      pumpVisualEl.style.background = "#7056ff";
+    } else {
+      pumpVisualEl.style.background = "#3f83cc";
+    }
+  }
+
+  function update() {
+    moneyEl.textContent = money;
+    ringsCountEl.textContent = rings;
+    depthEl.textContent = depth;
+    houseLevelEl.textContent = houseLevel;
+    pumpLevelEl.textContent = pumpLevel;
+    incomeClickEl.textContent = getIncomePerClick();
+    autoIncomeEl.textContent = getAutoIncome();
+
+    ringBtn.textContent = "Добавить кольцо — " + ringCost + " монет";
+    depthBtn.textContent = "Углубить колодец — " + depthCost + " монет";
+    houseBtn.textContent = "Улучшить домик — " + houseCost + " монет";
+    pumpBtn.textContent = "Улучшить насос — " + pumpCost + " монет";
+
+    ringBtn.disabled = money < ringCost;
+    depthBtn.disabled = money < depthCost;
+    houseBtn.disabled = money < houseCost;
+    pumpBtn.disabled = money < pumpCost;
+
+    updateVisual();
+    saveGame();
+  }
+
+  function showMessage(text) {
+    messageEl.textContent = text;
+    setTimeout(() => {
+      if (messageEl.textContent === text) {
+        messageEl.textContent = "";
+      }
+    }, 1800);
+  }
+
+  function saveGame() {
+    const save = {
+      money,
+      rings,
+      depth,
+      houseLevel,
+      pumpLevel,
+      ringCost,
+      depthCost,
+      houseCost,
+      pumpCost
+    };
+
+    localStorage.setItem("wellUpgradeGame", JSON.stringify(save));
+  }
+
+  function loadGame() {
+    const save = localStorage.getItem("wellUpgradeGame");
+
+    if (save) {
+      const data = JSON.parse(save);
+
+      money = data.money ?? 0;
+      rings = data.rings ?? 1;
+      depth = data.depth ?? 1;
+      houseLevel = data.houseLevel ?? 0;
+      pumpLevel = data.pumpLevel ?? 0;
+
+      ringCost = data.ringCost ?? 10;
+      depthCost = data.depthCost ?? 25;
+      houseCost = data.houseCost ?? 50;
+      pumpCost = data.pumpCost ?? 75;
+    }
+
+    update();
+  }
+
+  function resetGame() {
+    if (confirm("Точно начать заново?")) {
+      money = 0;
+      rings = 1;
+      depth = 1;
+      houseLevel = 0;
+      pumpLevel = 0;
+
+      ringCost = 10;
+      depthCost = 25;
+      houseCost = 50;
+      pumpCost = 75;
+
+      localStorage.removeItem("wellUpgradeGame");
+      update();
+    }
+  }
+
+  setInterval(() => {
+    const auto = getAutoIncome();
+
+    if (auto > 0) {
+      money += auto;
+      update();
+    }
+  }, 1000);
+
+  loadGame();
+</script>
+
+</body>
+</html>
