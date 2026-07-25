@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Колесо фортуны с вероятностями</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111827;
+      color: #f9fafb;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 30px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 1100px;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 30px;
+      align-items: start;
+    }
+
+    .wheel-section,
+    .settings {
+      background: #1f2937;
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+    }
+
+    .wheel-wrap {
+      position: relative;
+      width: 520px;
+      max-width: 100%;
+      aspect-ratio: 1 / 1;
+      margin: 0 auto;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border-radius: 50%;
+    }
+
+    .pointer {
+      position: absolute;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 22px solid transparent;
+      border-right: 22px solid transparent;
+      border-top: 44px solid #facc15;
+      z-index: 5;
+      filter: drop-shadow(0 4px 3px rgba(0,0,0,0.4));
+    }
+
+    .center-dot {
+      position: absolute;
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      background: #111827;
+      border: 8px solid #facc15;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #facc15;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.45);
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-weight: bold;
+      color: #111827;
+      background: #facc15;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.08);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .spin-btn {
+      display: block;
+      width: 220px;
+      margin: 26px auto 10px;
+      font-size: 18px;
+    }
+
+    .result {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 22px;
+      font-weight: bold;
+      min-height: 32px;
+      color: #facc15;
+    }
+
+    h1, h2 {
+      margin-top: 0;
+    }
+
+    .form {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #374151;
+      background: #111827;
+      color: #f9fafb;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #facc15;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 110px;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+      background: #111827;
+      padding: 10px;
+      border-radius: 12px;
+    }
+
+    .row input {
+      padding: 9px;
+    }
+
+    .delete-btn {
+      background: #ef4444;
+      color: white;
+      padding: 9px 10px;
+      font-size: 13px;
+    }
+
+    .small {
+      color: #9ca3af;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .status {
+      margin: 14px 0;
+      padding: 12px;
+      border-radius: 10px;
+      background: #111827;
+      color: #d1d5db;
+      font-size: 14px;
+    }
+
+    .error {
+      color: #f87171;
+    }
+
+    .ok {
+      color: #86efac;
+    }
+
+    code {
+      background: #111827;
+      color: #facc15;
+      padding: 2px 5px;
+      border-radius: 5px;
+    }
+
+    @media (max-width: 950px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .wheel-wrap {
+        width: min(520px, 90vw);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <section class="wheel-section">
+    <h1>Колесо фортуны</h1>
+
+    <div class="wheel-wrap">
+      <div class="pointer"></div>
+      <canvas id="wheelCanvas" width="700" height="700"></canvas>
+      <div class="center-dot">WIN</div>
+    </div>
+
+    <button id="spinBtn" class="spin-btn">Крутить</button>
+
+    <div id="result" class="result"></div>
+  </section>
+
+  <section class="settings">
+    <h2>Настройки</h2>
+
+    <div class="form">
+      <input id="itemName" type="text" placeholder="Название элемента">
+      <input id="itemChance" type="number" min="0" step="0.01" placeholder="Вероятность в процентах">
+      <button id="addBtn">Добавить элемент</button>
+    </div>
+
+    <div class="status">
+      Сумма вероятностей: <b id="totalChance">0%</b>
+      <div id="chanceMessage"></div>
+    </div>
+
+    <div id="itemsList"></div>
+
+    <p class="small">
+      Вероятности должны давать в сумме <code>100%</code>.
+      Если сумма не равна 100, колесо всё равно нарисуется, но кнопка запуска будет отключена.
+    </p>
+
+    <p class="small">
+      Управление через JS-консоль:
+      <br>
+      <code>WheelControl.force("Приз 1")</code>
+      <br>
+      <code>WheelControl.forceIndex(0)</code>
+      <br>
+      <code>WheelControl.random()</code>
+    </p>
+  </section>
+</div>
+
+<script>
+  const canvas = document.getElementById("wheelCanvas");
+  const ctx = canvas.getContext("2d");
+
+  const spinBtn = document.getElementById("spinBtn");
+  const addBtn = document.getElementById("addBtn");
+  const itemNameInput = document.getElementById("itemName");
+  const itemChanceInput = document.getElementById("itemChance");
+  const itemsList = document.getElementById("itemsList");
+  const totalChanceEl = document.getElementById("totalChance");
+  const chanceMessage = document.getElementById("chanceMessage");
+  const resultEl = document.getElementById("result");
+
+  let items = [
+    { name: "Приз 1", chance: 40 },
+    { name: "Приз 2", chance: 25 },
+    { name: "Приз 3", chance: 20 },
+    { name: "Приз 4", chance: 10 },
+    { name: "Суперприз", chance: 5 }
+  ];
+
+  let rotation = 0;
+  let spinning = false;
+
+  let forcedMode = false;
+  let forcedName = null;
+  let forcedIndex = null;
+
+  const colors = [
+    "#ef4444",
+    "#f97316",
+    "#facc15",
+    "#22c55e",
+    "#06b6d4",
+    "#3b82f6",
+    "#8b5cf6",
+    "#ec4899",
+    "#14b8a6",
+    "#a3e635"
+  ];
+
+  function degToRad(deg) {
+    return deg * Math.PI / 180;
+  }
+
+  function normalizeRotation(deg) {
+    return ((deg % 360) + 360) % 360;
+  }
+
+  function getTotalChance() {
+    return items.reduce((sum, item) => sum + Number(item.chance || 0), 0);
+  }
+
+  function isChanceValid() {
+    return Math.abs(getTotalChance() - 100) < 0.0001 && items.length > 0;
+  }
+
+  function getSegments() {
+    let start = 0;
+
+    return items.map((item, index) => {
+      const size = item.chance / 100 * 360;
+      const segment = {
+        index,
+        name: item.name,
+        chance: item.chance,
+        start,
+        end: start + size,
+        middle: start + size / 2
+      };
+      start += size;
+      return segment;
+    });
+  }
+
+  function drawWheel() {
+    const w = canvas.width;
+    const h = canvas.height;
+    const cx = w / 2;
+    const cy = h / 2;
+    const radius = Math.min(cx, cy) - 10;
+
+    ctx.clearRect(0, 0, w, h);
+
+    if (items.length === 0) {
+      ctx.fillStyle = "#374151";
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = "#f9fafb";
+      ctx.font = "bold 28px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("Добавьте элементы", cx, cy);
+      return;
+    }
+
+    const segments = getSegments();
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(degToRad(rotation));
+
+    segments.forEach((seg, i) => {
+      const startAngle = degToRad(seg.start - 90);
+      const endAngle = degToRad(seg.end - 90);
+
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.arc(0, 0, radius, startAngle, endAngle);
+      ctx.closePath();
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.fill();
+
+      ctx.strokeStyle = "#111827";
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      const textAngle = degToRad(seg.middle - 90);
+
+      ctx.save();
+      ctx.rotate(textAngle);
+      ctx.textAlign = "right";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "#111827";
+      ctx.font = "bold 22px Arial";
+
+      let label = seg.name;
+      if (label.length > 18) {
+        label = label.slice(0, 16) + "…";
+      }
+
+      ctx.fillText(label, radius - 28, 0);
+
+      ctx.font = "16px Arial";
+      ctx.fillText(seg.chance + "%", radius - 28, 26);
+
+      ctx.restore();
+    });
+
+    ctx.restore();
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.lineWidth = 8;
+    ctx.strokeStyle = "#facc15";
+    ctx.stroke();
+  }
+
+  function renderItems() {
+    itemsList.innerHTML = "";
+
+    items.forEach((item, index) => {
+      const row = document.createElement("div");
+      row.className = "row";
+
+      const nameInput = document.createElement("input");
+      nameInput.type = "text";
+      nameInput.value = item.name;
+      nameInput.placeholder = "Название";
+      nameInput.addEventListener("input", () => {
+        items[index].name = nameInput.value.trim() || "Без названия";
+        update();
+      });
+
+      const chanceInput = document.createElement("input");
+      chanceInput.type = "number";
+      chanceInput.min = "0";
+      chanceInput.step = "0.01";
+      chanceInput.value = item.chance;
+      chanceInput.placeholder = "%";
+      chanceInput.addEventListener("input", () => {
+        items[index].chance = Number(chanceInput.value) || 0;
+        update();
+      });
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "delete-btn";
+      deleteBtn.textContent = "Удалить";
+      deleteBtn.addEventListener("click", () => {
+        items.splice(index, 1);
+        update();
+      });
+
+      const left = document.createElement("div");
+      left.appendChild(nameInput);
+
+      const right = document.createElement("div");
+      right.appendChild(chanceInput);
+      right.appendChild(deleteBtn);
+      right.style.display = "grid";
+      right.style.gap = "8px";
+
+      row.appendChild(left);
+      row.appendChild(right);
+      itemsList.appendChild(row);
+    });
+  }
+
+  function updateStatus() {
+    const total = getTotalChance();
+    totalChanceEl.textContent = total.toFixed(2).replace(/\.00$/, "") + "%";
+
+    if (items.length === 0) {
+      chanceMessage.innerHTML = '<span class="error">Добавьте хотя бы один элемент.</span>';
+      spinBtn.disabled = true;
+      return;
+    }
+
+    if (isChanceValid()) {
+      chanceMessage.innerHTML = '<span class="ok">Вероятности настроены корректно.</span>';
+      spinBtn.disabled = spinning;
+    } else {
+      chanceMessage.innerHTML = '<span class="error">Сумма должна быть ровно 100%.</span>';
+      spinBtn.disabled = true;
+    }
+  }
+
+  function update() {
+    renderItems();
+    updateStatus();
+    drawWheel();
+  }
+
+  function addItem() {
+    const name = itemNameInput.value.trim();
+    const chance = Number(itemChanceInput.value);
+
+    if (!name) {
+      alert("Введите название элемента.");
+      return;
+    }
+
+    if (!Number.isFinite(chance) || chance < 0) {
+      alert("Введите корректную вероятность.");
+      return;
+    }
+
+    items.push({ name, chance });
+
+    itemNameInput.value = "";
+    itemChanceInput.value = "";
+
+    update();
+  }
+
+  function chooseWeightedRandomIndex() {
+    const r = Math.random() * 100;
+    let cumulative = 0;
+
+    for (let i = 0; i < items.length; i++) {
+      cumulative += Number(items[i].chance);
+
+      if (r <= cumulative) {
+        return i;
+      }
+    }
+
+    return items.length - 1;
+  }
+
+  function getForcedIndex() {
+    if (!forcedMode) {
+      return null;
+    }
+
+    if (forcedIndex !== null) {
+      if (forcedIndex >= 0 && forcedIndex < items.length) {
+        return forcedIndex;
+      }
+
+      console.warn("Forced index вне диапазона. Используется обычный рандом.");
+      return null;
+    }
+
+    if (forcedName !== null) {
+      const index = items.findIndex(item => item.name === forcedName);
+
+      if (index !== -1) {
+        return index;
+      }
+
+      console.warn("Элемент с названием '" + forcedName + "' не найден. Используется обычный рандом.");
+      return null;
+    }
+
+    return null;
+  }
+
+  function pickWinnerIndex() {
+    const forced = getForcedIndex();
+
+    if (forced !== null) {
+      return forced;
+    }
+
+    return chooseWeightedRandomIndex();
+  }
+
+  function spin() {
+    if (spinning || !isChanceValid()) {
+      return;
+    }
+
+    spinning = true;
+    spinBtn.disabled = true;
+    resultEl.textContent = "";
+
+    const winnerIndex = pickWinnerIndex();
+    const segments = getSegments();
+    const winnerSegment = segments[winnerIndex];
+
+    const pointerAngle = 0;
+    const winnerMiddle = winnerSegment.middle;
+
+    const currentRotation = normalizeRotation(rotation);
+
+    const desiredRotation = normalizeRotation(pointerAngle - winnerMiddle);
+
+    let delta = normalizeRotation(desiredRotation - currentRotation);
+
+    const extraSpins = 5 + Math.floor(Math.random() * 4);
+    const totalDelta = extraSpins * 360 + delta;
+
+    const startRotation = rotation;
+    const targetRotation = rotation + totalDelta;
+
+    const duration = 4200;
+    const startTime = performance.now();
+
+    function easeOutCubic(t) {
+      return 1 - Math.pow(1 - t, 3);
+    }
+
+    function animate(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = easeOutCubic(progress);
+
+      rotation = startRotation + (targetRotation - startRotation) * eased;
+      drawWheel();
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        rotation = normalizeRotation(targetRotation);
+        drawWheel();
+
+        const winner = items[winnerIndex];
+        resultEl.textContent = "Выпало: " + winner.name;
+
+        spinning = false;
+        updateStatus();
+      }
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  addBtn.addEventListener("click", addItem);
+
+  itemNameInput.addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+      addItem();
+    }
+  });
+
+  itemChanceInput.addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+      addItem();
+    }
+  });
+
+  spinBtn.addEventListener("click", spin);
+
+  window.WheelControl = {
+    force(name) {
+      forcedMode = true;
+      forcedName = String(name);
+      forcedIndex = null;
+      console.log("Рандом отключён. Принудительный результат:", forcedName);
+    },
+
+    forceIndex(index) {
+      forcedMode = true;
+      forcedIndex = Number(index);
+      forcedName = null;
+      console.log("Рандом отключён. Принудительный индекс:", forcedIndex);
+    },
+
+    random() {
+      forcedMode = false;
+      forcedName = null;
+      forcedIndex = null;
+      console.log("Обычный случайный режим включён.");
+    },
+
+    status() {
+      return {
+        forcedMode,
+        forcedName,
+        forcedIndex,
+        items: JSON.parse(JSON.stringify(items))
+      };
+    }
+  };
+
+  update();
+</script>
+
+</body>
+</html>
