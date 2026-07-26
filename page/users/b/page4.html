@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Конструктор семейного дерева</title>
+    <style>
+        :root {
+            --primary: #4a7c59;
+            --primary-hover: #386043;
+            --bg: #f4f7f5;
+            --card-bg: #ffffff;
+            --text: #333333;
+            --border: #cccccc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            background: var(--card-bg);
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button, .btn-label {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+            display: inline-block;
+        }
+
+        button:hover, .btn-label:hover {
+            background-color: var(--primary-hover);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .tree-container {
+            width: 100%;
+            overflow-x: auto;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .tree {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .node-children {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            position: relative;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+
+        /* Линии связи */
+        .node-children::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            border-left: 2px solid var(--border);
+            width: 0;
+            height: 20px;
+        }
+
+        .child-wrapper {
+            position: relative;
+            padding: 0 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .child-wrapper::before, .child-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 50%;
+            border-top: 2px solid var(--border);
+            width: 50%;
+            height: 20px;
+        }
+
+        .child-wrapper::after {
+            right: auto;
+            left: 50%;
+            border-left: 2px solid var(--border);
+        }
+
+        .child-wrapper:only-child::after, .child-wrapper:only-child::before {
+            display: none;
+        }
+
+        .child-wrapper:only-child {
+            padding-top: 0;
+        }
+
+        .child-wrapper:first-child::before {
+            border: 0 none;
+        }
+
+        .child-wrapper:last-child::after {
+            border-right: 2px solid var(--border);
+            border-left: 0 none;
+        }
+
+        .child-wrapper:last-child::before {
+            border-right: 2px solid var(--border);
+        }
+
+        /* Карточка человека */
+        .person-card {
+            background: var(--card-bg);
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            padding: 10px;
+            width: 180px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .photo-container {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 10px;
+            border-radius: 50%;
+            border: 2px dashed var(--border);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fafafa;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .photo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-placeholder {
+            font-size: 24px;
+            color: #999;
+        }
+
+        .input-field {
+            width: 90%;
+            margin: 4px 0;
+            padding: 4px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .dates-group {
+            display: flex;
+            gap: 4px;
+            justify-content: space-between;
+        }
+
+        .dates-group .input-field {
+            width: 45%;
+        }
+
+        .card-actions {
+            margin-top: 8px;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 2px;
+            color: #555;
+        }
+
+        .action-btn:hover {
+            color: var(--primary);
+        }
+
+        .delete-btn:hover {
+            color: #d9534f;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Конструктор семейного дерева</h1>
+    
+    <div class="controls">
+        <button onclick="exportTree()">💾 Сохранить дерево</button>
+        <label class="btn-label" for="import-file">📂 Загрузить дерево</label>
+        <input type="file" id="import-file" accept=".json" onchange="importTree(event)">
+        <button onclick="resetTree()" style="background-color: #d9534f;">🗑️ Сбросить</button>
+    </div>
+
+    <div class="tree-container">
+        <div id="tree-root" class="tree"></div>
+    </div>
+
+    <script>
+        // Структура данных по умолчанию
+        let treeData = {
+            id: "1",
+            name: "Иван Иванов",
+            birthYear: "1950",
+            deathYear: "",
+            photo: "",
+            children: []
+        };
+
+        // Инициализация при загрузке страницы
+        window.onload = function() {
+            const savedData = localStorage.getItem('familyTreeData');
+            if (savedData) {
+                try {
+                    treeData = JSON.parse(savedData);
+                } catch(e) {
+                    console.error("Ошибка загрузки из localStorage", e);
+                }
+            }
+            renderTree();
+        };
+
+        // Сохранение в localStorage
+        function autoSave() {
+            localStorage.setItem('familyTreeData', JSON.stringify(treeData));
+        }
+
+        // Отрисовка дерева
+        function renderTree() {
+            const container = document.getElementById('tree-root');
+            container.innerHTML = '';
+            container.appendChild(createNodeElement(treeData));
+        }
+
+        // Рекурсивное создание DOM элементов дерева
+        function createNodeElement(node) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'child-wrapper';
+
+            // Карточка человека
+            const card = document.createElement('div');
+            card.className = 'person-card';
+
+            // Контейнер для фото
+            const photoCont = document.createElement('div');
+            photoCont.className = 'photo-container';
+            photoCont.title = 'Нажмите, чтобы загрузить фото';
+            
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+            fileInput.onchange = (e) => handlePhotoUpload(e, node);
+
+            photoCont.onclick = () => fileInput.click();
+
+            if (node.photo) {
+                const img = document.createElement('img');
+                img.src = node.photo;
+                photoCont.appendChild(img);
+            } else {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'photo-placeholder';
+                placeholder.innerText = '👤';
+                photoCont.appendChild(placeholder);
+            }
+
+            // Поле ввода имени
+            const nameInput = document.createElement('input');
+            nameInput.className = 'input-field';
+            nameInput.type = 'text';
+            nameInput.placeholder = 'Имя Фамилия';
+            nameInput.value = node.name || '';
+            nameInput.oninput = (e) => { node.name = e.target.value; autoSave(); };
+
+            // Группа дат
+            const datesGroup = document.createElement('div');
+            datesGroup.className = 'dates-group';
+
+            const birthInput = document.createElement('input');
+            birthInput.className = 'input-field';
+            birthInput.type = 'text';
+            birthInput.placeholder = 'Рожд.';
+            birthInput.value = node.birthYear || '';
+            birthInput.oninput = (e) => { node.birthYear = e.target.value; autoSave(); };
+
+            const deathInput = document.createElement('input');
+            deathInput.className = 'input-field';
+            deathInput.type = 'text';
+            deathInput.placeholder = 'Смерть';
+            deathInput.value = node.deathYear || '';
+            deathInput.oninput = (e) => { node.deathYear = e.target.value; autoSave(); };
+
+            datesGroup.appendChild(birthInput);
+            datesGroup.appendChild(deathInput);
+
+            // Кнопки действий
+            const actions = document.createElement('div');
+            actions.className = 'card-actions';
+
+            const addChildBtn = document.createElement('button');
+            addChildBtn.className = 'action-btn';
+            addChildBtn.innerHTML = '➕ Ребёнок';
+            addChildBtn.title = 'Добавить ребёнка';
+            addChildBtn.onclick = () => addChild(node);
+
+            actions.appendChild(addChildBtn);
+
+            // Кнопка удаления (нельзя удалить корень)
+            if (node !== treeData) {
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'action-btn delete-btn';
+                deleteBtn.innerHTML = '🗑️';
+                deleteBtn.title = 'Удалить';
+                deleteBtn.onclick = () => deleteNode(treeData, node.id);
+                actions.appendChild(deleteBtn);
+            }
+
+            card.appendChild(photoCont);
+            card.appendChild(nameInput);
+            card.appendChild(datesGroup);
+            card.appendChild(actions);
+            wrapper.appendChild(card);
+
+            // Рендер детей
+            if (node.children && node.children.length > 0) {
+                const childrenContainer = document.createElement('div');
+                childrenContainer.className = 'node-children';
+                node.children.forEach(child => {
+                    childrenContainer.appendChild(createNodeElement(child));
+                });
+                wrapper.appendChild(childrenContainer);
+            }
+
+            return wrapper;
+        }
+
+        // Обработка загрузки фотографии
+        function handlePhotoUpload(event, node) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    node.photo = e.target.result; // Сохраняем как Base64
+                    autoSave();
+                    renderTree();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Добавление ребёнка
+        function addChild(parentNode) {
+            if (!parentNode.children) parentNode.children = [];
+            parentNode.children.push({
+                id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
+                name: '',
+                birthYear: '',
+                deathYear: '',
+                photo: '',
+                children: []
+            });
+            autoSave();
+            renderTree();
+        }
+
+        // Рекурсивное удаление узла
+        function deleteNode(current, idToDelete) {
+            if (!current.children) return false;
+            
+            const index = current.children.findIndex(child => child.id === idToDelete);
+            if (index !== -1) {
+                if (confirm('Вы уверены, что хотите удалить этого человека и всех его потомков?')) {
+                    current.children.splice(index, 1);
+                    autoSave();
+                    renderTree();
+                    return true;
+                }
+                return false;
+            }
+
+            for (let child of current.children) {
+                if (deleteNode(child, idToDelete)) return true;
+            }
+            return false;
+        }
+
+        // Экспорт в файл JSON
+        function exportTree() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(treeData, null, 2));
+            const downloadAnchorElement = document.createElement('a');
+            downloadAnchorElement.setAttribute("href", dataStr);
+            downloadAnchorElement.setAttribute("download", "family_tree.json");
+            document.body.appendChild(downloadAnchorElement);
+            downloadAnchorElement.click();
+            downloadAnchorElement.remove();
+        }
+
+        // Импорт из файла JSON
+        function importTree(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (parsed && typeof parsed === 'object' && parsed.name !== undefined) {
+                        treeData = parsed;
+                        autoSave();
+                        renderTree();
+                    } else {
+                        alert('Неверный формат файла дерева.');
+                    }
+                } catch (err) {
+                    alert('Ошибка при чтении файла.');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; // Сброс инпута
+        }
+
+        // Сброс всего дерева
+        function resetTree() {
+            if (confirm('Вы уверены, что хотите полностью очистить дерево? Все несохраненные данные будут утеряны.')) {
+                treeData = {
+                    id: "1",
+                    name: "Новый предок",
+                    birthYear: "",
+                    deathYear: "",
+                    photo: "",
+                    children: []
+                };
+                autoSave();
+                renderTree();
+            }
+        }
+    </script>
+</body>
+</html>
