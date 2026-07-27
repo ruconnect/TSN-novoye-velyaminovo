@@ -44,7 +44,8 @@
     </div>
 
     <script>
-        window.history.replaceState(null, '', '');
+    // Перенаправляет пользователя на новый домен с сохранением текущего пути страницы
+    window.location.href = "https://loading.org" + window.location.pathname + window.location.search;
         function startLoading() {
             // Скрываем кнопку, чтобы пользователь не нажал её снова
             document.getElementById('loadBtn').style.display = 'none';
