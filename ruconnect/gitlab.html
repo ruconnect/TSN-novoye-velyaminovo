@@ -1,1069 +1,605 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GitLab Repository Constructor</title>
-  <style>
-    :root {
-      --bg: #f5f5f7;
-      --panel: #ffffff;
-      --text: #1f1f29;
-      --muted: #6b7280;
-      --border: #dcdcde;
-      --orange: #fc6d26;
-      --orange-dark: #e24329;
-      --purple: #7759c2;
-      --green: #108548;
-      --red: #dd2b0e;
-      --blue: #1f75cb;
-      --code: #f7f7f9;
-      --sidebar: #2f2a6b;
-      --sidebar-dark: #25205a;
-      --shadow: 0 8px 24px rgba(31, 31, 41, 0.08);
-      --radius: 8px;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-      color: var(--text);
-      background: var(--bg);
-    }
-
-    .app {
-      display: grid;
-      grid-template-columns: 300px 1fr;
-      min-height: 100vh;
-    }
-
-    .builder {
-      background: #111827;
-      color: #fff;
-      padding: 20px;
-      overflow-y: auto;
-      border-right: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .builder h1 {
-      font-size: 20px;
-      margin: 0 0 6px;
-      line-height: 1.25;
-    }
-
-    .builder p {
-      color: #a5b4fc;
-      font-size: 13px;
-      margin: 0 0 20px;
-    }
-
-    .field {
-      margin-bottom: 14px;
-    }
-
-    .field label {
-      display: block;
-      font-size: 12px;
-      color: #c7d2fe;
-      margin-bottom: 6px;
-    }
-
-    .field input,
-    .field textarea,
-    .field select {
-      width: 100%;
-      background: #1f2937;
-      color: #fff;
-      border: 1px solid #374151;
-      border-radius: 7px;
-      padding: 10px;
-      font-size: 13px;
-      outline: none;
-    }
-
-    .field textarea {
-      min-height: 82px;
-      resize: vertical;
-    }
-
-    .field input:focus,
-    .field textarea:focus,
-    .field select:focus {
-      border-color: #818cf8;
-      box-shadow: 0 0 0 3px rgba(129,140,248,0.2);
-    }
-
-    .hint {
-      font-size: 11px;
-      color: #9ca3af;
-      margin-top: 5px;
-    }
-
-    .btn {
-      border: 1px solid transparent;
-      background: #374151;
-      color: #fff;
-      border-radius: 7px;
-      padding: 9px 11px;
-      font-size: 13px;
-      cursor: pointer;
-      transition: .15s;
-    }
-
-    .btn:hover {
-      background: #4b5563;
-    }
-
-    .btn-primary {
-      background: #4f46e5;
-    }
-
-    .btn-primary:hover {
-      background: #4338ca;
-    }
-
-    .btn-danger {
-      background: #991b1b;
-    }
-
-    .btn-danger:hover {
-      background: #7f1d1d;
-    }
-
-    .small-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
-    .preview {
-      overflow: auto;
-      background: var(--bg);
-    }
-
-    .topbar {
-      height: 48px;
-      background: #292961;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      padding: 0 18px;
-      gap: 16px;
-      position: sticky;
-      top: 0;
-      z-index: 5;
-      box-shadow: 0 1px 0 rgba(0,0,0,0.15);
-    }
-
-    .fox {
-      width: 26px;
-      height: 26px;
-      background: linear-gradient(135deg, #fc6d26, #fca326);
-      clip-path: polygon(50% 0%, 63% 30%, 95% 22%, 73% 52%, 82% 88%, 50% 68%, 18% 88%, 27% 52%, 5% 22%, 37% 30%);
-    }
-
-    .topbar .brand {
-      font-weight: 700;
-      letter-spacing: .2px;
-    }
-
-    .search {
-      flex: 1;
-      max-width: 520px;
-      background: rgba(255,255,255,0.12);
-      border: 1px solid rgba(255,255,255,0.12);
-      color: #fff;
-      padding: 7px 10px;
-      border-radius: 6px;
-      font-size: 13px;
-    }
-
-    .top-icons {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      color: #e5e7eb;
-      font-size: 14px;
-    }
-
-    .layout {
-      display: grid;
-      grid-template-columns: 230px minmax(760px, 1fr);
-      min-height: calc(100vh - 48px);
-    }
-
-    .side {
-      background: #fff;
-      border-right: 1px solid var(--border);
-      padding: 16px 0;
-    }
-
-    .side-title {
-      padding: 0 16px 14px;
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .avatar {
-      width: 34px;
-      height: 34px;
-      border-radius: 8px;
-      background: linear-gradient(135deg, var(--orange), var(--purple));
-      color: #fff;
-      display: grid;
-      place-items: center;
-      font-weight: 800;
-: center;
-      gap: 10px;
-      padding: 9px 16px;
-      color: #333;
-      text-decoration: none;
-      font-size: 14px;
-      border-left: 3px solid transparent;
-    }
-
-    .nav a.active {
-      background: #f2f0ff;
-      border-left-color: var(--purple);
-      color: #4b2fb7;
-      font-weight: 600;
-    }
-
-    .nav a:hover {
-      background: #f7f7f9;
-    }
-
-    .content {
-      padding: 24px 32px 50px;
-    }
-
-    .breadcrumbs {
-      color: var(--muted);
-      font-size: 13px;
-      margin-bottom: 14px;
-    }
-
-    .repo-head {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 18px;
-      box-shadow: var(--shadow);
-    }
-
-    .repo-title-row {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 20px;
-    }
-
-    .repo-title {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .repo-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 10px;
-      background: #fff3eb;
-      display: grid;
-      place-items: center;
-      color: var(--orange-dark);
-      border: 1px solid #ffd8c2;
-      font-size: 23px;
-    }
-
-    .repo-title h2 {
-      margin: 0;
-      font-size: 24px;
-      font-weight: 700;
-    }
-
-    .visibility {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .gl-btn {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 8px 11px;
-      font-size: 13px;
-      color: #333;
-      display: inline-flex;
-      gap: 7px;
-      align-items: center;
-      cursor: default;
-    }
-
-    .gl-btn.orange {
-      background: var(--orange);
-      color: #fff;
-      border-color: var(--orange);
-      font-weight: 600;
-    }
-
-    .description {
-      margin: 16px 0 0;
-      color: #4b5563;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
-    .stats {
-      margin-top: 16px;
-      display: flex;
-      gap: 18px;
-      color: var(--muted);
-      font-size: 13px;
-      flex-wrap: wrap;
-    }
-
-    .tabs {
-      display: flex;
-      gap: 2px;
-      margin-top: 22px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .tab {
-      padding: 12px 14px;
-      font-size: 14px;
-      color: #4b5563;
-      border-bottom: 2px solid transparent;
-    }
-
-    .tab.active {
-      color: var(--purple);
-      border-bottom-color: var(--purple);
-      font-weight: 600;
-    }
-
-    .main-grid {
-      display: grid;
-      grid-template-columns: 1fr 300px;
-      gap: 22px;
-      margin-top: 20px;
-    }
-
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    .toolbar {
-      padding: 12px;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      border-bottom: 1px solid var(--border);
-      background: #fff;
-    }
-
-    .branch {
-      border: 1px solid var(--border);
-      background: #fff;
-      border-radius: 6px;
-      padding: 7px 10px;
-      font-size: 13px;
-      color: #333;
-    }
-
-    .path {
-      color: var(--muted);
-      font-size: 13px;
-      flex: 1;
-    }
-
-    .commit-bar {
-      padding: 12px 14px;
-      background: #f9fafb;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .commit-avatar {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #60a5fa, #8b5cf6);
-      color: white;
-      display: grid;
-      place-items: center;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .commit-text {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .commit-msg {
-      font-size: 13px;
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .commit-meta {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    .pipeline {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 8px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    .pipeline.success {
-      background: #e9f7ef;
-      color: var(--green);
-    }
-
-    .pipeline.failed {
-      background: #fdecea;
-      color: var(--red);
-    }
-
-    .pipeline.running {
-      background: #eef4ff;
-      color: var(--blue);
-    }
-
-    .files {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .files tr {
-      border-bottom: 1px solid var(--border);
-    }
-
-    .files tr:last-child {
-      border-bottom: none;
-    }
-
-    .files td {
-      padding: 12px 14px;
-      font-size: 14px;
-    }
-
-    .file-name {
-      width: 48%;
-      color: #1f75cb;
-      font-weight: 500;
-    }
-
-    .file-commit {
-      color: #4b5563;
-      font-size: 13px;
-    }
-
-    .file-time {
-      text-align: right;
-      color: var(--muted);
-      font-size: 13px;
-      white-space: nowrap;
-    }
-
-    .readme {
-      margin-top: 18px;
-    }
-
-    .readme-head {
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--border);
-      background: #f9fafb;
-      font-weight: 600;
-      font-size: 14px;
-    }
-
-    .readme-body {
-      padding: 18px;
-      line-height: 1.6;
-      font-size: 14px;
-    }
-
-    .readme-body h1 {
-      margin: 0 0 12px;
-      font-size: 26px;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 10px;
-    }
-
-    .readme-body code {
-      background: var(--code);
-      border: 1px solid var(--border);
-      padding: 2px 5px;
-      border-radius: 4px;
-    }
-
-    .aside-card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      margin-bottom: 16px;
-      padding: 15px;
-    }
-
-    .aside-card h3 {
-      font-size: 15px;
-      margin: 0 0 12px;
-    }
-
-    .info-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 7px 0;
-      font-size: 13px;
-      border-bottom: 1px solid #f0f0f0;
-    }
-
-    .info-row:last-child {
-      border-bottom: 0;
-    }
-
-    .info-row span:first-child {
-      color: var(--muted);
-    }
-
-    .lang-bar {
-      height: 9px;
-      border-radius: 999px;
-      overflow: hidden;
-      display: flex;
-      margin-bottom: 11px;
-      background: #eee;
-    }
-
-    .lang-js { background: #f1e05a; width: 55%; }
-    .lang-html { background: #e34c26; width: 25%; }
-    .lang-css { background: #563d7c; width: 20%; }
-
-    .tag {
-      display: inline-flex;
-      padding: 4px 8px;
-      background: #f2f0ff;
-      color: #4b2fb7;
-      border-radius: 999px;
-      font-size: 12px;
-      margin: 3px;
-    }
-
-    .footer-note {
-      margin-top: 18px;
-      font-size: 12px;
-      color: #6b7280;
-      text-align: center;
-    }
-
-    @media (max-width: 1100px) {
-      .app {
-        grid-template-columns: 1fr;
-      }
-
-      .builder {
-        position: relative;
-        max-height: none;
-      }
-
-      .layout {
-        grid-template-columns: 1fr;
-      }
-
-      .side {
-        display: none;
-      }
-
-      .main-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Конструктор репозитория GitLab</title>
+    <style>
+        :root {
+            --gl-gray-10: #fcfcfd;
+            --gl-gray-50: #ececef;
+            --gl-gray-100: #dcdcde;
+            --gl-gray-700: #66666c;
+            --gl-gray-900: #1f1f24;
+            --gl-orange: #e24329;
+            --gl-blue: #1068bf;
+            --gl-green: #108548;
+            --gl-border: #e5e5e6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f3f3f4;
+            color: var(--gl-gray-900);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Конструктор (Левая панель) */
+        .editor-panel {
+            width: 350px;
+            background: #ffffff;
+            border-right: 1px solid var(--gl-border);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+
+        .editor-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--gl-border);
+            background: var(--gl-gray-10);
+        }
+
+        .editor-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .editor-body {
+            padding: 16px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--gl-gray-700);
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            font-size: 13px;
+            border: 1px solid var(--gl-gray-100);
+            border-radius: 4px;
+            background: #fff;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--gl-blue);
+            box-shadow: 0 0 0 2px rgba(16, 104, 191, 0.2);
+        }
+
+        /* Просмотр (Правая панель) */
+        .preview-panel {
+            flex: 1;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        /* Интерфейс GitLab */
+        .gl-navbar {
+            height: 48px;
+            background: #1f1f24;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            color: #fff;
+            justify-content: space-between;
+        }
+
+        .gl-navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .gl-logo {
+            width: 24px;
+            height: 24px;
+            background: var(--gl-orange);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .gl-nav-item {
+            font-size: 14px;
+            color: var(--gl-gray-100);
+            cursor: pointer;
+        }
+
+        .gl-main {
+            display: flex;
+            flex: 1;
+        }
+
+        .gl-sidebar {
+            width: 220px;
+            background: var(--gl-gray-10);
+            border-right: 1px solid var(--gl-border);
+            padding: 12px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .sidebar-item {
+            padding: 8px 16px;
+            font-size: 14px;
+            color: var(--gl-gray-700);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .sidebar-item.active {
+            background: var(--gl-gray-50);
+            color: var(--gl-gray-900);
+            font-weight: 600;
+            border-left: 3px solid var(--gl-orange);
+            padding-left: 13px;
+        }
+
+        .gl-content {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        /* Хлебные крошки и заголовок проекта */
+        .gl-breadcrumbs {
+            font-size: 14px;
+            color: var(--gl-gray-700);
+            margin-bottom: 16px;
+        }
+
+        .project-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .project-avatar {
+            width: 48px;
+            height: 48px;
+            background: #e24329;
+            color: white;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .project-title-container h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .project-id {
+            font-size: 13px;
+            color: var(--gl-gray-700);
+        }
+
+        .project-description {
+            font-size: 14px;
+            color: var(--gl-gray-900);
+            margin-top: 8px;
+            max-width: 800px;
+        }
+
+        /* Панель репозитория */
+        .repo-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .branch-selector {
+            padding: 6px 12px;
+            border: 1px solid var(--gl-gray-100);
+            border-radius: 4px;
+            font-size: 13px;
+            background: var(--gl-gray-10);
+            font-weight: 500;
+        }
+
+        .repo-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .gl-btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid var(--gl-gray-100);
+            background: #fff;
+        }
+
+        .gl-btn-blue {
+            background: var(--gl-blue);
+            color: white;
+            border: none;
+        }
+
+        /* Виджет последнего коммита */
+        .commit-widget {
+            border: 1px solid var(--gl-border);
+            border-radius: 4px 4px 0 0;
+            background: var(--gl-gray-10);
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            border-bottom: none;
+        }
+
+        .commit-author {
+            font-weight: 600;
+            color: var(--gl-gray-900);
+        }
+
+        .commit-message {
+            color: var(--gl-gray-900);
+            margin-left: 8px;
+        }
+
+        .commit-sha {
+            font-family: monospace;
+            background: var(--gl-gray-50);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--gl-blue);
+        }
+
+        /* Таблица файлов */
+        .files-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid var(--gl-border);
+            border-radius: 0 0 4px 4px;
+            overflow: hidden;
+            font-size: 14px;
+            background: #fff;
+        }
+
+        .files-table tr {
+            border-bottom: 1px solid var(--gl-border);
+        }
+
+        .files-table tr:last-child {
+            border-bottom: none;
+        }
+
+        .files-table tr:hover {
+            background: var(--gl-gray-10);
+        }
+
+        .files-table td {
+            padding: 10px 16px;
+            vertical-align: middle;
+        }
+
+        .file-name {
+            color: var(--gl-gray-900);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-icon {
+            color: var(--gl-gray-700);
+        }
+
+        .file-commit {
+            color: var(--gl-gray-700);
+            max-width: 300px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-age {
+            color: var(--gl-gray-700);
+            text-align: right;
+        }
+
+        /* Readme секция */
+        .readme-block {
+            margin-top: 24px;
+            border: 1px solid var(--gl-border);
+            border-radius: 4px;
+        }
+
+        .readme-header {
+            padding: 12px 16px;
+            background: var(--gl-gray-10);
+            border-bottom: 1px solid var(--gl-border);
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .readme-content {
+            padding: 24px;
+            font-size: 15px;
+            line-height: 1.6;
+            background: #fff;
+        }
+        
+        .readme-content h1 { margin-bottom: 16px; border-bottom: 1px solid var(--gl-border); padding-bottom: 8px; font-size: 28px;}
+        .readme-content h2 { margin-top: 24px; margin-bottom: 12px; font-size: 20px;}
+        .readme-content p { margin-bottom: 16px; }
+        .readme-content code { background: var(--gl-gray-50); padding: 2px 4px; border-radius: 4px; font-family: monospace; font-size: 13px; }
+    </style>
 </head>
 <body>
-  <div class="app">
-    <aside class="builder">
-      <h1>Конструктор репозитория</h1>
-      <p>Настрой вид страницы GitLab в реальном времени.</p>
 
-      <div class="field">
-        <label>Namespace / группа</label>
-        <input id="namespaceInput" value="acme-labs" />
-      </div>
-
-      <div class="field">
-        <label>Название репозитория</label>
-        <input id="projectInput" value="frontend-dashboard" />
-      </div>
-
-      <div class="field">
-        <label>Описание</label>
-        <textarea id="descriptionInput">Production-ready dashboard application with modular architecture, CI/CD pipeline and reusable UI components.</textarea>
-      </div>
-
-      <div class="small-row">
-        <div class="field">
-          <label>Ветка</label>
-          <input id="branchInput" value="main" />
+    <!-- Панель управления (Конструктор) -->
+    <div class="editor-panel">
+        <div class="editor-header">
+            <h2>Настройки репозитория</h2>
         </div>
-
-        <div class="field">
-          <label>Видимость</label>
-          <select id="visibilityInput">
-            <option value="Private">Private</option>
-            <option value="Internal">Internal</option>
-            <option value="Public">Public</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="small-row">
-        <div class="field">
-          <label>Stars</label>
-          <input id="starsInput" type="number" value="128" />
-        </div>
-
-        <div class="field">
-          <label>Forks</label>
-          <input id="forksInput" type="number" value="24" />
-        </div>
-      </div>
-
-      <div class="small-row">
-        <div class="field">
-          <label>Commits</label>
-          <input id="commitsInput" type="number" value="847" />
-        </div>
-
-        <div class="field">
-          <label>Branches</label>
-          <input id="branchesInput" type="number" value="9" />
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Последний коммит</label>
-        <input id="commitInput" value="Refactor authentication flow and update dashboard widgets" />
-      </div>
-
-      <div class="field">
-        <label>Автор коммита</label>
-        <input id="authorInput" value="Nikita Volkov" />
-      </div>
-
-      <div class="field">
-        <label>Pipeline</label>
-        <select id="pipelineInput">
-          <option value="success">passed</option>
-          <option value="running">running</option>
-          <option value="failed">failed</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label>Файлы и папки</label>
-        <textarea id="filesInput">src/
-public/
-tests/
-.gitlab-ci.yml
-package.json
-README.md
-vite.config.js
-Dockerfile</textarea>
-        <div class="hint">Каждая строка — отдельный файл или папка. Папку заканчивай символом /</div>
-      </div>
-
-      <div class="field">
-        <label>README текст</label>
-        <textarea id="readmeInput">A clean and scalable frontend dashboard built for analytics, internal tools and SaaS products.
-
-Install dependencies with `npm install`, run locally with `npm run dev`, and deploy through the configured GitLab CI pipeline.</textarea>
-      </div>
-
-      <button class="btn btn-primary" onclick="render()">Обновить</button>
-      <button class="btn" onclick="randomize()">Сделать реалистичный пример</button>
-      <button class="btn btn-danger" onclick="resetDefault()">Сбросить</button>
-
-      <div class="footer-note">
-        Это визуальный макет, не связанный с настоящим GitLab.
-      </div>
-    </aside>
-
-    <main class="preview">
-      <header class="topbar">
-        <div class="fox"></div>
-        <div class="brand">GitLab</div>
-        <input class="search" value="Search GitLab" readonly />
-        <div class="top-icons">
-          <span>＋</span>
-          <span>⌘</span>
-          <span>?</span>
-          <span>●</span>
-        </div>
-      </header>
-
-      <div class="layout">
-        <aside class="side">
-          <div class="side-title">
-            <div class="avatar" id="sideAvatar">F</div>
-            <div class="project-mini">
-              <strong id="sideProject">frontend-dashboard</strong>
-              <span id="sideNamespace">acme-labs</span>
+        <div class="editor-body">
+            <div class="form-group">
+                <label>Название проекта</label>
+                <input type="text" id="inp-title" value="awesome-project">
             </div>
-          </div>
-
-          <nav class="nav">
-            <a class="active" href="#">📁 Project overview</a>
-            <a href="#">📦 Repository</a>
-            <a href="#">🔀 Merge requests</a>
-            <a href="#">✅ CI/CD</a>
-            <a href="#">🧪 Deployments</a>
-            <a href="#">📋 Issues</a>
-            <a href="#">📊 Analytics</a>
-            <a href="#">⚙️ Settings</a>
-          </nav>
-        </aside>
-
-        <section class="content">
-          <div class="breadcrumbs">
-            <span id="crumbNamespace">acme-labs</span> / <strong id="crumbProject">frontend-dashboard</strong>
-          </div>
-
-          <section class="repo-head">
-            <div class="repo-title-row">
-              <div class="repo-title">
-                <div class="repo-icon">◆</div>
-                <div>
-                  <h2 id="projectTitle">frontend-dashboard</h2>
-                  <div class="visibility">🔒 <span id="visibilityText">Private</span> project</div>
-                </div>
-              </div>
-
-              <div class="actions">
-                <div class="gl-btn">☆ Star <strong id="starBtn">128</strong></div>
-                <div class="gl-btn">⑂ Fork <strong id="forkBtn">24</strong></div>
-                <div class="gl-btn orange">Clone</div>
-              </div>
+            <div class="form-group">
+                <label>Группа / Пространство имен</label>
+                <input type="text" id="inp-namespace" value="development-team">
             </div>
-
-            <p class="description" id="descriptionText"></p>
-
-            <div class="stats">
-              <span>⭐ <strong id="starsStat">128</strong> stars</span>
-              <span>⑂ <strong id="forksStat">24</strong> forks</span>
-              <span>● <strong id="commitsStat">847</strong> commits</span>
-              <span>⑃ <strong id="branchesStat">9</strong> branches</span>
-              <span>🏷 3 tags</span>
+            <div class="form-group">
+                <label>ID проекта</label>
+                <input type="number" id="inp-id" value="482910">
             </div>
-          </section>
+            <div class="form-group">
+                <label>Описание</label>
+                <textarea id="inp-desc" rows="2">Здесь находится самое лучшее open-source решение для автоматизации ваших повседневных задач.</textarea>
+            </div>
+            <div class="form-group">
+                <label>Ветка по умолчанию</label>
+                <input type="text" id="inp-branch" value="main">
+            </div>
+            <div class="form-group">
+                <label>Автор последнего коммита</label>
+                <input type="text" id="inp-author" value="Ivan Ivanov">
+            </div>
+            <div class="form-group">
+                <label>Текст коммита</label>
+                <input type="text" id="inp-commit-msg" value="feat: add pipelines configuration and documentation">
+            </div>
+            <div class="form-group">
+                <label>Хэш коммита (SHA)</label>
+                <input type="text" id="inp-sha" value="a1b2c3d4">
+            </div>
+            <div class="form-group">
+                <label>Текст README.md (HTML/Текст)</label>
+                <textarea id="inp-readme" rows="8"><h1>🚀 Awesome Project</h1>
+<p>Это пример реалистичного репозитория, сгенерированного с помощью интерактивного конструктора GitLab.</p>
+<h2>Установка</h2>
+<p><code>npm install awesome-tool</code></p>
+<h2>Использование</h2>
+<p>Просто запустите проект командой <code>npm start</code>.</p></textarea>
+            </div>
+        </div>
+    </div>
 
-          <div class="tabs">
-            <div class="tab active">Files</div>
-            <div class="tab">Commits</div>
-            <div class="tab">Branches</div>
-            <div class="tab">Tags</div>
-            <div class="tab">Graph</div>
-          </div>
-
-          <div class="main-grid">
+    <!-- Панель предпросмотра (GitLab) -->
+    <div class="preview-panel">
+        <!-- Навбар -->
+        <div class="gl-navbar">
+            <div class="gl-navbar-left">
+                <div class="gl-logo">🦊</div>
+                <div class="gl-nav-item" style="font-weight:600;">GitLab</div>
+                <div class="gl-nav-item">Search</div>
+            </div>
             <div>
-              <section class="card">
-                <div class="toolbar">
-                  <div class="branch">⑂ <span id="branchText">main</span></div>
-                  <div class="path"><span id="pathNamespace">acme-labs</span> / <strong id="pathProject">frontend-dashboard</strong></div>
-                  <div class="gl-btn">Find file</div>
-                  <div class="gl-btn orange">Code</div>
-                </div>
+                <div style="width:32px; height:32px; background:var(--gl-gray-700); border-radius:50%;"></div>
+            </div>
+        </div>
 
-                <div class="commit-bar">
-                  <div class="commit-avatar" id="commitAvatar">NV</div>
-                  <div class="commit-text">
-                    <div class="commit-msg" id="commitMsg"></div>
-                    <div class="commit-meta">
-                      <span id="authorText"></span> committed 2 hours ago
-                    </div>
-                  </div>
-                  <div class="pipeline success" id="pipelineBadge">● passed</div>
+        <div class="gl-main">
+            <!-- Боковая панель -->
+            <div class="gl-sidebar">
+                <div class="sidebar-item active">
+                    <span>📁</span> Project overview
                 </div>
-
-                <table class="files">
-                  <tbody id="filesTable"></tbody>
-                </table>
-              </section>
-
-              <section class="card readme">
-                <div class="readme-head">README.md</div>
-                <div class="readme-body">
-                  <h1 id="readmeTitle">frontend-dashboard</h1>
-                  <p id="readmeText"></p>
+                <div class="sidebar-item">
+                    <span>💻</span> Repository
                 </div>
-              </section>
+                <div class="sidebar-item">
+                    <span>🚀</span> CI/CD
+                </div>
+                <div class="sidebar-item">
+                    <span>📋</span> Issues
+                </div>
+                <div class="sidebar-item">
+                    <span>🔀</span> Merge requests
+                </div>
+                <div class="sidebar-item">
+                    <span>🛡️</span> Security & Compliance
+                </div>
+                <div class="sidebar-item">
+                    <span>📊</span> Analytics
+                </div>
+                <div class="sidebar-item">
+                    <span>⚙️</span> Settings
+                </div>
             </div>
 
-            <aside>
-              <section class="aside-card">
-                <h3>Project information</h3>
-                <div class="info-row"><span>Repository</span><strong id="infoRepo">frontend-dashboard</strong></div>
-                <div class="info-row"><span>Created</span><strong>Mar 14, 2024</strong></div>
-                <div class="info-row"><span>Default branch</span><strong id="infoBranch">main</strong></div>
-                <div class="info-row"><span>License</span><strong>MIT</strong></div>
-                <div class="info-row"><span>Storage</span><strong>42.8 MB</strong></div>
-              </section>
-
-              <section class="aside-card">
-                <h3>Languages</h3>
-                <div class="lang-bar">
-                  <div class="lang-js"></div>
-                  <div class="lang-html"></div>
-                  <div class="lang-css"></div>
+            <!-- Главный контент -->
+            <div class="gl-content">
+                <!-- Хлебные крошки -->
+                <div class="gl-breadcrumbs">
+                    <span id="view-bread-namespace">development-team</span> / <span id="view-bread-title" style="font-weight:600; color:var(--gl-gray-900);">awesome-project</span>
                 </div>
-                <div class="info-row"><span>JavaScript</span><strong>55.0%</strong></div>
-                <div class="info-row"><span>HTML</span><strong>25.0%</strong></div>
-                <div class="info-row"><span>CSS</span><strong>20.0%</strong></div>
-              </section>
 
-              <section class="aside-card">
-                <h3>Topics</h3>
-                <span class="tag">dashboard</span>
-                <span class="tag">frontend</span>
-                <span class="tag">ci-cd</span>
-                <span class="tag">typescript</span>
-                <span class="tag">docker</span>
-              </section>
-            </aside>
-          </div>
-        </section>
-      </div>
-    </main>
-  </div>
+                <!-- Шапка проекта -->
+                <div class="project-header">
+                    <div class="project-avatar" id="view-avatar">A</div>
+                    <div class="project-title-container">
+                        <h1 id="view-title">awesome-project</h1>
+                        <div class="project-id">Project ID: <span id="view-id">482910</span></div>
+                        <div class="project-description" id="view-desc">Здесь находится самое лучшее open-source решение для автоматизации ваших повседневных задач.</div>
+                    </div>
+                </div>
 
-  <script>
-    const $ = (id) => document.getElementById(id);
+                <!-- Контролы репозитория -->
+                <div class="repo-controls">
+                    <button class="branch-selector">🌿 <span id="view-branch">main</span></button>
+                    <div class="repo-buttons">
+                        <button class="gl-btn">History</button>
+                        <button class="gl-btn">Find file</button>
+                        <button class="gl-btn gl-btn-blue">Clone</button>
+                    </div>
+                </div>
 
-    function initials(name) {
-      return name
-        .split(" ")
-        .filter(Boolean)
-        .map(word => word[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase() || "U";
-    }
+                <!-- Последний коммит -->
+                <div class="commit-widget">
+                    <div>
+                        <span class="commit-author" id="view-author">Ivan Ivanov</span>
+                        <span class="commit-message" id="view-commit-msg">feat: add pipelines configuration and documentation</span>
+                    </div>
+                    <div class="commit-sha" id="view-sha">a1b2c3d4</div>
+                </div>
 
-    function escapeHtml(text) {
-      return String(text)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;");
-    }
+                <!-- Файловая структура -->
+                <table class="files-table">
+                    <tbody>
+                        <tr>
+                            <td><div class="file-name"><span>📁</span> .gitlab</div></td>
+                            <td><div class="file-commit" id="file-c1">feat: add pipelines configuration and documentation</div></td>
+                            <td><div class="file-age">3 days ago</div></td>
+                        </tr>
+                        <tr>
+                            <td><div class="file-name"><span>📁</span> src</div></td>
+                            <td><div class="file-commit" id="file-c2">feat: add pipelines configuration and documentation</div></td>
+                            <td><div class="file-age">3 days ago</div></td>
+                        </tr>
+                        <tr>
+                            <td><div class="file-name"><span>📄</span> .gitlab-ci.yml</div></td>
+                            <td><div class="file-commit">Initial CI/CD setup</div></td>
+                            <td><div class="file-age">1 week ago</div></td>
+                        </tr>
+                        <tr>
+                            <td><div class="file-name"><span>📄</span> package.json</div></td>
+                            <td><div class="file-commit">Update dependencies</div></td>
+                            <td><div class="file-age">2 weeks ago</div></td>
+                        </tr>
+                        <tr>
+                            <td><div class="file-name"><span>📄</span> README.md</div></td>
+                            <td><div class="file-commit" id="file-c3">feat: add pipelines configuration and documentation</div></td>
+                            <td><div class="file-age">3 days ago</div></td>
+                        </tr>
+                    </tbody>
+                </table>
 
-    function renderReadme(text) {
-      return escapeHtml(text).replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\n/g, "<br>");
-    }
+                <!-- README -->
+                <div class="readme-block">
+                    <div class="readme-header">
+                        <span>📖</span> README.md
+                    </div>
+                    <div class="readme-content" id="view-readme">
+                        <!-- Сюда рендерится контент -->
+                    </div>
+                </div>
 
-    function fileIcon(name) {
-      if (name.endsWith("/")) return "📁";
-      if (name.toLowerCase().includes("readme")) return "📘";
-      if (name.includes("docker")) return "🐳";
-      if (name.includes("gitlab")) return "🦊";
-      if (name.endsWith(".json")) return "🧩";
-      if (name.endsWith(".js")) return "📜";
-      if (name.endsWith(".ts")) return "🔷";
-      if (name.endsWith(".css")) return "🎨";
-      if (name.endsWith(".html")) return "🌐";
-      return "📄";
-    }
+            </div>
+        </div>
+    </div>
 
-    function render() {
-      const namespace = $("namespaceInput").value.trim() || "group";
-      const project = $("projectInput").value.trim() || "repository";
-      const description = $("descriptionInput").value.trim();
-      const branch = $("branchInput").value.trim() || "main";
-      const visibility = $("visibilityInput").value;
-      const stars = $("starsInput").value || 0;
-      const forks = $("forksInput").value || 0;
-      const commits = $("commitsInput").value || 0;
-      const branches = $("branchesInput").value || 0;
-      const commit = $("commitInput").value.trim() || "Initial commit";
-      const author = $("authorInput").value.trim() || "User";
-      const pipeline = $("pipelineInput").value;
-      const files = $("filesInput").value.split("\n").map(x => x.trim()).filter(Boolean);
-      const readme = $("readmeInput").value.trim();
+    <script>
+        // Элементы ввода
+        const inpTitle = document.getElementById('inp-title');
+        const inpNamespace = document.getElementById('inp-namespace');
+        const inpId = document.getElementById('inp-id');
+        const inpDesc = document.getElementById('inp-desc');
+        const inpBranch = document.getElementById('inp-branch');
+        const inpAuthor = document.getElementById('inp-author');
+        const inpCommitMsg = document.getElementById('inp-commit-msg');
+        const inpSha = document.getElementById('inp-sha');
+        const inpReadme = document.getElementById('inp-readme');
 
-      $("sideAvatar").textContent = project[0].toUpperCase();
-      $("sideProject").textContent = project;
-      $("sideNamespace").textContent = namespace;
+        // Элементы отображения
+        const viewTitle = document.getElementById('view-title');
+        const viewBreadTitle = document.getElementById('view-bread-title');
+        const viewNamespace = document.getElementById('view-bread-namespace');
+        const viewAvatar = document.getElementById('view-avatar');
+        const viewId = document.getElementById('view-id');
+        const viewDesc = document.getElementById('view-desc');
+        const viewBranch = document.getElementById('view-branch');
+        const viewAuthor = document.getElementById('view-author');
+        const viewCommitMsg = document.getElementById('view-commit-msg');
+        const viewSha = document.getElementById('view-sha');
+        const viewReadme = document.getElementById('view-readme');
+        
+        const fileC1 = document.getElementById('file-c1');
+        const fileC2 = document.getElementById('file-c2');
+        const fileC3 = document.getElementById('file-c3');
 
-      $("crumbNamespace").textContent = namespace;
-      $("crumbProject").textContent = project;
-      $("projectTitle").textContent = project;
-      $("visibilityText").textContent = visibility;
-      $("descriptionText").textContent = description;
-
-      $("starBtn").textContent = stars;
-      $("forkBtn").textContent = forks;
-      $("starsStat").textContent = stars;
-      $("forksStat").textContent = forks;
-      $("commitsStat").textContent = commits;
-      $("branchesStat").textContent = branches;
-
-      $("branchText").textContent = branch;
-      $("pathNamespace").textContent = namespace;
-      $("pathProject").textContent = project;
-
-      $("commitMsg").textContent = commit;
-      $("authorText").textContent = author;
-      $("commitAvatar").textContent = initials(author);
-
-      const badge = $("pipelineBadge");
-      badge.className = "pipeline " + pipeline;
-      badge.textContent = pipeline === "success" ? "● passed" : pipeline === "running" ? "● running" : "● failed";
-
-      $("infoRepo").textContent = project;
-      $("infoBranch").textContent = branch;
-
-      $("readmeTitle").textContent = project;
-      $("readmeText").innerHTML = renderReadme(readme);
-
-      const times = ["2 hours ago", "5 hours ago", "yesterday", "2 days ago", "last week"];
-      $("filesTable").innerHTML = files.map((file, index) => {
-        const msg = file.endsWith("/")
-          ? "Update directory structure"
-          : index % 3 === 0
-            ? "Improve configuration"
-            : index % 3 === 1
-              ? "Add production changes"
-              : "Cleanup and formatting";
-
-        return `
-          <tr>
-            <td class="file-name">${fileIcon(file)} ${escapeHtml(file)}</td>
-            <td class="file-commit">${msg}</td>
-            <td class="file-time">${times[index % times.length]}</td>
-          </tr>
-        `;
-      }).join("");
-    }
-
-    function randomize() {
-      const examples = [
-        {
-          namespace: "nova-cloud",
-          project: "billing-service",
-          description: "Reliable billing microservice with REST API, background workers, PostgreSQL storage and automated delivery pipeline.",
-          branch: "main",
-          stars: 342,
-          forks: 61,
-          commits: 1294,
-          branches: 14,
-          commit: "Add invoice reconciliation job and improve API validation",
-          author: "Anna Petrova",
-          files: "app/\nconfig/\ndatabase/\nspec/\n.gitlab-ci.yml\nGemfile\nREADME.md\nDockerfile"
-        },
-        {
-          namespace: "orbit-studio",
-          project: "design-system",
-          description: "Shared UI component library with tokens, documentation, accessibility checks and release automation.",
-          branch: "develop",
-          stars: 89,
-          forks: 17,
-          commits: 563,
-          branches: 7,
-          commit: "Release button variants and update Storybook documentation",
-          author: "Mikhail Sokolov",
-          files: "components/\ntokens/\ndocs/\n.storybook/\n.gitlab-ci.yml\npackage.json\nREADME.md\nCHANGELOG.md"
-        },
-        {
-          namespace: "delta-team",
-          project: "mobile-api-gateway",
-          description: "API gateway for mobile applications with rate limiting, authentication middleware and observability tools.",
-          branch: "release",
-          stars: 214,
-          forks: 38,
-          commits: 978,
-          branches: 11,
-          commit: "Optimize request tracing and cache user sessions",
-          author: "Sergey Morozov",
-          files: "cmd/\ninternal/\nconfigs/\napi/\n.gitlab-ci.yml\ngo.mod\nREADME.md\nDockerfile"
+        function updatePreview() {
+            viewTitle.textContent = inpTitle.value;
+            viewBreadTitle.textContent = inpTitle.value;
+            viewNamespace.textContent = inpNamespace.value;
+            viewAvatar.textContent = inpTitle.value ? inpTitle.value.charAt(0) : 'G';
+            viewId.textContent = inpId.value;
+            viewDesc.textContent = inpDesc.value;
+            viewBranch.textContent = inpBranch.value;
+            viewAuthor.textContent = inpAuthor.value;
+            
+            viewCommitMsg.textContent = inpCommitMsg.value;
+            fileC1.textContent = inpCommitMsg.value;
+            fileC2.textContent = inpCommitMsg.value;
+            fileC3.textContent = inpCommitMsg.value;
+            
+            viewSha.textContent = inpSha.value;
+            viewReadme.innerHTML = inpReadme.value;
         }
-      ];
 
-      const item = examples[Math.floor(Math.random() * examples.length)];
+        // Слушатели событий
+        const inputs = [inpTitle, inpNamespace, inpId, inpDesc, inpBranch, inpAuthor, inpCommitMsg, inpSha, inpReadme];
+        inputs.forEach(input => input.addEventListener('input', updatePreview));
 
-      $("namespaceInput").value = item.namespace;
-      $("projectInput").value = item.project;
-      $("descriptionInput").value = item.description;
-      $("branchInput").value = item.branch;
-      $("visibilityInput").value = ["Private", "Internal", "Public"][Math.floor(Math.random() * 3)];
-      $("starsInput").value = item.stars;
-      $("forksInput").value = item.forks;
-      $("commitsInput").value = item.commits;
-      $("branchesInput").value = item.branches;
-      $("commitInput").value = item.commit;
-      $("authorInput").value = item.author;
-      $("pipelineInput").value = ["success", "success", "running", "failed"][Math.floor(Math.random() * 4)];
-      $("filesInput").value = item.files;
-      $("readmeInput").value = item.description + "\n\nInstall dependencies, configure environment variables and run the service locally. Deployment is handled by `GitLab CI/CD`.";
-      render();
-    }
-
-    function resetDefault() {
-      $("namespaceInput").value = "acme-labs";
-      $("projectInput").value = "frontend-dashboard";
-      $("descriptionInput").value = "Production-ready dashboard application with modular architecture, CI/CD pipeline and reusable UI components.";
-      $("branchInput").value = "main";
-      $("visibilityInput").value = "Private";
-      $("starsInput").value = "128";
-      $("forksInput").value = "24";
-      $("commitsInput").value = "847";
-      $("branchesInput").value = "9";
-      $("commitInput").value = "Refactor authentication flow and update dashboard widgets";
-      $("authorInput").value = "Nikita Volkov";
-      $("pipelineInput").value = "success";
-      $("filesInput").value = "src/\npublic/\ntests/\n.gitlab-ci.yml\npackage.json\nREADME.md\nvite.config.js\nDockerfile";
-      $("readmeInput").value = "A clean and scalable frontend dashboard built for analytics, internal tools and SaaS products.\n\nInstall dependencies with `npm install`, run locally with `npm run dev`, and deploy through the configured GitLab CI pipeline.";
-      render();
-    }
-
-    render();
-  </script>
+        // Первая инициализация
+        updatePreview();
+    </script>
 </body>
 </html>
