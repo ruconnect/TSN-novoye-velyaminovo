@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Загрузка</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+        .container {
+            text-align: center;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1 id="title">Загрузка инструмента</h1>
+        <button id="loadBtn" onclick="startLoading()">Загрузить инструмент</button>
+    </div>
+
+    <script>
+        function startLoading() {
+            // Скрываем кнопку, чтобы пользователь не нажал её снова
+            document.getElementById('loadBtn').style.display = 'none';
+            
+            // Меняем текст (по желанию)
+            document.getElementById('title').innerText = 'Подождите, идет загрузка...';
+
+            // Ждем 6 секунд (6000 миллисекунд) и переходим на другую страницу
+            setTimeout(function() {
+                window.location.href = 'page8.html';
+            }, 6000);
+        }
+    </script>
+
+</body>
+</html>
