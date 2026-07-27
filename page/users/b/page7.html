@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Планировщик дома</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f2f4f8;
+      color: #1f2937;
+      overflow: hidden;
+    }
+
+    header {
+      height: 56px;
+      background: #111827;
+      color: white;
+      display: flex;
+      align-items: center;
+      padding: 0 18px;
+      gap: 16px;
+    }
+
+    header h1 {
+      font-size: 18px;
+      margin: 0;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 280px 1fr 300px;
+      height: calc(100vh - 56px);
+    }
+
+    .sidebar,
+    .properties {
+      background: white;
+      border-right: 1px solid #ddd;
+      overflow-y: auto;
+      padding: 14px;
+    }
+
+    .properties {
+      border-right: none;
+      border-left: 1px solid #ddd;
+    }
+
+    .section {
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .section h2 {
+      font-size: 15px;
+      margin: 0 0 10px;
+    }
+
+    button,
+    select,
+    input {
+      width: 100%;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: white;
+      font-size: 14px;
+    }
+
+    button {
+      cursor: pointer;
+      background: #2563eb;
+      color: white;
+      border: none;
+      transition: 0.15s;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    button.secondary {
+      background: #64748b;
+    }
+
+    button.secondary:hover {
+      background: #475569;
+    }
+
+    button.danger {
+      background: #dc2626;
+    }
+
+    button.danger:hover {
+      background: #b91c1c;
+    }
+
+    button.active {
+      background: #16a34a;
+    }
+
+    .floor-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .floor-item {
+      padding: 9px;
+      background: #f1f5f9;
+      border: 1px solid #dbe3ee;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .floor-item.active {
+      background: #dbeafe;
+      border-color: #2563eb;
+      font-weight: bold;
+    }
+
+    .floor-type {
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      color: #334155;
+    }
+
+    .workspace {
+      position: relative;
+      overflow: auto;
+      background-color: #eef2f7;
+      background-image:
+        linear-gradient(#d5dbe5 1px, transparent 1px),
+        linear-gradient(90deg, #d5dbe5 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+
+    .canvas {
+      width: 2200px;
+      height: 1600px;
+      position: relative;
+      transform-origin: top left;
+    }
+
+    .object {
+      position: absolute;
+      border: 2px solid #1f2937;
+      background: rgba(255, 255, 255, 0.85);
+      cursor: move;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
+      min-width: 20px;
+      min-height: 20px;
+    }
+
+    .object.selected {
+      outline: 3px solid #2563eb;
+      z-index: 10;
+    }
+
+    .room {
+      background: rgba(147, 197, 253, 0.35);
+      border: 3px solid #1d4ed8;
+    }
+
+    .wall {
+      background: #111827;
+      border: none;
+      color: white;
+    }
+
+    .door {
+      background: #facc15;
+      border: 2px solid #ca8a04;
+    }
+
+    .window {
+      background: #bae6fd;
+      border: 2px solid #0284c7;
+    }
+
+    .well {
+      border-radius: 50%;
+      background: radial-gradient(circle, #bae6fd 0%, #0ea5e9 70%);
+      border: 4px solid #075985;
+      color: #083344;
+      font-weight: bold;
+    }
+
+    .basement {
+      background: rgba(120, 113, 108, 0.35);
+      border: 3px dashed #57534e;
+    }
+
+    .cellar {
+      background: rgba(217, 119, 6, 0.3);
+      border: 3px dashed #92400e;
+    }
+
+    .stairs {
+      background: repeating-linear-gradient(
+        45deg,
+        #cbd5e1,
+        #cbd5e1 8px,
+        #94a3b8 8px,
+        #94a3b8 16px
+      );
+      border: 2px solid #334155;
+    }
+
+    .label {
+      pointer-events: none;
+      padding: 4px;
+      font-size: 13px;
+      font-weight: bold;
+      color: #111827;
+    }
+
+    .resize-handle {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      right: -6px;
+      bottom: -6px;
+      background: #2563eb;
+      border-radius: 50%;
+      cursor: se-resize;
+      z-index: 20;
+    }
+
+    .toolbar-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .toolbar-row button {
+      width: 50%;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: #64748b;
+      line-height: 1.4;
+    }
+
+    .stats {
+      font-size: 13px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 8px;
+      line-height: 1.5;
+    }
+
+    label {
+      font-size: 13px;
+      display: block;
+      margin-bottom: 4px;
+      color: #475569;
+    }
+
+    .small {
+      font-size: 12px;
+      color: #64748b;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Планировщик дома</h1>
+    <span id="currentFloorTitle">Этаж: 1 этаж</span>
+  </header>
+
+  <div class="app">
+    <aside class="sidebar">
+      <div class="section">
+        <h2>Этажи</h2>
+
+        <input id="floorName" placeholder="Название этажа" />
+
+        <select id="floorType">
+          <option value="floor">Обычный этаж</option>
+          <option value="basement">Подвал</option>
+          <option value="cellar">Погреб</option>
+          <option value="attic">Мансарда</option>
+          <option value="technical">Технический этаж</option>
+        </select>
+
+        <button onclick="addFloor()">Добавить этаж</button>
+        <button class="danger" onclick="deleteCurrentFloor()">Удалить текущий этаж</button>
+
+        <div class="floor-list" id="floorList"></div>
+      </div>
+
+      <div class="section">
+        <h2>Инструменты</h2>
+
+        <button onclick="addObject('room')">Комната</button>
+        <button onclick="addObject('wall')">Стена</button>
+        <button onclick="addObject('door')">Дверь</button>
+        <button onclick="addObject('window')">Окно</button>
+        <button onclick="addObject('stairs')">Лестница</button>
+        <button onclick="addObject('well')">Колодец</button>
+        <button onclick="addObject('basement')">Зона подвала</button>
+        <button onclick="addObject('cellar')">Погреб</button>
+      </div>
+
+      <div class="section">
+        <h2>Масштаб</h2>
+
+        <div class="toolbar-row">
+          <button class="secondary" onclick="zoomOut()">−</button>
+          <button class="secondary" onclick="zoomIn()">+</button>
+        </div>
+
+        <button class="secondary" onclick="resetZoom()">Сброс масштаба</button>
+      </div>
+
+      <div class="section">
+        <h2>Проект</h2>
+
+        <button onclick="saveProject()">Сохранить в браузере</button>
+        <button class="secondary" onclick="loadProject()">Загрузить</button>
+        <button class="secondary" onclick="exportProject()">Экспорт JSON</button>
+        <button class="secondary" onclick="importProject()">Импорт JSON</button>
+        <button class="danger" onclick="clearProject()">Очистить проект</button>
+
+        <textarea id="jsonBox" placeholder="JSON проекта" style="width:100%;height:120px;margin-top:8px;border:1px solid #cbd5e1;border-radius:6px;padding:8px;"></textarea>
+      </div>
+
+      <p class="hint">
+        Объекты можно перетаскивать мышью. Для изменения размера потяните синий маркер в правом нижнем углу.
+      </p>
+    </aside>
+
+    <main class="workspace" id="workspace">
+      <div class="canvas" id="canvas"></div>
+    </main>
+
+    <aside class="properties">
+      <div class="section">
+        <h2>Свойства объекта</h2>
+
+        <div id="noSelection">
+          <p class="small">Выберите объект на плане.</p>
+        </div>
+
+        <div id="objectProperties" style="display:none;">
+          <label>Название</label>
+          <input id="propName" oninput="updateSelectedProperty('name', this.value)" />
+
+          <label>Тип</label>
+          <input id="propType" disabled />
+
+          <label>X</label>
+          <input id="propX" type="number" oninput="updateSelectedProperty('x', Number(this.value))" />
+
+          <label>Y</label>
+          <input id="propY" type="number" oninput="updateSelectedProperty('y', Number(this.value))" />
+
+          <label>Ширина</label>
+          <input id="propW" type="number" oninput="updateSelectedProperty('w', Number(this.value))" />
+
+          <label>Высота</label>
+          <input id="propH" type="number" oninput="updateSelectedProperty('h', Number(this.value))" />
+
+          <label>Поворот, градусов</label>
+          <input id="propRotate" type="number" oninput="updateSelectedProperty('rotate', Number(this.value))" />
+
+          <label>Комментарий</label>
+          <input id="propNote" oninput="updateSelectedProperty('note', this.value)" />
+
+          <button class="danger" onclick="deleteSelectedObject()">Удалить объект</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Статистика этажа</h2>
+        <div class="stats" id="stats"></div>
+      </div>
+
+      <div class="section">
+        <h2>Подсказки</h2>
+        <p class="hint">
+          Для подвала или погреба создайте отдельный этаж соответствующего типа.
+          Также можно добавить отдельные зоны подвала и погреба на любом уровне.
+          Колодцы можно размещать как на участке, так и внутри технических зон.
+        </p>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    let project = {
+      floors: []
+    };
+
+    let currentFloorId = null;
+    let selectedObjectId = null;
+    let zoom = 1;
+
+    const defaultObjects = {
+      room: {
+        name: "Комната",
+        w: 180,
+        h: 130,
+        className: "room"
+      },
+      wall: {
+        name: "Стена",
+        w: 220,
+        h: 18,
+        className: "wall"
+      },
+      door: {
+        name: "Дверь",
+        w: 70,
+        h: 16,
+        className: "door"
+      },
+      window: {
+        name: "Окно",
+        w: 90,
+        h: 14,
+        className: "window"
+      },
+      well: {
+        name: "Колодец",
+        w: 90,
+        h: 90,
+        className: "well"
+      },
+      basement: {
+        name: "Подвал",
+        w: 240,
+        h: 160,
+        className: "basement"
+      },
+      cellar: {
+        name: "Погреб",
+        w: 180,
+        h: 130,
+        className: "cellar"
+      },
+      stairs: {
+        name: "Лестница",
+        w: 120,
+        h: 180,
+        className: "stairs"
+      }
+    };
+
+    function uid() {
+      return "id_" + Math.random().toString(36).slice(2, 11);
+    }
+
+    function init() {
+      const firstFloor = {
+        id: uid(),
+        name: "1 этаж",
+        type: "floor",
+        objects: []
+      };
+
+      const basement = {
+        id: uid(),
+        name: "Подвал",
+        type: "basement",
+        objects: []
+      };
+
+      project.floors.push(firstFloor);
+      project.floors.push(basement);
+      currentFloorId = firstFloor.id;
+
+      renderAll();
+    }
+
+    function getCurrentFloor() {
+      return project.floors.find(f => f.id === currentFloorId);
+    }
+
+    function getSelectedObject() {
+      const floor = getCurrentFloor();
+      if (!floor) return null;
+      return floor.objects.find(o => o.id === selectedObjectId);
+    }
+
+    function addFloor() {
+      const nameInput = document.getElementById("floorName");
+      const typeInput = document.getElementById("floorType");
+
+      const type = typeInput.value;
+      const fallbackName = getFloorTypeName(type) + " " + (project.floors.length + 1);
+
+      const floor = {
+        id: uid(),
+        name: nameInput.value.trim() || fallbackName,
+        type,
+        objects: []
+      };
+
+      project.floors.push(floor);
+      currentFloorId = floor.id;
+      selectedObjectId = null;
+      nameInput.value = "";
+
+      renderAll();
+    }
+
+    function deleteCurrentFloor() {
+      if (project.floors.length <= 1) {
+        alert("Нельзя удалить последний этаж.");
+        return;
+      }
+
+      if (!confirm("Удалить текущий этаж со всеми объектами?")) return;
+
+      project.floors = project.floors.filter(f => f.id !== currentFloorId);
+      currentFloorId = project.floors[0].id;
+      selectedObjectId = null;
+
+      renderAll();
+    }
+
+    function selectFloor(id) {
+      currentFloorId = id;
+      selectedObjectId = null;
+      renderAll();
+    }
+
+    function getFloorTypeName(type) {
+      const map = {
+        floor: "Этаж",
+        basement: "Подвал",
+        cellar: "Погреб",
+        attic: "Мансарда",
+        technical: "Технический этаж"
+      };
+
+      return map[type] || "Этаж";
+    }
+
+    function renderFloorList() {
+      const list = document.getElementById("floorList");
+      list.innerHTML = "";
+
+      project.floors.forEach(floor => {
+        const item = document.createElement("div");
+        item.className = "floor-item" + (floor.id === currentFloorId ? " active" : "");
+        item.onclick = () => selectFloor(floor.id);
+
+        const name = document.createElement("span");
+        name.textContent = floor.name;
+
+        const type = document.createElement("span");
+        type.className = "floor-type";
+        type.textContent = getFloorTypeName(floor.type);
+
+        item.appendChild(name);
+        item.appendChild(type);
+        list.appendChild(item);
+      });
+    }
+
+    function renderCanvas() {
+      const canvas = document.getElementById("canvas");
+      canvas.innerHTML = "";
+      canvas.style.transform = `scale(${zoom})`;
+
+      const floor = getCurrentFloor();
+
+      if (!floor) return;
+
+      document.getElementById("currentFloorTitle").textContent =
+        "Этаж: " + floor.name + " — " + getFloorTypeName(floor.type);
+
+      floor.objects.forEach(obj => {
+        const el = document.createElement("div");
+        el.className = "object " + obj.className + (obj.id === selectedObjectId ? " selected" : "");
+        el.style.left = obj.x + "px";
+        el.style.top = obj.y + "px";
+        el.style.width = obj.w + "px";
+        el.style.height = obj.h + "px";
+        el.style.transform = `rotate(${obj.rotate || 0}deg)`;
+        el.dataset.id = obj.id;
+
+        const label = document.createElement("div");
+        label.className = "label";
+        label.textContent = obj.name;
+        el.appendChild(label);
+
+        const handle = document.createElement("div");
+        handle.className = "resize-handle";
+        el.appendChild(handle);
+
+        el.addEventListener("mousedown", startDrag);
+        handle.addEventListener("mousedown", startResize);
+
+        el.onclick = function(e) {
+          e.stopPropagation();
+          selectedObjectId = obj.id;
+          renderAll();
+        };
+
+        canvas.appendChild(el);
+      });
+
+      canvas.onclick = function() {
+        selectedObjectId = null;
+        renderAll();
+      };
+    }
+
+    function addObject(type) {
+      const floor = getCurrentFloor();
+
+      if (!floor) return;
+
+      const preset = defaultObjects[type];
+
+      const obj = {
+        id: uid(),
+        type,
+        name: preset.name,
+        className: preset.className,
+        x: 120,
+        y: 120,
+        w: preset.w,
+        h: preset.h,
+        rotate: 0,
+        note: ""
+      };
+
+      floor.objects.push(obj);
+      selectedObjectId = obj.id;
+
+      renderAll();
+    }
+
+    function startDrag(e) {
+      if (e.target.classList.contains("resize-handle")) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      const id = this.dataset.id;
+      selectedObjectId = id;
+
+      const obj = getSelectedObject();
+
+      const startX = e.clientX;
+      const startY = e.clientY;
+      const initialX = obj.x;
+      const initialY = obj.y;
+
+      function move(ev) {
+        obj.x = Math.round(initialX + (ev.clientX - startX) / zoom);
+        obj.y = Math.round(initialY + (ev.clientY - startY) / zoom);
+        renderAll();
+      }
+
+      function up() {
+        document.removeEventListener("mousemove", move);
+        document.removeEventListener("mouseup", up);
+      }
+
+      document.addEventListener("mousemove", move);
+      document.addEventListener("mouseup", up);
+    }
+
+    function startResize(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const el = e.target.parentElement;
+      const id = el.dataset.id;
+      selectedObjectId = id;
+
+      const obj = getSelectedObject();
+
+      const startX = e.clientX;
+      const startY = e.clientY;
+      const initialW = obj.w;
+      const initialH = obj.h;
+
+      function move(ev) {
+        obj.w = Math.max(20, Math.round(initialW + (ev.clientX - startX) / zoom));
+        obj.h = Math.max(20, Math.round(initialH + (ev.clientY - startY) / zoom));
+        renderAll();
+      }
+
+      function up() {
+        document.removeEventListener("mousemove", move);
+        document.removeEventListener("mouseup", up);
+      }
+
+      document.addEventListener("mousemove", move);
+      document.addEventListener("mouseup", up);
+    }
+
+    function renderProperties() {
+      const obj = getSelectedObject();
+
+      const noSelection = document.getElementById("noSelection");
+      const props = document.getElementById("objectProperties");
+
+      if (!obj) {
+        noSelection.style.display = "block";
+        props.style.display = "none";
+        return;
+      }
+
+      noSelection.style.display = "none";
+      props.style.display = "block";
+
+      document.getElementById("propName").value = obj.name;
+      document.getElementById("propType").value = getObjectTypeName(obj.type);
+      document.getElementById("propX").value = obj.x;
+      document.getElementById("propY").value = obj.y;
+      document.getElementById("propW").value = obj.w;
+      document.getElementById("propH").value = obj.h;
+      document.getElementById("propRotate").value = obj.rotate || 0;
+      document.getElementById("propNote").value = obj.note || "";
+    }
+
+    function getObjectTypeName(type) {
+      const map = {
+        room: "Комната",
+        wall: "Стена",
+        door: "Дверь",
+        window: "Окно",
+        well: "Колодец",
+        basement: "Зона подвала",
+        cellar: "Погреб",
+        stairs: "Лестница"
+      };
+
+      return map[type] || type;
+    }
+
+    function updateSelectedProperty(key, value) {
+      const obj = getSelectedObject();
+
+      if (!obj) return;
+
+      if (["x", "y", "w", "h", "rotate"].includes(key)) {
+        value = Number(value);
+        if (Number.isNaN(value)) value = 0;
+      }
+
+      if (key === "w" || key === "h") {
+        value = Math.max(20, value);
+      }
+
+      obj[key] = value;
+      renderCanvas();
+      renderStats();
+    }
+
+    function deleteSelectedObject() {
+      const floor = getCurrentFloor();
+
+      if (!floor || !selectedObjectId) return;
+
+      floor.objects = floor.objects.filter(o => o.id !== selectedObjectId);
+      selectedObjectId = null;
+
+      renderAll();
+    }
+
+    function renderStats() {
+      const floor = getCurrentFloor();
+      const stats = document.getElementById("stats");
+
+      if (!floor) {
+        stats.innerHTML = "";
+        return;
+      }
+
+      const total = floor.objects.length;
+      const rooms = floor.objects.filter(o => o.type === "room").length;
+      const wells = floor.objects.filter(o => o.type === "well").length;
+      const basementZones = floor.objects.filter(o => o.type === "basement").length;
+      const cellars = floor.objects.filter(o => o.type === "cellar").length;
+
+      const roomArea = floor.objects
+        .filter(o => o.type === "room" || o.type === "basement" || o.type === "cellar")
+        .reduce((sum, o) => sum + o.w * o.h, 0);
+
+      stats.innerHTML = `
+        Тип этажа: ${getFloorTypeName(floor.type)}<br>
+        Объектов: ${total}<br>
+        Комнат: ${rooms}<br>
+        Колодцев: ${wells}<br>
+        Зон подвала: ${basementZones}<br>
+        Погребов: ${cellars}<br>
+        Условная площадь зон: ${Math.round(roomArea / 100)} м²
+      `;
+    }
+
+    function zoomIn() {
+      zoom = Math.min(2.5, zoom + 0.1);
+      renderCanvas();
+    }
+
+    function zoomOut() {
+      zoom = Math.max(0.3, zoom - 0.1);
+      renderCanvas();
+    }
+
+    function resetZoom() {
+      zoom = 1;
+      renderCanvas();
+    }
+
+    function saveProject() {
+      localStorage.setItem("housePlannerProject", JSON.stringify(project));
+      alert("Проект сохранён в браузере.");
+    }
+
+    function loadProject() {
+      const raw = localStorage.getItem("housePlannerProject");
+
+      if (!raw) {
+        alert("Сохранённый проект не найден.");
+        return;
+      }
+
+      try {
+        project = JSON.parse(raw);
+
+        if (!project.floors || !project.floors.length) {
+          throw new Error("Некорректный проект");
+        }
+
+        currentFloorId = project.floors[0].id;
+        selectedObjectId = null;
+
+        renderAll();
+      } catch (e) {
+        alert("Ошибка загрузки проекта.");
+      }
+    }
+
+    function exportProject() {
+      document.getElementById("jsonBox").value = JSON.stringify(project, null, 2);
+    }
+
+    function importProject() {
+      const raw = document.getElementById("jsonBox").value;
+
+      if (!raw.trim()) {
+        alert("Вставьте JSON проекта.");
+        return;
+      }
+
+      try {
+        const imported = JSON.parse(raw);
+
+        if (!imported.floors || !Array.isArray(imported.floors)) {
+          throw new Error("Некорректный формат");
+        }
+
+        project = imported;
+        currentFloorId = project.floors[0]?.id || null;
+        selectedObjectId = null;
+
+        renderAll();
+      } catch (e) {
+        alert("Не удалось импортировать JSON.");
+      }
+    }
+
+    function clearProject() {
+      if (!confirm("Полностью очистить проект?")) return;
+
+      project = {
+        floors: []
+      };
+
+      const floor = {
+        id: uid(),
+        name: "1 этаж",
+        type: "floor",
+        objects: []
+      };
+
+      project.floors.push(floor);
+      currentFloorId = floor.id;
+      selectedObjectId = null;
+
+      renderAll();
+    }
+
+    function renderAll() {
+      renderFloorList();
+      renderCanvas();
+      renderProperties();
+      renderStats();
+    }
+
+    init();
+  </script>
+</body>
+</html>
