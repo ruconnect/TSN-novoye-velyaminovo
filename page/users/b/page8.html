@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Калькулятор стоимости пластикового погреба</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #3aa7ee;
+      color: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 15px;
+    }
+
+    .app-wrapper {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .top-title {
+      color: #ffffff;
+      margin-bottom: 18px;
+      text-align: left;
+    }
+
+    .top-title h1 {
+      margin: 0;
+      font-size: 26px;
+      font-weight: 400;
+      letter-spacing: 1px;
+    }
+
+    .top-title p {
+      margin: 6px 0 0;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .phone-card {
+      background: #ffffff;
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+    }
+
+    .status-bar {
+      height: 22px;
+      background: #1b84d1;
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 10px;
+      gap: 8px;
+    }
+
+    .header {
+      background: #2196f3;
+      color: #ffffff;
+      padding: 34px 24px 30px;
+      text-align: center;
+    }
+
+    .header .icon {
+      width: 58px;
+      height: 58px;
+      margin: 0 auto 16px;
+      border-radius: 50%;
+      background: #76d900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+      font-size: 28px;
+    }
+
+    .header h2 {
+      margin: 0;
+      font-size: 23px;
+      font-weight: 400;
+    }
+
+    .header p {
+      margin: 10px 0 0;
+      font-size: 13px;
+      line-height: 1.45;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .content {
+      padding: 22px 22px 12px;
+      background: #ffffff;
+    }
+
+    .field {
+      margin-bottom: 17px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 13px;
+      color: #777;
+    }
+
+    .field select,
+    .field input {
+      width: 100%;
+      border: none;
+      border-bottom: 1px solid #d6d6d6;
+      padding: 10px 2px 9px;
+      font-size: 15px;
+      outline: none;
+      background: transparent;
+      color: #333;
+      transition: border-color 0.2s;
+    }
+
+    .field select:focus,
+    .field input:focus {
+      border-bottom-color: #2196f3;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 0;
+      font-size: 14px;
+      color: #444;
+      border-bottom: 1px solid #eeeeee;
+      cursor: pointer;
+    }
+
+    .checkbox-row input {
+      width: 18px;
+      height: 18px;
+      accent-color: #2196f3;
+      cursor: pointer;
+    }
+
+    .result-box {
+      margin-top: 20px;
+      padding: 18px;
+      background: #f4f8fb;
+      border-radius: 3px;
+      border-left: 4px solid #76d900;
+    }
+
+    .result-label {
+      font-size: 13px;
+      color: #777;
+      margin-bottom: 6px;
+    }
+
+    .result-price {
+      font-size: 30px;
+      color: #2196f3;
+      font-weight: 500;
+      line-height: 1.2;
+    }
+
+    .note {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #888;
+      line-height: 1.4;
+    }
+
+    .bottom-nav {
+      height: 56px;
+      background: #f7f7f7;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      border-top: 1px solid #e6e6e6;
+    }
+
+    .back {
+      color: #888;
+      font-size: 22px;
+      user-select: none;
+    }
+
+    .btn {
+      border: none;
+      background: #76d900;
+      color: #ffffff;
+      padding: 11px 20px;
+      border-radius: 3px;
+      font-size: 13px;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 3px 7px rgba(0, 0, 0, 0.18);
+      transition: 0.2s;
+    }
+
+    .btn:hover {
+      background: #68c500;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: #bdbdbd;
+      box-shadow: none;
+      margin-right: 8px;
+    }
+
+    .btn-secondary:hover {
+      background: #a9a9a9;
+    }
+
+    .buttons {
+      display: flex;
+      align-items: center;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        align-items: flex-start;
+        padding-top: 20px;
+      }
+
+      .top-title h1 {
+        font-size: 22px;
+      }
+
+      .header {
+        padding: 28px 20px 24px;
+      }
+
+      .result-price {
+        font-size: 26px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-wrapper">
+    <div class="top-title">
+      <h1>Расчёт погреба</h1>
+      <p>Калькулятор стоимости пластикового погреба</p>
+    </div>
+
+    <div class="phone-card">
+      <div class="status-bar">
+        <span>● ● ●</span>
+        <span>12:45</span>
+      </div>
+
+      <div class="header">
+        <div class="icon">✓</div>
+        <h2>Выберите параметры</h2>
+        <p>
+          Укажите размер, комплектацию и дополнительные услуги.
+          Стоимость пересчитается автоматически.
+        </p>
+      </div>
+
+      <div class="content">
+        <div class="field">
+          <label for="size">Размер погреба</label>
+          <select id="size">
+            <option value="120000">Малый 1.5 × 1.5 м — 120 000 ₽</option>
+            <option value="165000">Стандарт 2 × 2 м — 165 000 ₽</option>
+            <option value="220000">Большой 2.5 × 2 м — 220 000 ₽</option>
+            <option value="285000">Макси 3 × 2 м — 285 000 ₽</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="neck">Высота горловины</label>
+          <select id="neck">
+            <option value="0">Стандартная — включено</option>
+            <option value="15000">Увеличенная +15 000 ₽</option>
+            <option value="28000">Усиленная высокая +28 000 ₽</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="distance">Доставка от города, км</label>
+          <input type="number" id="distance" value="30" min="0" />
+        </div>
+
+        <label class="checkbox-row">
+          <input type="checkbox" id="install" checked />
+          Монтаж погреба +45 000 ₽
+        </label>
+
+        <label class="checkbox-row">
+          <input type="checkbox" id="shelves" />
+          Полки и стеллажи +18 000 ₽
+        </label>
+
+        <label class="checkbox-row">
+          <input type="checkbox" id="ventilation" checked />
+          Вентиляция +9 000 ₽
+        </label>
+
+        <label class="checkbox-row">
+          <input type="checkbox" id="light" />
+          Освещение +7 000 ₽
+        </label>
+
+        <div class="result-box">
+          <div class="result-label">Итоговая стоимость</div>
+          <div class="result-price" id="result">0 ₽</div>
+          <div class="note">
+            Расчёт предварительный. Точная цена зависит от грунта,
+            глубины установки и условий подъезда.
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="back">‹</div>
+
+        <div class="buttons">
+          <button class="btn btn-secondary" onclick="resetCalc()">Сброс</button>
+          <button class="btn" onclick="calculate()">Расчёт</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const size = document.getElementById('size');
+    const neck = document.getElementById('neck');
+    const distance = document.getElementById('distance');
+
+    const install = document.getElementById('install');
+    const shelves = document.getElementById('shelves');
+    const ventilation = document.getElementById('ventilation');
+    const light = document.getElementById('light');
+
+    const result = document.getElementById('result');
+
+    function formatPrice(number) {
+      return new Intl.NumberFormat('ru-RU').format(number) + ' ₽';
+    }
+
+    function calculate() {
+      let total = 0;
+
+      total += Number(size.value);
+      total += Number(neck.value);
+
+      const km = Number(distance.value) || 0;
+      const deliveryPricePerKm = 80;
+      total += km * deliveryPricePerKm;
+
+      if (install.checked) total += 45000;
+      if (shelves.checked) total += 18000;
+      if (ventilation.checked) total += 9000;
+      if (light.checked) total += 7000;
+
+      result.textContent = formatPrice(total);
+    }
+
+    function resetCalc() {
+      size.selectedIndex = 0;
+      neck.selectedIndex = 0;
+      distance.value = 30;
+
+      install.checked = true;
+      shelves.checked = false;
+      ventilation.checked = true;
+      light.checked = false;
+
+      calculate();
+    }
+
+    const controls = [
+      size,
+      neck,
+      distance,
+      install,
+      shelves,
+      ventilation,
+      light
+    ];
+
+    controls.forEach(control => {
+      control.addEventListener('input', calculate);
+      control.addEventListener('change', calculate);
+    });
+
+    calculate();
+  </script>
+</body>
+</html>
