@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>React App Setup</title>
+  <title>React Setup — Loading</title>
   <style>
     * {
       margin: 0;
@@ -12,7 +12,7 @@
     }
 
     body {
-      background-color: #0a192f; /* глубокий синий, как на фото */
+      background-color: #0a192f; /* глубокий синий */
       height: 100vh;
       display: flex;
       justify-content: center;
@@ -22,13 +22,13 @@
     }
 
     .terminal-window {
-      background-color: #0d253f; /* чуть светлее фона — синее окно */
-      color: #ffffff; /* белый текст */
+      background-color: #0d253f;
+      color: #ffffff;
       width: 80%;
       max-width: 700px;
       padding: 2rem;
       border-radius: 8px;
-      box-shadow: 0 0 30px rgba(10, 25, 47, 0.7);
+      box-shadow: 0 0 30px rgba(10, 25, 47, 0.8);
       position: relative;
       overflow: hidden;
     }
@@ -50,29 +50,20 @@
       font-size: 0.92rem;
     }
 
-    .sill-placeholder {
+    .progress-bar {
+      display: inline-block;
+      font-family: monospace;
+      letter-spacing: -0.1em;
+    }
+
+    .status-text {
       color: #ffffff;
-      animation: blink 0.8s infinite;
+      animation: blink 0.7s infinite;
     }
 
     @keyframes blink {
       0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-
-    /* Для эффекта "мелькания" sill */
-    .sill-word {
-      display: inline-block;
-      animation: changeSill 3.2s infinite;
-    }
-
-    @keyframes changeSill {
-      0%   { content: "sill"; }
-      20%  { content: "fetch"; }
-      40%  { content: "load"; }
-      60%  { content: "retry"; }
-      80%  { content: "zZz"; }
-      100% { content: "sill"; }
+      50% { opacity: 0.4; }
     }
   </style>
 </head>
@@ -82,24 +73,53 @@
 Creating a new React app in D:\my-best-proj.
 Installing packages. This might take a couple of minutes.
 Installing react, react-dom, and react-scripts with cra-template...
-[..................] / fetchMetadata: <span class="sill-word">sill</span>
+[######............] / fetchMetadata: <span class="status-text">sill</span>
       electron-to-chromium@1.3.55
     </div>
   </div>
 
   <script>
-    // Меняем текст внутри .sill-word через setInterval
-    const sillEl = document.querySelector('.sill-word');
-    const states = ['sill', 'fetch', 'load', 'retry', 'zZz', 'wait', 'sync', 'idle'];
+    const statusEl = document.querySelector('.status-text');
+    const progress = '[######............]'; // 6 # + 14 . = 20 символов → 30%? Нет — 6/20 = 30% → но нужно 25% → 5 # + 15 .
+    // ✅ 25% от 20 = 5 символов → [#####.............]
+    const progressBar = '[#####.............]'; // 5 #, 15 .
+
+    // Обновляем строку в логе
+    const logEl = document.getElementById('log');
+    const baseLines = [
+      "Creating a new React app in D:\\\\my-best-proj.",
+      "Installing packages. This might take a couple of minutes.",
+      "Installing react, react-dom, and react-scripts with cra-template...",
+      `${progressBar} / fetchMetadata: <span class="status-text">sill</span>`,
+      "      electron-to-chromium@1.3.55"
+    ];
+
+    // Состояния для динамической части
+    const statuses = [
+      "sill", "fetch", "resolving", "downloading", "extracting",
+      "linking", "building", "waiting", "retrying", "zZz", "idle",
+      "checking", "verifying", "caching", "optimizing", "done?"
+    ];
+
     let idx = 0;
 
-    setInterval(() => {
-      sillEl.textContent = states[idx];
-      idx = (idx + 1) % states.length;
-    }, 500); // каждые 0.5 секунды
+    // Инициализируем
+    function updateStatus() {
+      const newLine = `${progressBar} / fetchMetadata: <span class="status-text">${statuses[idx]}</span>`;
+      // Заменяем только строку с fetchMetadata
+      const lines = logEl.innerHTML.split('\n');
+      lines[3] = newLine;
+      logEl.innerHTML = lines.join('\n');
+      idx = (idx + 1) % statuses.length;
+    }
 
-    // Дополнительно: мерцание курсора (если хочешь добавить | после sill)
-    // Но по вашему описанию — только `sill` меняется, курсор не нужен.
+    // Первый вызов сразу
+    updateStatus();
+
+    // Цикл каждые 400 мс (быстро, как в реальном npm)
+    setInterval(updateStatus, 400);
+
+    // Дополнительно: мерцание через CSS уже есть (.status-text + blink)
   </script>
 </body>
 </html>
