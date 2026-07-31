@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Расчёт погреба | Новое Вельяминово</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #3a86ff, #4a90e2);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+
+    /* КВАДРАТНОЕ ОКНО — фиксированные размеры */
+    .container {
+      width: 400px;
+      height: 400px; /* 🔑 ГАРАНТИЯ КВАДРАТА */
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Шапка */
+    .header {
+      background: #3a86ff;
+      color: white;
+      padding: 24px 20px;
+      text-align: center;
+      position: relative;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .check-circle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 56px;
+      height: 56px;
+      background: #4caf50;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    /* Контент */
+    .content {
+      padding: 24px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 16px;
+      color: #212121;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      color: #757575;
+      margin-bottom: 8px;
+    }
+
+    select, input[type="number"] {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 16px;
+      background: #fafafa;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23757575' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.384 4 3.274 4h9.898a1 1 0 0 1 .707.293l4.795 5.48a1 1 0 0 1 0 1.093l-4.795 5.48a1 1 0 0 1-.707.293H3.274A1 1 0 0 1 2.451 10.34l4.796-5.484z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 12px;
+    }
+
+    select:focus, input:focus {
+      outline: none;
+      border-color: #3a86ff;
+      box-shadow: 0 0 0 2px rgba(58, 134, 255, 0.2);
+    }
+
+    .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .checkbox-item input {
+      width: 20px;
+      height: 20px;
+      accent-color: #3a86ff;
+    }
+
+    .checkbox-item label {
+      font-size: 14px;
+      color: #212121;
+      flex: 1;
+    }
+
+    .price-block {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: auto;
+      border-left: 4px solid #4caf50;
+    }
+
+    .price-label {
+      font-size: 14px;
+      color: #757575;
+      margin-bottom: 8px;
+    }
+
+    .price-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: #3a86ff;
+    }
+
+    .price-note {
+      font-size: 12px;
+      color: #757575;
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    /* Футер */
+    .footer {
+      padding: 20px;
+      border-top: 1px solid #eee;
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+
+    .btn-reset {
+      background: #e0e0e0;
+      color: #212121;
+    }
+
+    .btn-reset:hover {
+      background: #d6d6d6;
+    }
+
+    .btn-calculate {
+      background: #4caf50;
+      color: white;
+    }
+
+    .btn-calculate:hover {
+      background: #43a047;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Шапка -->
+  <div class="header">
+    <h1>Расчёт погреба</h1>
+    <p>Калькулятор стоимости пластикового погреба</p>
+    <div class="check-circle">✓</div>
+  </div>
+
+  <!-- Контент -->
+  <div class="content">
+    <h2 class="section-title">Выберите параметры</h2>
+    <p style="font-size:14px;color:#757575;margin-bottom:20px;">
+      Укажите размер, комплектацию и дополнительные услуги.<br>
+      Стоимость пересчитывается автоматически.
+    </p>
+
+    <div class="form-group">
+      <label>Размер погреба</label>
+      <select id="size" onchange="update()">
+        <option value="small">Малый 1.5 × 1.5 м — 120 000 ₽</option>
+        <option value="medium" selected>Средний 2.0 × 2.0 м — 180 000 ₽</option>
+        <option value="large">Большой 2.5 × 2.5 м — 250 000 ₽</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Высота горловины</label>
+      <select id="height" onchange="update()">
+        <option value="standard" selected>Стандартная — включено</option>
+        <option value="high">Увеличенная +15 000 ₽</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Доставка от города, км</label>
+      <input type="number" id="distance" min="0" max="100" value="30" oninput="update()" />
+    </div>
+
+    <div class="form-group">
+      <label>Дополнительно</label>
+      <div class="checkbox-group">
+        <div class="checkbox-item">
+          <input type="checkbox" id="install" checked onchange="update()" />
+          <label>Монтаж погреба +45 000 ₽</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="shelves" onchange="update()" />
+          <label>Полки и стеллажи +18 000 ₽</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="vent" checked onchange="update()" />
+          <label>Вентиляция +9 000 ₽</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="light" onchange="update()" />
+          <label>Освещение +7 000 ₽</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Итог -->
+    <div class="price-block">
+      <div class="price-label">Итоговая стоимость</div>
+      <div class="price-value" id="total">176 400 ₽</div>
+      <div class="price-note">
+        Расчёт предварительный. Точная цена зависит от грунта, глубины установки и условий подъезда.
+      </div>
+    </div>
+  </div>
+
+  <!-- Футер -->
+  <div class="footer">
+    <button class="btn btn-reset" onclick="reset()">СБРОС</button>
+    <button class="btn btn-calculate" onclick="calculateFinal()">РАСЧЁТ</button>
+  </div>
+</div>
+
+<script>
+  // Базовые цены
+  const BASE_PRICES = {
+    small: 120000,
+    medium: 180000,
+    large: 250000
+  };
+
+  const OPTIONS = {
+    height: { standard: 0, high: 15000 },
+    install: 45000,
+    shelves: 18000,
+    vent: 9000,
+    light: 7000
+  };
+
+  function update() {
+    let total = 0;
+
+    // Размер
+    const size = document.getElementById('size').value;
+    total += BASE_PRICES[size] || 180000;
+
+    // Высота
+    const height = document.getElementById('height').value;
+    total += OPTIONS.height[height] || 0;
+
+    // Доставка: +1000 ₽ за каждый км свыше 20 км
+    const dist = parseFloat(document.getElementById('distance').value) || 0;
+    if (dist > 20) {
+      total += Math.round((dist - 20) * 1000);
+    }
+
+    // Чекбоксы
+    if (document.getElementById('install').checked) total += OPTIONS.install;
+    if (document.getElementById('shelves').checked) total += OPTIONS.shelves;
+    if (document.getElementById('vent').checked) total += OPTIONS.vent;
+    if (document.getElementById('light').checked) total += OPTIONS.light;
+
+    // Обновить вывод
+    document.getElementById('total').textContent = total.toLocaleString() + ' ₽';
+
+    // Для отладки (можно удалить)
+    console.log(`[Расчёт] Итого: ${total} ₽`);
+  }
+
+  function reset() {
+    document.getElementById('size').value = 'medium';
+    document.getElementById('height').value = 'standard';
+    document.getElementById('distance').value = '30';
+
+    document.getElementById('install').checked = true;
+    document.getElementById('shelves').checked = false;
+    document.getElementById('vent').checked = true;
+    document.getElementById('light').checked = false;
+
+    update();
+  }
+
+  function calculateFinal() {
+    const total = document.getElementById('total').textContent;
+    alert(`✅ Расчёт готов:\nИтого: ${total}\n\nСпасибо за обращение! Наш менеджер свяжется с вами в течение 15 минут.`);
+  }
+
+  // Инициализация при загрузке
+  document.addEventListener('DOMContentLoaded', update);
+</script>
+
+</body>
+</html>
