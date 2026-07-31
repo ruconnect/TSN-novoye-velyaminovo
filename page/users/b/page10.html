@@ -22,14 +22,14 @@
       padding: 16px;
     }
 
-    /* КВАДРАТНОЕ ОКНО — фиксированные размеры */
+    /* Прямоугольное окно — как на фото: достаточно высоты для всех блоков */
     .container {
       width: 400px;
-      height: 400px; /* 🔑 ГАРАНТИЯ КВАДРАТА */
+      height: 620px; /* ✅ Достаточно для текста + чекбоксов + итога */
       background: white;
       border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
       display: flex;
       flex-direction: column;
     }
@@ -80,12 +80,19 @@
     .section-title {
       font-size: 18px;
       font-weight: 500;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       color: #212121;
     }
 
+    .hint {
+      font-size: 14px;
+      color: #757575;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
 
     label {
@@ -95,7 +102,7 @@
       margin-bottom: 8px;
     }
 
-    select, input[type="number"] {
+    select {
       width: 100%;
       padding: 14px 16px;
       border: 1px solid #e0e0e0;
@@ -109,26 +116,27 @@
       background-size: 12px;
     }
 
-    select:focus, input:focus {
+    select:focus {
       outline: none;
       border-color: #3a86ff;
       box-shadow: 0 0 0 2px rgba(58, 134, 255, 0.2);
     }
 
+    /* Чекбоксы — как на фото */
     .checkbox-group {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      margin-top: 8px;
+      gap: 14px;
     }
 
     .checkbox-item {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 12px;
     }
 
     .checkbox-item input {
+      margin-top: 4px;
       width: 20px;
       height: 20px;
       accent-color: #3a86ff;
@@ -137,9 +145,10 @@
     .checkbox-item label {
       font-size: 14px;
       color: #212121;
-      flex: 1;
+      line-height: 1.4;
     }
 
+    /* Итог */
     .price-block {
       background: #f8f9fa;
       border-radius: 8px;
@@ -218,14 +227,14 @@
   <!-- Контент -->
   <div class="content">
     <h2 class="section-title">Выберите параметры</h2>
-    <p style="font-size:14px;color:#757575;margin-bottom:20px;">
+    <p class="hint">
       Укажите размер, комплектацию и дополнительные услуги.<br>
       Стоимость пересчитывается автоматически.
     </p>
 
     <div class="form-group">
       <label>Размер погреба</label>
-      <select id="size" onchange="update()">
+      <select id="size" onchange="calculate()">
         <option value="small">Малый 1.5 × 1.5 м — 120 000 ₽</option>
         <option value="medium" selected>Средний 2.0 × 2.0 м — 180 000 ₽</option>
         <option value="large">Большой 2.5 × 2.5 м — 250 000 ₽</option>
@@ -233,35 +242,22 @@
     </div>
 
     <div class="form-group">
-      <label>Высота горловины</label>
-      <select id="height" onchange="update()">
-        <option value="standard" selected>Стандартная — включено</option>
-        <option value="high">Увеличенная +15 000 ₽</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label>Доставка от города, км</label>
-      <input type="number" id="distance" min="0" max="100" value="30" oninput="update()" />
-    </div>
-
-    <div class="form-group">
       <label>Дополнительно</label>
       <div class="checkbox-group">
         <div class="checkbox-item">
-          <input type="checkbox" id="install" checked onchange="update()" />
+          <input type="checkbox" id="install" checked onchange="calculate()" />
           <label>Монтаж погреба +45 000 ₽</label>
         </div>
         <div class="checkbox-item">
-          <input type="checkbox" id="shelves" onchange="update()" />
+          <input type="checkbox" id="shelves" onchange="calculate()" />
           <label>Полки и стеллажи +18 000 ₽</label>
         </div>
         <div class="checkbox-item">
-          <input type="checkbox" id="vent" checked onchange="update()" />
+          <input type="checkbox" id="vent" checked onchange="calculate()" />
           <label>Вентиляция +9 000 ₽</label>
         </div>
         <div class="checkbox-item">
-          <input type="checkbox" id="light" onchange="update()" />
+          <input type="checkbox" id="light" onchange="calculate()" />
           <label>Освещение +7 000 ₽</label>
         </div>
       </div>
@@ -270,7 +266,7 @@
     <!-- Итог -->
     <div class="price-block">
       <div class="price-label">Итоговая стоимость</div>
-      <div class="price-value" id="total">176 400 ₽</div>
+      <div class="price-value" id="total">241 000 ₽</div>
       <div class="price-note">
         Расчёт предварительный. Точная цена зависит от грунта, глубины установки и условий подъезда.
       </div>
@@ -280,76 +276,52 @@
   <!-- Футер -->
   <div class="footer">
     <button class="btn btn-reset" onclick="reset()">СБРОС</button>
-    <button class="btn btn-calculate" onclick="calculateFinal()">РАСЧЁТ</button>
+    <button class="btn btn-calculate" onclick="submit()">РАСЧЁТ</button>
   </div>
 </div>
 
 <script>
-  // Базовые цены
-  const BASE_PRICES = {
+  // Цены
+  const BASE = {
     small: 120000,
     medium: 180000,
     large: 250000
   };
 
-  const OPTIONS = {
-    height: { standard: 0, high: 15000 },
+  const EXTRA = {
     install: 45000,
     shelves: 18000,
     vent: 9000,
     light: 7000
   };
 
-  function update() {
-    let total = 0;
+  function calculate() {
+    let total = BASE[document.getElementById('size').value] || BASE.medium;
 
-    // Размер
-    const size = document.getElementById('size').value;
-    total += BASE_PRICES[size] || 180000;
+    if (document.getElementById('install').checked) total += EXTRA.install;
+    if (document.getElementById('shelves').checked) total += EXTRA.shelves;
+    if (document.getElementById('vent').checked) total += EXTRA.vent;
+    if (document.getElementById('light').checked) total += EXTRA.light;
 
-    // Высота
-    const height = document.getElementById('height').value;
-    total += OPTIONS.height[height] || 0;
-
-    // Доставка: +1000 ₽ за каждый км свыше 20 км
-    const dist = parseFloat(document.getElementById('distance').value) || 0;
-    if (dist > 20) {
-      total += Math.round((dist - 20) * 1000);
-    }
-
-    // Чекбоксы
-    if (document.getElementById('install').checked) total += OPTIONS.install;
-    if (document.getElementById('shelves').checked) total += OPTIONS.shelves;
-    if (document.getElementById('vent').checked) total += OPTIONS.vent;
-    if (document.getElementById('light').checked) total += OPTIONS.light;
-
-    // Обновить вывод
     document.getElementById('total').textContent = total.toLocaleString() + ' ₽';
-
-    // Для отладки (можно удалить)
-    console.log(`[Расчёт] Итого: ${total} ₽`);
   }
 
   function reset() {
     document.getElementById('size').value = 'medium';
-    document.getElementById('height').value = 'standard';
-    document.getElementById('distance').value = '30';
-
     document.getElementById('install').checked = true;
     document.getElementById('shelves').checked = false;
     document.getElementById('vent').checked = true;
     document.getElementById('light').checked = false;
-
-    update();
+    calculate();
   }
 
-  function calculateFinal() {
+  function submit() {
     const total = document.getElementById('total').textContent;
-    alert(`✅ Расчёт готов:\nИтого: ${total}\n\nСпасибо за обращение! Наш менеджер свяжется с вами в течение 15 минут.`);
+    alert(`✅ Расчёт готов!\nИтого: ${total}\n\nВы получили результат`);
   }
 
-  // Инициализация при загрузке
-  document.addEventListener('DOMContentLoaded', update);
+  // Инициализация
+  document.addEventListener('DOMContentLoaded', calculate);
 </script>
 
 </body>
