@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>React Setup — Loading</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #0a192f; /* глубокий синий */
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'SFMono-Regular', 'Consolas', 'Liberation Mono', Menlo, monospace;
+      overflow: hidden;
+    }
+
+    .terminal-window {
+      background-color: #0d253f;
+      color: #ffffff;
+      width: 80%;
+      max-width: 700px;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 30px rgba(10, 25, 47, 0.8);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .terminal-window::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #4a90e2, #5cb8e6, #7ac6f0);
+      border-radius: 4px 4px 0 0;
+    }
+
+    .log {
+      white-space: pre-wrap;
+      line-height: 1.6;
+      font-size: 0.92rem;
+    }
+
+    /* Убрано мерцание — статус просто меняется без анимации */
+    .status-text {
+      color: #ffffff;
+      /* Никаких animation, transition — чистый текст */
+    }
+  </style>
+</head>
+<body>
+  <div class="terminal-window">
+    <div class="log" id="log">
+Creating a new React app in D:\my-best-proj.
+Installing packages. This might take a couple of minutes.
+Installing react, react-dom, and react-scripts with cra-template...
+[#####.............] / fetchMetadata: <span class="status-text">sill</span>
+      electron-to-chromium@1.3.55
+    </div>
+  </div>
+
+  <script>
+    const statusEl = document.querySelector('.status-text');
+    const progressBar = '[#####.............]'; // 5 # + 15 . = 25%
+
+    const statuses = [
+      "sill", "fetch", "resolving", "downloading", "extracting",
+      "linking", "building", "waiting", "retrying", "zZz",
+      "idle", "checking", "verifying", "caching", "optimizing",
+      "preparing", "compiling", "finalizing", "almost..."
+    ];
+
+    let idx = 0;
+
+    function updateStatus() {
+      statusEl.textContent = statuses[idx];
+      idx = (idx + 1) % statuses.length;
+    }
+
+    // Первый раз — сразу обновляем (чтобы не оставалось "sill" долго)
+    updateStatus();
+
+    // Меняем каждые 450 мс — плавно, но без мерцания
+    setInterval(updateStatus, 450);
+  </script>
+</body>
+</html>

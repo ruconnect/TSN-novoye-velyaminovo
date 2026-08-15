@@ -1,0 +1,605 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Конструктор репозитория GitLab</title>
+    <style>
+        :root {
+            --gl-gray-10: #fcfcfd;
+            --gl-gray-50: #ececef;
+            --gl-gray-100: #dcdcde;
+            --gl-gray-700: #66666c;
+            --gl-gray-900: #1f1f24;
+            --gl-orange: #e24329;
+            --gl-blue: #1068bf;
+            --gl-green: #108548;
+            --gl-border: #e5e5e6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f3f3f4;
+            color: var(--gl-gray-900);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Конструктор (Левая панель) */
+        .editor-panel {
+            width: 350px;
+            background: #ffffff;
+            border-right: 1px solid var(--gl-border);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+
+        .editor-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--gl-border);
+            background: var(--gl-gray-10);
+        }
+
+        .editor-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .editor-body {
+            padding: 16px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--gl-gray-700);
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            font-size: 13px;
+            border: 1px solid var(--gl-gray-100);
+            border-radius: 4px;
+            background: #fff;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--gl-blue);
+            box-shadow: 0 0 0 2px rgba(16, 104, 191, 0.2);
+        }
+
+        /* Просмотр (Правая панель) */
+        .preview-panel {
+            flex: 1;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        /* Интерфейс GitLab */
+        .gl-navbar {
+            height: 48px;
+            background: #1f1f24;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            color: #fff;
+            justify-content: space-between;
+        }
+
+        .gl-navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .gl-logo {
+            width: 24px;
+            height: 24px;
+            background: var(--gl-orange);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .gl-nav-item {
+            font-size: 14px;
+            color: var(--gl-gray-100);
+            cursor: pointer;
+        }
+
+        .gl-main {
+            display: flex;
+            flex: 1;
+        }
+
+        .gl-sidebar {
+            width: 220px;
+            background: var(--gl-gray-10);
+            border-right: 1px solid var(--gl-border);
+            padding: 12px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .sidebar-item {
+            padding: 8px 16px;
+            font-size: 14px;
+            color: var(--gl-gray-700);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .sidebar-item.active {
+            background: var(--gl-gray-50);
+            color: var(--gl-gray-900);
+            font-weight: 600;
+            border-left: 3px solid var(--gl-orange);
+            padding-left: 13px;
+        }
+
+        .gl-content {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        /* Хлебные крошки и заголовок проекта */
+        .gl-breadcrumbs {
+            font-size: 14px;
+            color: var(--gl-gray-700);
+            margin-bottom: 16px;
+        }
+
+        .project-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .project-avatar {
+            width: 48px;
+            height: 48px;
+            background: #e24329;
+            color: white;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .project-title-container h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .project-id {
+            font-size: 13px;
+            color: var(--gl-gray-700);
+        }
+
+        .project-description {
+            font-size: 14px;
+            color: var(--gl-gray-900);
+            margin-top: 8px;
+            max-width: 800px;
+        }
+
+        /* Панель репозитория */
+        .repo-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .branch-selector {
+            padding: 6px 12px;
+            border: 1px solid var(--gl-gray-100);
+            border-radius: 4px;
+            font-size: 13px;
+            background: var(--gl-gray-10);
+            font-weight: 500;
+        }
+
+        .repo-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .gl-btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid var(--gl-gray-100);
+            background: #fff;
+        }
+
+        .gl-btn-blue {
+            background: var(--gl-blue);
+            color: white;
+            border: none;
+        }
+
+        /* Виджет последнего коммита */
+        .commit-widget {
+            border: 1px solid var(--gl-border);
+            border-radius: 4px 4px 0 0;
+            background: var(--gl-gray-10);
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            border-bottom: none;
+        }
+
+        .commit-author {
+            font-weight: 600;
+            color: var(--gl-gray-900);
+        }
+
+        .commit-message {
+            color: var(--gl-gray-900);
+            margin-left: 8px;
+        }
+
+        .commit-sha {
+            font-family: monospace;
+            background: var(--gl-gray-50);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--gl-blue);
+        }
+
+        /* Таблица файлов */
+        .files-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid var(--gl-border);
+            border-radius: 0 0 4px 4px;
+            overflow: hidden;
+            font-size: 14px;
+            background: #fff;
+        }
+
+        .files-table tr {
+            border-bottom: 1px solid var(--gl-border);
+        }
+
+        .files-table tr:last-child {
+            border-bottom: none;
+        }
+
+        .files-table tr:hover {
+            background: var(--gl-gray-10);
+        }
+
+        .files-table td {
+            padding: 10px 16px;
+            vertical-align: middle;
+        }
+
+        .file-name {
+            color: var(--gl-gray-900);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-icon {
+            color: var(--gl-gray-700);
+        }
+
+        .file-commit {
+            color: var(--gl-gray-700);
+            max-width: 300px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-age {
+            color: var(--gl-gray-700);
+            text-align: right;
+        }
+
+        /* Readme секция */
+        .readme-block {
+            margin-top: 24px;
+            border: 1px solid var(--gl-border);
+            border-radius: 4px;
+        }
+
+        .readme-header {
+            padding: 12px 16px;
+            background: var(--gl-gray-10);
+            border-bottom: 1px solid var(--gl-border);
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .readme-content {
+            padding: 24px;
+            font-size: 15px;
+            line-height: 1.6;
+            background: #fff;
+        }
+        
+        .readme-content h1 { margin-bottom: 16px; border-bottom: 1px solid var(--gl-border); padding-bottom: 8px; font-size: 28px;}
+        .readme-content h2 { margin-top: 24px; margin-bottom: 12px; font-size: 20px;}
+        .readme-content p { margin-bottom: 16px; }
+        .readme-content code { background: var(--gl-gray-50); padding: 2px 4px; border-radius: 4px; font-family: monospace; font-size: 13px; }
+    </style>
+</head>
+<body>
+
+    <!-- Панель управления (Конструктор) -->
+    <div class="editor-panel">
+        <div class="editor-header">
+            <h2>Настройки репозитория</h2>
+        </div>
+        <div class="editor-body">
+            <div class="form-group">
+                <label>Название проекта</label>
+                <input type="text" id="inp-title" value="awesome-project">
+            </div>
+            <div class="form-group">
+                <label>Группа / Пространство имен</label>
+                <input type="text" id="inp-namespace" value="development-team">
+            </div>
+            <div class="form-group">
+                <label>ID проекта</label>
+                <input type="number" id="inp-id" value="482910">
+            </div>
+            <div class="form-group">
+                <label>Описание</label>
+                <textarea id="inp-desc" rows="2">Здесь находится самое лучшее open-source решение для автоматизации ваших повседневных задач.</textarea>
+            </div>
+            <div class="form-group">
+                <label>Ветка по умолчанию</label>
+                <input type="text" id="inp-branch" value="main">
+            </div>
+            <div class="form-group">
+                <label>Автор последнего коммита</label>
+                <input type="text" id="inp-author" value="Ivan Ivanov">
+            </div>
+            <div class="form-group">
+                <label>Текст коммита</label>
+                <input type="text" id="inp-commit-msg" value="feat: add pipelines configuration and documentation">
+            </div>
+            <div class="form-group">
+                <label>Хэш коммита (SHA)</label>
+                <input type="text" id="inp-sha" value="a1b2c3d4">
+            </div>
+            <div class="form-group">
+                <label>Текст README.md (HTML/Текст)</label>
+                <textarea id="inp-readme" rows="8"><h1>🚀 Awesome Project</h1>
+<p>Это пример реалистичного репозитория, сгенерированного с помощью интерактивного конструктора GitLab.</p>
+<h2>Установка</h2>
+<p><code>npm install awesome-tool</code></p>
+<h2>Использование</h2>
+<p>Просто запустите проект командой <code>npm start</code>.</p></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- Панель предпросмотра (GitLab) -->
+    <div class="preview-panel">
+        <!-- Навбар -->
+        <div class="gl-navbar">
+            <div class="gl-navbar-left">
+                <div class="gl-logo">🦊</div>
+                <div class="gl-nav-item" style="font-weight:600;">GitLab</div>
+                <div class="gl-nav-item">Search</div>
+            </div>
+            <div>
+                <div style="width:32px; height:32px; background:var(--gl-gray-700); border-radius:50%;"></div>
+            </div>
+        </div>
+
+        <div class="gl-main">
+            <!-- Боковая панель -->
+            <div class="gl-sidebar">
+                <div class="sidebar-item active">
+                    <span>📁</span> Project overview
+                </div>
+                <div class="sidebar-item">
+                    <span>💻</span> Repository
+                </div>
+                <div class="sidebar-item">
+                    <span>🚀</span> CI/CD
+                </div>
+                <div class="sidebar-item">
+                    <span>📋</span> Issues
+                </div>
+                <div class="sidebar-item">
+                    <span>🔀</span> Merge requests
+                </div>
+                <div class="sidebar-item">
+                    <span>🛡️</span> Security & Compliance
+                </div>
+                <div class="sidebar-item">
+                    <span>📊</span> Analytics
+                </div>
+                <div class="sidebar-item">
+                    <span>⚙️</span> Settings
+                </div>
+            </div>
+
+            <!-- Главный контент -->
+            <div class="gl-content">
+                <!-- Хлебные крошки -->
+                <div class="gl-breadcrumbs">
+                    <span id="view-bread-namespace">development-team</span> / <span id="view-bread-title" style="font-weight:600; color:var(--gl-gray-900);">awesome-project</span>
+                </div>
+
+                <!-- Шапка проекта -->
+                <div class="project-header">
+                    <div class="project-avatar" id="view-avatar">A</div>
+                    <div class="project-title-container">
+                        <h1 id="view-title">awesome-project</h1>
+                        <div class="project-id">Project ID: <span id="view-id">482910</span></div>
+                        <div class="project-description" id="view-desc">Здесь находится самое лучшее open-source решение для автоматизации ваших повседневных задач.</div>
+                    </div>
+                </div>
+
+                <!-- Контролы репозитория -->
+                <div class="repo-controls">
+                    <button class="branch-selector">🌿 <span id="view-branch">main</span></button>
+                    <div class="repo-buttons">
+                        <button class="gl-btn">History</button>
+                        <button class="gl-btn">Find file</button>
+                        <button class="gl-btn gl-btn-blue">Clone</button>
+                    </div>
+                </div>
+
+                <!-- Последний коммит -->
+                <div class="commit-widget">
+                    <div>
+                        <span class="commit-author" id="view-author">Ivan Ivanov</span>
+                        <span class="commit-message" id="view-commit-msg">feat: add pipelines configuration and documentation</span>
+                    </div>
+                    <div class="commit-sha" id="view-sha">a1b2c3d4</div>
+                </div>
+
+                <!-- Файловая структура -->
+                <table class="files-table">
+                    <tbody>
+                        <tr>
+                            <td><div class="file-name"><span>📁</span> .gitlab</div></td>
+                            <td><div class="file-commit" id="file-c1">feat: add pipelines configuration and documentation</div></td>
+                            <td><div class="file-age">3 days ago</div></td>
+                        </tr>
+                        <tr>
+                            <td><div class="file-name"><span>📁</span> src</div></td>
+                            <td><div class="file-commit" id="file-c2">feat: add pipelines configuration and documentation</div></td>
+                            <td><div class="file-age">3 days ago</div></td>
+                        </tr>
+                        <tr>
+                            <td><div class="file-name"><span>📄</span> .gitlab-ci.yml</div></td>
+                            <td><div class="file-commit">Initial CI/CD setup</div></td>
+                            <td><div class="file-age">1 week ago</div></td>
+                        </tr>
+                        <tr>
+                            <td><div class="file-name"><span>📄</span> package.json</div></td>
+                            <td><div class="file-commit">Update dependencies</div></td>
+                            <td><div class="file-age">2 weeks ago</div></td>
+                        </tr>
+                        <tr>
+                            <td><div class="file-name"><span>📄</span> README.md</div></td>
+                            <td><div class="file-commit" id="file-c3">feat: add pipelines configuration and documentation</div></td>
+                            <td><div class="file-age">3 days ago</div></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- README -->
+                <div class="readme-block">
+                    <div class="readme-header">
+                        <span>📖</span> README.md
+                    </div>
+                    <div class="readme-content" id="view-readme">
+                        <!-- Сюда рендерится контент -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Элементы ввода
+        const inpTitle = document.getElementById('inp-title');
+        const inpNamespace = document.getElementById('inp-namespace');
+        const inpId = document.getElementById('inp-id');
+        const inpDesc = document.getElementById('inp-desc');
+        const inpBranch = document.getElementById('inp-branch');
+        const inpAuthor = document.getElementById('inp-author');
+        const inpCommitMsg = document.getElementById('inp-commit-msg');
+        const inpSha = document.getElementById('inp-sha');
+        const inpReadme = document.getElementById('inp-readme');
+
+        // Элементы отображения
+        const viewTitle = document.getElementById('view-title');
+        const viewBreadTitle = document.getElementById('view-bread-title');
+        const viewNamespace = document.getElementById('view-bread-namespace');
+        const viewAvatar = document.getElementById('view-avatar');
+        const viewId = document.getElementById('view-id');
+        const viewDesc = document.getElementById('view-desc');
+        const viewBranch = document.getElementById('view-branch');
+        const viewAuthor = document.getElementById('view-author');
+        const viewCommitMsg = document.getElementById('view-commit-msg');
+        const viewSha = document.getElementById('view-sha');
+        const viewReadme = document.getElementById('view-readme');
+        
+        const fileC1 = document.getElementById('file-c1');
+        const fileC2 = document.getElementById('file-c2');
+        const fileC3 = document.getElementById('file-c3');
+
+        function updatePreview() {
+            viewTitle.textContent = inpTitle.value;
+            viewBreadTitle.textContent = inpTitle.value;
+            viewNamespace.textContent = inpNamespace.value;
+            viewAvatar.textContent = inpTitle.value ? inpTitle.value.charAt(0) : 'G';
+            viewId.textContent = inpId.value;
+            viewDesc.textContent = inpDesc.value;
+            viewBranch.textContent = inpBranch.value;
+            viewAuthor.textContent = inpAuthor.value;
+            
+            viewCommitMsg.textContent = inpCommitMsg.value;
+            fileC1.textContent = inpCommitMsg.value;
+            fileC2.textContent = inpCommitMsg.value;
+            fileC3.textContent = inpCommitMsg.value;
+            
+            viewSha.textContent = inpSha.value;
+            viewReadme.innerHTML = inpReadme.value;
+        }
+
+        // Слушатели событий
+        const inputs = [inpTitle, inpNamespace, inpId, inpDesc, inpBranch, inpAuthor, inpCommitMsg, inpSha, inpReadme];
+        inputs.forEach(input => input.addEventListener('input', updatePreview));
+
+        // Первая инициализация
+        updatePreview();
+    </script>
+</body>
+</html>

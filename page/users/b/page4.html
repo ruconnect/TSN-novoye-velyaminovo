@@ -1,483 +1,1066 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Конструктор семейного дерева</title>
-    <style>
-        :root {
-            --primary: #4a7c59;
-            --primary-hover: #386043;
-            --bg: #f4f7f5;
-            --card-bg: #ffffff;
-            --text: #333333;
-            --border: #cccccc;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Конструктор семейного дерева</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f6fb;
+      color: #222;
+    }
 
-        h1 {
-            color: var(--primary);
-            margin-bottom: 10px;
-        }
+    header {
+      background: #2f5bea;
+      color: white;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
 
-        .controls {
-            background: var(--card-bg);
-            padding: 15px 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
+    header h1 {
+      margin: 0;
+      font-size: 22px;
+    }
 
-        button, .btn-label {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background 0.2s;
-            display: inline-block;
-        }
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
 
-        button:hover, .btn-label:hover {
-            background-color: var(--primary-hover);
-        }
+    button {
+      border: none;
+      background: #2f5bea;
+      color: white;
+      padding: 9px 13px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: 0.2s;
+    }
 
-        input[type="file"] {
-            display: none;
-        }
+    button:hover {
+      background: #2448bd;
+    }
 
-        .tree-container {
-            width: 100%;
-            overflow-x: auto;
-            padding: 40px 20px;
-            display: flex;
-            justify-content: center;
-        }
+    button.secondary {
+      background: #eef2ff;
+      color: #2f5bea;
+    }
 
-        .tree {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+    button.secondary:hover {
+      background: #dbe4ff;
+    }
 
-        .node-children {
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            position: relative;
-            padding-top: 20px;
-            margin-top: 20px;
-        }
+    button.danger {
+      background: #e53935;
+    }
 
-        /* Линии связи */
-        .node-children::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 50%;
-            border-left: 2px solid var(--border);
-            width: 0;
-            height: 20px;
-        }
+    button.danger:hover {
+      background: #b92522;
+    }
 
-        .child-wrapper {
-            position: relative;
-            padding: 0 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+    button.gray {
+      background: #64748b;
+    }
 
-        .child-wrapper::before, .child-wrapper::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 50%;
-            border-top: 2px solid var(--border);
-            width: 50%;
-            height: 20px;
-        }
+    button.gray:hover {
+      background: #475569;
+    }
 
-        .child-wrapper::after {
-            right: auto;
-            left: 50%;
-            border-left: 2px solid var(--border);
-        }
+    .app {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      min-height: calc(100vh - 68px);
+    }
 
-        .child-wrapper:only-child::after, .child-wrapper:only-child::before {
-            display: none;
-        }
+    aside {
+      background: white;
+      border-right: 1px solid #ddd;
+      padding: 18px;
+      overflow-y: auto;
+    }
 
-        .child-wrapper:only-child {
-            padding-top: 0;
-        }
+    main {
+      padding: 18px;
+      overflow: auto;
+      position: relative;
+    }
 
-        .child-wrapper:first-child::before {
-            border: 0 none;
-        }
+    .panel-title {
+      margin: 0 0 12px;
+      font-size: 18px;
+    }
 
-        .child-wrapper:last-child::after {
-            border-right: 2px solid var(--border);
-            border-left: 0 none;
-        }
+    .form-group {
+      margin-bottom: 12px;
+    }
 
-        .child-wrapper:last-child::before {
-            border-right: 2px solid var(--border);
-        }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 13px;
+      color: #555;
+    }
 
-        /* Карточка человека */
-        .person-card {
-            background: var(--card-bg);
-            border: 2px solid var(--primary);
-            border-radius: 8px;
-            padding: 10px;
-            width: 180px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            text-align: center;
-            position: relative;
-            z-index: 10;
-        }
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 9px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      background: white;
+    }
 
-        .photo-container {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 10px;
-            border-radius: 50%;
-            border: 2px dashed var(--border);
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #fafafa;
-            cursor: pointer;
-            position: relative;
-        }
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #2f5bea;
+      box-shadow: 0 0 0 2px rgba(47, 91, 234, 0.15);
+    }
 
-        .photo-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+    textarea {
+      min-height: 70px;
+      resize: vertical;
+    }
 
-        .photo-placeholder {
-            font-size: 24px;
-            color: #999;
-        }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
 
-        .input-field {
-            width: 90%;
-            margin: 4px 0;
-            padding: 4px;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            font-size: 13px;
-            text-align: center;
-        }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+    }
 
-        .dates-group {
-            display: flex;
-            gap: 4px;
-            justify-content: space-between;
-        }
+    .hint {
+      font-size: 13px;
+      color: #666;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 10px;
+      border-radius: 10px;
+      line-height: 1.45;
+      margin-bottom: 14px;
+    }
 
-        .dates-group .input-field {
-            width: 45%;
-        }
+    .people-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 12px;
+      max-height: 260px;
+      overflow-y: auto;
+    }
 
-        .card-actions {
-            margin-top: 8px;
-            display: flex;
-            justify-content: space-around;
-        }
+    .person-list-item {
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 10px;
+      cursor: pointer;
+      background: #fff;
+      transition: 0.2s;
+    }
 
-        .action-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            padding: 2px;
-            color: #555;
-        }
+    .person-list-item:hover {
+      background: #f8fafc;
+      border-color: #2f5bea;
+    }
 
-        .action-btn:hover {
-            color: var(--primary);
-        }
+    .person-list-item.active {
+      border-color: #2f5bea;
+      background: #eef2ff;
+    }
 
-        .delete-btn:hover {
-            color: #d9534f;
-        }
-    </style>
+    .person-list-item strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .person-list-item span {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .tree-wrapper {
+      background:
+        linear-gradient(#e9eef8 1px, transparent 1px),
+        linear-gradient(90deg, #e9eef8 1px, transparent 1px);
+      background-size: 24px 24px;
+      border: 1px solid #dce3f0;
+      border-radius: 14px;
+      min-height: 720px;
+      min-width: 900px;
+      padding: 30px;
+      position: relative;
+    }
+
+    .tree {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 46px;
+      position: relative;
+      padding-bottom: 60px;
+    }
+
+    .generation {
+      display: flex;
+      gap: 26px;
+      justify-content: center;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      width: 100%;
+      position: relative;
+    }
+
+    .card {
+      width: 190px;
+      background: white;
+      border: 2px solid #cbd5e1;
+      border-radius: 14px;
+      padding: 12px;
+      text-align: center;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+      cursor: pointer;
+      position: relative;
+      transition: 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+    }
+
+    .card.active {
+      border-color: #2f5bea;
+      box-shadow: 0 0 0 4px rgba(47, 91, 234, 0.15);
+    }
+
+    .avatar {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: #eef2ff;
+      color: #2f5bea;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 8px;
+      font-weight: bold;
+      font-size: 22px;
+      overflow: hidden;
+      border: 2px solid #dbe4ff;
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .name {
+      font-weight: bold;
+      font-size: 15px;
+      margin-bottom: 4px;
+      word-break: break-word;
+    }
+
+    .dates {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 5px;
+    }
+
+    .role {
+      display: inline-block;
+      font-size: 11px;
+      padding: 3px 7px;
+      background: #f1f5f9;
+      border-radius: 20px;
+      color: #475569;
+      margin-bottom: 6px;
+    }
+
+    .note {
+      font-size: 12px;
+      color: #555;
+      max-height: 36px;
+      overflow: hidden;
+    }
+
+    .connector {
+      position: absolute;
+      left: 50%;
+      top: -32px;
+      width: 2px;
+      height: 32px;
+      background: #94a3b8;
+    }
+
+    .empty {
+      text-align: center;
+      color: #64748b;
+      padding: 80px 20px;
+    }
+
+    .search {
+      margin-bottom: 10px;
+    }
+
+    .small-text {
+      font-size: 12px;
+      color: #777;
+      line-height: 1.45;
+    }
+
+    .divider {
+      height: 1px;
+      background: #e2e8f0;
+      margin: 16px 0;
+    }
+
+    @media print {
+      header,
+      aside {
+        display: none;
+      }
+
+      .app {
+        display: block;
+      }
+
+      main {
+        padding: 0;
+      }
+
+      .tree-wrapper {
+        border: none;
+        min-width: auto;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      aside {
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .tree-wrapper {
+        min-width: 720px;
+      }
+    }
+  </style>
 </head>
 <body>
-
+  <header>
     <h1>Конструктор семейного дерева</h1>
-    
-    <div class="controls">
-        <button onclick="exportTree()">💾 Сохранить дерево</button>
-        <label class="btn-label" for="import-file">📂 Загрузить дерево</label>
-        <input type="file" id="import-file" accept=".json" onchange="importTree(event)">
-        <button onclick="resetTree()" style="background-color: #d9534f;">🗑️ Сбросить</button>
+    <div class="header-actions">
+      <button class="secondary" onclick="downloadJSON()">Скачать JSON</button>
+      <button class="secondary" onclick="document.getElementById('importFile').click()">Импорт JSON</button>
+      <button class="secondary" onclick="window.print()">Печать</button>
+      <button class="danger" onclick="clearAll()">Очистить</button>
+      <input id="importFile" type="file" accept="application/json" hidden onchange="importJSON(event)">
     </div>
+  </header>
 
-    <div class="tree-container">
-        <div id="tree-root" class="tree"></div>
-    </div>
+  <div class="app">
+    <aside>
+      <h2 class="panel-title">Карточка человека</h2>
 
-    <script>
-        // Структура данных по умолчанию
-        let treeData = {
-            id: "1",
-            name: "Иван Иванов",
-            birthYear: "1950",
-            deathYear: "",
-            photo: "",
-            children: []
+      <div class="hint">
+        Добавьте человека, затем выберите для него родителя. Дерево строится автоматически по поколениям.
+      </div>
+
+      <div class="form-group">
+        <label>Выбранный человек</label>
+        <select id="personSelect" onchange="selectPerson(this.value)">
+          <option value="">Никто не выбран</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>ФИО</label>
+        <input id="name" placeholder="Например: Иван Петров">
+      </div>
+
+      <div class="row">
+        <div class="form-group">
+          <label>Год рождения</label>
+          <input id="birth" placeholder="1970">
+        </div>
+
+        <div class="form-group">
+          <label>Год смерти</label>
+          <input id="death" placeholder="если есть">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Пол</label>
+        <select id="gender">
+          <option value="">Не указан</option>
+          <option value="Мужчина">Мужчина</option>
+          <option value="Женщина">Женщина</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Родитель</label>
+        <select id="parent">
+          <option value="">Нет родителя / основатель дерева</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Фото</label>
+        <input id="photo" type="file" accept="image/*" onchange="loadPhoto(event)">
+        <div class="small-text">Фото сохраняется внутри браузера вместе с деревом.</div>
+      </div>
+
+      <div class="form-group">
+        <label>Заметка</label>
+        <textarea id="note" placeholder="Род занятий, место проживания, важные факты"></textarea>
+      </div>
+
+      <div class="actions">
+        <button onclick="addPerson()">Добавить</button>
+        <button class="gray" onclick="savePerson()">Сохранить</button>
+        <button class="danger" onclick="deletePerson()">Удалить</button>
+      </div>
+
+      <div class="actions">
+        <button class="secondary" onclick="resetForm()">Новая карточка</button>
+        <button class="secondary" onclick="addDemo()">Пример</button>
+      </div>
+
+      <div class="divider"></div>
+
+      <h2 class="panel-title">Люди в дереве</h2>
+      <input class="search" id="search" placeholder="Поиск по имени..." oninput="renderPeopleList()">
+      <div id="peopleList" class="people-list"></div>
+    </aside>
+
+    <main>
+      <div id="treeWrapper" class="tree-wrapper">
+        <div id="tree" class="tree"></div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    var people = [];
+    var selectedId = "";
+    var currentPhoto = "";
+
+    try {
+      people = JSON.parse(localStorage.getItem("familyTreePeople") || "[]");
+      if (!Array.isArray(people)) {
+        people = [];
+      }
+    } catch (e) {
+      people = [];
+    }
+
+    function uid() {
+      return Date.now().toString(36) + Math.random().toString(36).slice(2);
+    }
+
+    function saveStorage() {
+      localStorage.setItem("familyTreePeople", JSON.stringify(people));
+    }
+
+    function getValue(id) {
+      return document.getElementById(id).value.trim();
+    }
+
+    function setValue(id, value) {
+      document.getElementById(id).value = value || "";
+    }
+
+    function resetForm() {
+      selectedId = "";
+      currentPhoto = "";
+
+      document.getElementById("personSelect").value = "";
+      setValue("name", "");
+      setValue("birth", "");
+      setValue("death", "");
+      setValue("gender", "");
+      setValue("parent", "");
+      setValue("note", "");
+      document.getElementById("photo").value = "";
+
+      render();
+    }
+
+    function loadPhoto(event) {
+      var file = event.target.files[0];
+
+      if (!file) {
+        return;
+      }
+
+      var reader = new FileReader();
+
+      reader.onload = function(e) {
+        currentPhoto = e.target.result;
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    function addPerson() {
+      var name = getValue("name");
+
+      if (!name) {
+        alert("Введите ФИО.");
+        return;
+      }
+
+      var parentId = getValue("parent");
+
+      var person = {
+        id: uid(),
+        name: name,
+        birth: getValue("birth"),
+        death: getValue("death"),
+        gender: getValue("gender"),
+        parentId: parentId,
+        photo: currentPhoto,
+        note: getValue("note")
+      };
+
+      people.push(person);
+      selectedId = person.id;
+
+      saveStorage();
+      render();
+      fillForm(person);
+    }
+
+    function savePerson() {
+      if (!selectedId) {
+        alert("Сначала выберите человека или добавьте нового.");
+        return;
+      }
+
+      var person = people.find(function(p) {
+        return p.id === selectedId;
+      });
+
+      if (!person) {
+        return;
+      }
+
+      var parentId = getValue("parent");
+
+      if (parentId === selectedId) {
+        alert("Человек не может быть родителем самому себе.");
+        return;
+      }
+
+      if (isDescendant(parentId, selectedId)) {
+        alert("Нельзя назначить потомка родителем.");
+        return;
+      }
+
+      var name = getValue("name");
+
+      if (!name) {
+        alert("Введите ФИО.");
+        return;
+      }
+
+      person.name = name;
+      person.birth = getValue("birth");
+      person.death = getValue("death");
+      person.gender = getValue("gender");
+      person.parentId = parentId;
+      person.note = getValue("note");
+
+      if (currentPhoto) {
+        person.photo = currentPhoto;
+      }
+
+      saveStorage();
+      render();
+    }
+
+    function deletePerson() {
+      if (!selectedId) {
+        alert("Выберите человека для удаления.");
+        return;
+      }
+
+      var person = people.find(function(p) {
+        return p.id === selectedId;
+      });
+
+      if (!person) {
+        return;
+      }
+
+      if (!confirm('Удалить "' + person.name + '"? Его дети станут основателями дерева.')) {
+        return;
+      }
+
+      people = people.filter(function(p) {
+        return p.id !== selectedId;
+      });
+
+      people.forEach(function(p) {
+        if (p.parentId === selectedId) {
+          p.parentId = "";
+        }
+      });
+
+      selectedId = "";
+      currentPhoto = "";
+
+      saveStorage();
+      resetForm();
+      render();
+    }
+
+    function selectPerson(id) {
+      selectedId = id;
+
+      if (!id) {
+        resetForm();
+        return;
+      }
+
+      var person = people.find(function(p) {
+        return p.id === id;
+      });
+
+      if (person) {
+        fillForm(person);
+      }
+
+      render();
+    }
+
+    function fillForm(person) {
+      selectedId = person.id;
+      currentPhoto = person.photo || "";
+
+      setValue("name", person.name);
+      setValue("birth", person.birth);
+      setValue("death", person.death);
+      setValue("gender", person.gender);
+      setValue("parent", person.parentId);
+      setValue("note", person.note);
+
+      document.getElementById("personSelect").value = person.id;
+      document.getElementById("photo").value = "";
+    }
+
+    function isDescendant(possibleChildId, parentId) {
+      if (!possibleChildId || !parentId) {
+        return false;
+      }
+
+      var current = people.find(function(p) {
+        return p.id === possibleChildId;
+      });
+
+      while (current) {
+        if (current.parentId === parentId) {
+          return true;
+        }
+
+        current = people.find(function(p) {
+          return p.id === current.parentId;
+        });
+      }
+
+      return false;
+    }
+
+    function getInitials(name) {
+      return String(name || "")
+        .split(" ")
+        .filter(function(word) {
+          return Boolean(word);
+        })
+        .slice(0, 2)
+        .map(function(word) {
+          return word[0].toUpperCase();
+        })
+        .join("");
+    }
+
+    function buildLevels() {
+      var roots = people.filter(function(p) {
+        return !p.parentId || !people.some(function(x) {
+          return x.id === p.parentId;
+        });
+      });
+
+      var levels = [];
+      var visited = {};
+
+      function walk(person, level) {
+        if (visited[person.id]) {
+          return;
+        }
+
+        visited[person.id] = true;
+
+        if (!levels[level]) {
+          levels[level] = [];
+        }
+
+        levels[level].push(person);
+
+        var children = people
+          .filter(function(p) {
+            return p.parentId === person.id;
+          })
+          .sort(function(a, b) {
+            return a.name.localeCompare(b.name);
+          });
+
+        children.forEach(function(child) {
+          walk(child, level + 1);
+        });
+      }
+
+      roots
+        .sort(function(a, b) {
+          return a.name.localeCompare(b.name);
+        })
+        .forEach(function(root) {
+          walk(root, 0);
+        });
+
+      people.forEach(function(p) {
+        if (!visited[p.id]) {
+          if (!levels[0]) {
+            levels[0] = [];
+          }
+
+          levels[0].push(p);
+        }
+      });
+
+      return levels;
+    }
+
+    function renderTree() {
+      var tree = document.getElementById("tree");
+      tree.innerHTML = "";
+
+      if (!people.length) {
+        tree.innerHTML =
+          '<div class="empty">' +
+            '<h2>Дерево пока пустое</h2>' +
+            '<p>Добавьте первого человека слева или нажмите «Пример».</p>' +
+          '</div>';
+        return;
+      }
+
+      var levels = buildLevels();
+
+      levels.forEach(function(level) {
+        var generation = document.createElement("div");
+        generation.className = "generation";
+
+        level.forEach(function(person) {
+          var card = document.createElement("div");
+          card.className = "card" + (person.id === selectedId ? " active" : "");
+          card.onclick = function() {
+            selectPerson(person.id);
+          };
+
+          var dates = (person.birth || "?") + " — " + (person.death || "");
+
+          var avatarHTML = "";
+
+          if (person.photo) {
+            avatarHTML = '<img src="' + person.photo + '" alt="">';
+          } else {
+            avatarHTML = escapeHTML(getInitials(person.name));
+          }
+
+          card.innerHTML =
+            (person.parentId ? '<div class="connector"></div>' : '') +
+            '<div class="avatar">' + avatarHTML + '</div>' +
+            '<div class="name">' + escapeHTML(person.name) + '</div>' +
+            '<div class="dates">' + escapeHTML(dates) + '</div>' +
+            (person.gender ? '<div class="role">' + escapeHTML(person.gender) + '</div>' : '') +
+            (person.note ? '<div class="note">' + escapeHTML(person.note) + '</div>' : '');
+
+          generation.appendChild(card);
+        });
+
+        tree.appendChild(generation);
+      });
+    }
+
+    function renderSelects() {
+      var personSelect = document.getElementById("personSelect");
+      var parentSelect = document.getElementById("parent");
+
+      personSelect.innerHTML = '<option value="">Никто не выбран</option>';
+      parentSelect.innerHTML = '<option value="">Нет родителя / основатель дерева</option>';
+
+      people
+        .slice()
+        .sort(function(a, b) {
+          return a.name.localeCompare(b.name);
+        })
+        .forEach(function(person) {
+          var option1 = document.createElement("option");
+          option1.value = person.id;
+          option1.textContent = person.name;
+          personSelect.appendChild(option1);
+
+          var canBeParent =
+            person.id !== selectedId &&
+            (!selectedId || !isDescendant(person.id, selectedId));
+
+          if (canBeParent) {
+            var option2 = document.createElement("option");
+            option2.value = person.id;
+            option2.textContent = person.name;
+            parentSelect.appendChild(option2);
+          }
+        });
+
+      personSelect.value = selectedId || "";
+
+      var selected = people.find(function(p) {
+        return p.id === selectedId;
+      });
+
+      if (selected) {
+        parentSelect.value = selected.parentId || "";
+      }
+    }
+
+    function renderPeopleList() {
+      var container = document.getElementById("peopleList");
+      var query = getValue("search").toLowerCase();
+
+      container.innerHTML = "";
+
+      var filtered = people
+        .filter(function(p) {
+          return p.name.toLowerCase().indexOf(query) !== -1;
+        })
+        .sort(function(a, b) {
+          return a.name.localeCompare(b.name);
+        });
+
+      if (!filtered.length) {
+        container.innerHTML = '<div class="small-text">Ничего не найдено.</div>';
+        return;
+      }
+
+      filtered.forEach(function(person) {
+        var item = document.createElement("div");
+        item.className = "person-list-item" + (person.id === selectedId ? " active" : "");
+
+        var years = [person.birth, person.death]
+          .filter(function(value) {
+            return Boolean(value);
+          })
+          .join(" — ");
+
+        item.innerHTML =
+          '<strong>' + escapeHTML(person.name) + '</strong>' +
+          '<span>' + escapeHTML(years || "Годы не указаны") + '</span>';
+
+        item.onclick = function() {
+          selectPerson(person.id);
         };
 
-        // Инициализация при загрузке страницы
-        window.onload = function() {
-            const savedData = localStorage.getItem('familyTreeData');
-            if (savedData) {
-                try {
-                    treeData = JSON.parse(savedData);
-                } catch(e) {
-                    console.error("Ошибка загрузки из localStorage", e);
-                }
-            }
-            renderTree();
-        };
+        container.appendChild(item);
+      });
+    }
 
-        // Сохранение в localStorage
-        function autoSave() {
-            localStorage.setItem('familyTreeData', JSON.stringify(treeData));
-        }
+    function render() {
+      renderSelects();
+      renderTree();
+      renderPeopleList();
+    }
 
-        // Отрисовка дерева
-        function renderTree() {
-            const container = document.getElementById('tree-root');
-            container.innerHTML = '';
-            container.appendChild(createNodeElement(treeData));
-        }
+    function escapeHTML(text) {
+      return String(text || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
 
-        // Рекурсивное создание DOM элементов дерева
-        function createNodeElement(node) {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'child-wrapper';
+    function downloadJSON() {
+      var data = JSON.stringify(people, null, 2);
+      var blob = new Blob([data], { type: "application/json" });
+      var url = URL.createObjectURL(blob);
+      var link = document.createElement("a");
 
-            // Карточка человека
-            const card = document.createElement('div');
-            card.className = 'person-card';
+      link.href = url;
+      link.download = "family-tree.json";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
 
-            // Контейнер для фото
-            const photoCont = document.createElement('div');
-            photoCont.className = 'photo-container';
-            photoCont.title = 'Нажмите, чтобы загрузить фото';
-            
-            const fileInput = document.createElement('input');
-            fileInput.type = 'file';
-            fileInput.accept = 'image/*';
-            fileInput.onchange = (e) => handlePhotoUpload(e, node);
+      URL.revokeObjectURL(url);
+    }
 
-            photoCont.onclick = () => fileInput.click();
+    function importJSON(event) {
+      var file = event.target.files[0];
 
-            if (node.photo) {
-                const img = document.createElement('img');
-                img.src = node.photo;
-                photoCont.appendChild(img);
-            } else {
-                const placeholder = document.createElement('div');
-                placeholder.className = 'photo-placeholder';
-                placeholder.innerText = '👤';
-                photoCont.appendChild(placeholder);
-            }
+      if (!file) {
+        return;
+      }
 
-            // Поле ввода имени
-            const nameInput = document.createElement('input');
-            nameInput.className = 'input-field';
-            nameInput.type = 'text';
-            nameInput.placeholder = 'Имя Фамилия';
-            nameInput.value = node.name || '';
-            nameInput.oninput = (e) => { node.name = e.target.value; autoSave(); };
+      var reader = new FileReader();
 
-            // Группа дат
-            const datesGroup = document.createElement('div');
-            datesGroup.className = 'dates-group';
+      reader.onload = function(e) {
+        try {
+          var data = JSON.parse(e.target.result);
 
-            const birthInput = document.createElement('input');
-            birthInput.className = 'input-field';
-            birthInput.type = 'text';
-            birthInput.placeholder = 'Рожд.';
-            birthInput.value = node.birthYear || '';
-            birthInput.oninput = (e) => { node.birthYear = e.target.value; autoSave(); };
+          if (!Array.isArray(data)) {
+            throw new Error("Неверный формат файла.");
+          }
 
-            const deathInput = document.createElement('input');
-            deathInput.className = 'input-field';
-            deathInput.type = 'text';
-            deathInput.placeholder = 'Смерть';
-            deathInput.value = node.deathYear || '';
-            deathInput.oninput = (e) => { node.deathYear = e.target.value; autoSave(); };
-
-            datesGroup.appendChild(birthInput);
-            datesGroup.appendChild(deathInput);
-
-            // Кнопки действий
-            const actions = document.createElement('div');
-            actions.className = 'card-actions';
-
-            const addChildBtn = document.createElement('button');
-            addChildBtn.className = 'action-btn';
-            addChildBtn.innerHTML = '➕ Ребёнок';
-            addChildBtn.title = 'Добавить ребёнка';
-            addChildBtn.onclick = () => addChild(node);
-
-            actions.appendChild(addChildBtn);
-
-            // Кнопка удаления (нельзя удалить корень)
-            if (node !== treeData) {
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'action-btn delete-btn';
-                deleteBtn.innerHTML = '🗑️';
-                deleteBtn.title = 'Удалить';
-                deleteBtn.onclick = () => deleteNode(treeData, node.id);
-                actions.appendChild(deleteBtn);
-            }
-
-            card.appendChild(photoCont);
-            card.appendChild(nameInput);
-            card.appendChild(datesGroup);
-            card.appendChild(actions);
-            wrapper.appendChild(card);
-
-            // Рендер детей
-            if (node.children && node.children.length > 0) {
-                const childrenContainer = document.createElement('div');
-                childrenContainer.className = 'node-children';
-                node.children.forEach(child => {
-                    childrenContainer.appendChild(createNodeElement(child));
-                });
-                wrapper.appendChild(childrenContainer);
-            }
-
-            return wrapper;
-        }
-
-        // Обработка загрузки фотографии
-        function handlePhotoUpload(event, node) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    node.photo = e.target.result; // Сохраняем как Base64
-                    autoSave();
-                    renderTree();
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        // Добавление ребёнка
-        function addChild(parentNode) {
-            if (!parentNode.children) parentNode.children = [];
-            parentNode.children.push({
-                id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
-                name: '',
-                birthYear: '',
-                deathYear: '',
-                photo: '',
-                children: []
-            });
-            autoSave();
-            renderTree();
-        }
-
-        // Рекурсивное удаление узла
-        function deleteNode(current, idToDelete) {
-            if (!current.children) return false;
-            
-            const index = current.children.findIndex(child => child.id === idToDelete);
-            if (index !== -1) {
-                if (confirm('Вы уверены, что хотите удалить этого человека и всех его потомков?')) {
-                    current.children.splice(index, 1);
-                    autoSave();
-                    renderTree();
-                    return true;
-                }
-                return false;
-            }
-
-            for (let child of current.children) {
-                if (deleteNode(child, idToDelete)) return true;
-            }
-            return false;
-        }
-
-        // Экспорт в файл JSON
-        function exportTree() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(treeData, null, 2));
-            const downloadAnchorElement = document.createElement('a');
-            downloadAnchorElement.setAttribute("href", dataStr);
-            downloadAnchorElement.setAttribute("download", "family_tree.json");
-            document.body.appendChild(downloadAnchorElement);
-            downloadAnchorElement.click();
-            downloadAnchorElement.remove();
-        }
-
-        // Импорт из файла JSON
-        function importTree(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const parsed = JSON.parse(e.target.result);
-                    if (parsed && typeof parsed === 'object' && parsed.name !== undefined) {
-                        treeData = parsed;
-                        autoSave();
-                        renderTree();
-                    } else {
-                        alert('Неверный формат файла дерева.');
-                    }
-                } catch (err) {
-                    alert('Ошибка при чтении файла.');
-                }
+          people = data.map(function(p) {
+            return {
+              id: p.id || uid(),
+              name: p.name || "Без имени",
+              birth: p.birth || "",
+              death: p.death || "",
+              gender: p.gender || "",
+              parentId: p.parentId || "",
+              photo: p.photo || "",
+              note: p.note || ""
             };
-            reader.readAsText(file);
-            event.target.value = ''; // Сброс инпута
-        }
+          });
 
-        // Сброс всего дерева
-        function resetTree() {
-            if (confirm('Вы уверены, что хотите полностью очистить дерево? Все несохраненные данные будут утеряны.')) {
-                treeData = {
-                    id: "1",
-                    name: "Новый предок",
-                    birthYear: "",
-                    deathYear: "",
-                    photo: "",
-                    children: []
-                };
-                autoSave();
-                renderTree();
-            }
+          selectedId = "";
+          currentPhoto = "";
+
+          saveStorage();
+          resetForm();
+          render();
+
+          alert("Дерево импортировано.");
+        } catch (err) {
+          alert("Не удалось импортировать файл JSON.");
         }
-    </script>
+      };
+
+      reader.readAsText(file);
+      event.target.value = "";
+    }
+
+    function clearAll() {
+      if (!confirm("Полностью очистить семейное дерево?")) {
+        return;
+      }
+
+      people = [];
+      selectedId = "";
+      currentPhoto = "";
+
+      saveStorage();
+      resetForm();
+      render();
+    }
+
+    function addDemo() {
+      if (people.length && !confirm("Добавить пример к текущему дереву?")) {
+        return;
+      }
+
+      var grandpa = {
+        id: uid(),
+        name: "Алексей Иванов",
+        birth: "1938",
+        death: "2010",
+        gender: "Мужчина",
+        parentId: "",
+        photo: "",
+        note: "Основатель ветви"
+      };
+
+      var grandma = {
+        id: uid(),
+        name: "Мария Иванова",
+        birth: "1942",
+        death: "",
+        gender: "Женщина",
+        parentId: "",
+        photo: "",
+        note: "Основательница ветви"
+      };
+
+      var father = {
+        id: uid(),
+        name: "Сергей Иванов",
+        birth: "1968",
+        death: "",
+        gender: "Мужчина",
+        parentId: grandpa.id,
+        photo: "",
+        note: "Сын Алексея"
+      };
+
+      var aunt = {
+        id: uid(),
+        name: "Елена Смирнова",
+        birth: "1972",
+        death: "",
+        gender: "Женщина",
+        parentId: grandpa.id,
+        photo: "",
+        note: "Дочь Алексея"
+      };
+
+      var child = {
+        id: uid(),
+        name: "Анна Иванова",
+        birth: "1995",
+        death: "",
+        gender: "Женщина",
+        parentId: father.id,
+        photo: "",
+        note: "Внучка Алексея"
+      };
+
+      people.push(grandpa, grandma, father, aunt, child);
+
+      saveStorage();
+      render();
+    }
+
+    render();
+  </script>
 </body>
 </html>
