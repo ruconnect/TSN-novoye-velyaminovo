@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Загородная жизнь vs Москва</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .presentation {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.6s ease-in-out;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .slide.prev {
+            transform: translateX(-100%);
+        }
+
+        .slide-content {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 50px;
+            max-width: 1000px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3em;
+            color: #2d3748;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            font-size: 2.5em;
+            color: #4a5568;
+            margin-bottom: 40px;
+        }
+
+        h3 {
+            font-size: 2em;
+            color: #5a67d8;
+            margin-bottom: 25px;
+        }
+
+        p {
+            font-size: 1.3em;
+            color: #4a5568;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 30px;
+        }
+
+        .comparison-box {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 30px;
+            border-radius: 15px;
+            color: white;
+        }
+
+        .comparison-box.good {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .comparison-box h4 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+        }
+
+        .comparison-box ul {
+            list-style: none;
+            text-align: left;
+        }
+
+        .comparison-box li {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .comparison-box li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        .comparison-box.bad li:before {
+            content: "✗";
+        }
+
+        .benefits {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .benefit-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .benefit-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .benefit-card .icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .benefit-card h4 {
+            font-size: 1.5em;
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+
+        .benefit-card p {
+            font-size: 1.1em;
+            color: #718096;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .stat-number {
+            font-size: 3em;
+            font-weight: bold;
+            color: #5a67d8;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 1.2em;
+            color: #4a5568;
+            margin-top: 10px;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            color: #4a5568;
+            font-weight: bold;
+        }
+
+        .nav-btn:hover {
+            background: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .slide-counter {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 1.2em;
+            color: #4a5568;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #ffd89b 0%, #19547b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: bold;
+        }
+
+        .title-slide {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%);
+        }
+
+        .title-slide .slide-content {
+            background: transparent;
+            color: white;
+        }
+
+        .title-slide h1 {
+            color: white;
+            font-size: 3.5em;
+        }
+
+        .title-slide p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.5em;
+        }
+
+        @media (max-width: 768px) {
+            .slide-content {
+                padding: 30px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            h2 {
+                font-size: 1.8em;
+            }
+
+            .comparison, .benefits {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        <!-- Slide 1: Title -->
+        <div class="slide title-slide active">
+            <div class="slide-content">
+                <div class="icon">🏡</div>
+                <h1>Загородная жизнь<br>vs<br>Жизнь в Москве</h1>
+                <p>Почему пластиковый погреб, огород и колодец — это лучший выбор</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Problems of City Life -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>🏙️ Проблемы городской жизни</h2>
+                <div class="comparison">
+                    <div class="comparison-box bad">
+                        <h4>Москва</h4>
+                        <ul>
+                            <li>Шум и суета 24/7</li>
+                            <li>Загрязнённый воздух</li>
+                            <li>Высокая стоимость продуктов</li>
+                            <li>Маленькие квартиры</li>
+                            <li>Стресс и усталость</li>
+                            <li>Зависимость от магазинов</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-box good">
+                        <h4>Загород</h4>
+                        <ul>
+                            <li>Тишина и спокойствие</li>
+                            <li>Чистый воздух и природа</li>
+                            <li>Свои свежие продукты</li>
+                            <li>Просторный дом с участком</li>
+                            <li>Здоровье и энергия</li>
+                            <li>Автономность и независимость</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Plastic Cellar -->
+        <div class="slide">
+            <div class="slide-content">
+                <div class="icon">📦</div>
+                <h2>Пластиковый погреб</h2>
+                <h3>Идеальное хранилище для ваших запасов</h3>
+                <div class="benefits">
+                    <div class="benefit-card">
+                        <div class="icon">💧</div>
+                        <h4>Герметичность</h4>
+                        <p>Полная защита от влаги, грызунов и насекомых</p>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="icon">🌡️</div>
+                        <h4>Стабильная температура</h4>
+                        <p>Оптимальные условия для хранения продуктов круглый год</p>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="icon">⚡</div>
+                        <h4>Лёгкий монтаж</h4>
+                        <p>Установка за 1 день без специальной техники</p>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="icon">💰</div>
+                        <h4>Экономия</h4>
+                        <p>Служит 50+ лет, не требует обслуживания</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Garden -->
+        <div class="slide">
+            <div class="slide-content">
+                <div class="icon">🥕</div>
+                <h2>Свой огород</h2>
+                <h3>Свежие продукты прямо с грядки</h3>
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-number">100%</span>
+                        <span class="stat-label">Натуральные продукты</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">0%</span>
+                        <span class="stat-label">Химикатов и пестицидов</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">50%</span>
+                        <span class="stat-label">Экономия на продуктах</span>
+                    </div>
+                </div>
+                <p style="margin-top: 30px; font-size: 1.2em;">
+                    Выращивайте овощи, фрукты и зелень без химии.<br>
+                    Знайте точно, что ест ваша семья!
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 5: Well -->
+        <div class="slide">
+            <div class="slide-content">
+                <div class="icon">🪣</div>
+                <h2>Колодец</h2>
+                <h3>Чистая вода из собственного источника</h3>
+                <div class="benefits">
+                    <div class="benefit-card">
+                        <div class="icon">💎</div>
+                        <h4>Кристальная чистота</h4>
+                        <p>Природная вода без хлора и химических добавок</p>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="icon">🆓</div>
+                        <h4>Бесплатно</h4>
+                        <p>Никаких счетов за водоснабжение</p>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="icon">🛡️</div>
+                        <h4>Автономность</h4>
+                        <p>Независимость от городских коммуникаций</p>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="icon">❤️</div>
+                        <h4>Здоровье</h4>
+                        <p>Живая вода с природными минералами</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Financial Comparison -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>💵 Финансовая выгода</h2>
+                <div class="comparison">
+                    <div class="comparison-box bad">
+                        <h4>Расходы в Москве</h4>
+                        <ul>
+                            <li>Аренда квартиры: 60 000₽/мес</li>
+                            <li>Продукты: 40 000₽/мес</li>
+                            <li>Коммунальные: 8 000₽/мес</li>
+                            <li>Транспорт: 5 000₽/мес</li>
+                            <li><strong>Итого: 113 000₽/мес</strong></li>
+                        </ul>
+                    </div>
+                    <div class="comparison-box good">
+                        <h4>Расходы за городом</h4>
+                        <ul>
+                            <li>Свой дом: 0₽ (уже ваш)</li>
+                            <li>Продукты: 15 000₽/мес (свои)</li>
+                            <li>Коммунальные: 3 000₽/мес</li>
+                            <li>Транспорт: 3 000₽/мес</li>
+                            <li><strong>Итого: 21 000₽/мес</strong></li>
+                        </ul>
+                    </div>
+                </div>
+                <p style="margin-top: 30px; font-size: 1.5em; color: #48bb78; font-weight: bold;">
+                    Экономия: 92 000₽ в месяц = 1 104 000₽ в год!
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 7: Health and Ecology -->
+        <div class="slide">
+            <div class="slide-content">
+                <div class="icon">🌿</div>
+                <h2>Здоровье и экология</h2>
+                <div class="benefits">
+                    <div class="benefit-card">
+                        <div class="icon">🫁</div>
+                        <h4>Чистый воздух</h4>
+                        <p>В 10 раз чище, чем в городе. Никаких выхлопных газов</p>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="icon">🧘</div>
+                        <h4>Меньше стресса</h4>
+                        <p>Природа успокаивает, работа в саду лечит душу</p>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="icon">🏃</div>
+                        <h4>Активный образ жизни</h4>
+                        <p>Физическая активность на свежем воздухе</p>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="icon">👨‍👩‍👧‍👦</div>
+                        <h4>Семейные ценности</h4>
+                        <p>Дети растут на природе, учатся трудиться</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Conclusion -->
+        <div class="slide title-slide">
+            <div class="slide-content">
+                <div class="icon">✨</div>
+                <h1>Выбор за вами!</h1>
+                <p style="font-size: 1.8em; margin: 30px 0;">
+                    Загородная жизнь — это<br>
+                    <span class="highlight">здоровье, экономия, свобода и счастье</span>
+                </p>
+                <p style="font-size: 1.5em; margin-top: 40px;">
+                    Пластиковый погреб + огород + колодец<br>
+                    = идеальная формула качественной жизни
+                </p>
+                <p style="font-size: 1.3em; margin-top: 50px; opacity: 0.9;">
+                    Начните менять свою жизнь уже сегодня! 🌟
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-counter">
+        <span id="current-slide">1</span> / <span id="total-slides">8</span>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-btn" id="prev-btn" onclick="changeSlide(-1)">← Назад</button>
+        <button class="nav-btn" id="next-btn" onclick="changeSlide(1)">Далее →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('total-slides').textContent = totalSlides;
+
+        function changeSlide(direction) {
+            const newSlide = currentSlide + direction;
+            
+            if (newSlide >= 0 && newSlide < totalSlides) {
+                slides[currentSlide].classList.remove('active');
+                slides[currentSlide].classList.add(direction > 0 ? 'prev' : '');
+                
+                currentSlide = newSlide;
+                
+                slides[currentSlide].classList.remove('prev');
+                slides[currentSlide].classList.add('active');
+                
+                document.getElementById('current-slide').textContent = currentSlide + 1;
+                
+                updateButtons();
+            }
+        }
+
+        function updateButtons() {
+            document.getElementById('prev-btn').disabled = currentSlide === 0;
+            document.getElementById('next-btn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            if (e.key === 'ArrowRight') changeSlide(1);
+        });
+
+        updateButtons();
+    </script>
+</body>
+</html>
